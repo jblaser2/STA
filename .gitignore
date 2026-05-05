@@ -1,0 +1,28 @@
+# Ignore large microscopy / data files
+
+*.mrc
+*.mrcs
+*.map
+
+# RELION / cryo-EM metadata
+
+*.star
+
+# HDF5 data formats
+
+*.hdf
+*.h5
+*.hdf5
+
+# Optional: other large binary data formats
+
+*.bin
+*.dat
+
+# Ignore compressed archives (often large)
+
+*.zip
+*.tar
+*.gz
+*.bz2
+*.7z
