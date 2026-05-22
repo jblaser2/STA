@@ -1,0 +1,90 @@
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2024 The MathWorks, Inc.
+             R2024a Update 8 (24.1.0.3050227) 64-bit (glnxa64)
+                              October 13, 2025
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+ 
+   An installation of  Dynamo has been located with home folder:    /home/jblaser2/Research/dynamo   
+ 
+[warning] Path conflict detected 
+  A total of 1 Dynamo shorthand function names are now shadowing previous functions in your previous Matlab path
+dvput 
+ 
+   Checking operativity of MEX files in your architecture...
+Launching a sample mex file...
+If the screen is stuck here, there is some problem...
+ 
+ MEX files are ok: Dynamo is ready.
+ 
+------------------------------------------------------------
+ 
+ Dynamo version: v-1.1.558 
+ 
+For general help on the available commands, type:
+ >> doc Dynamo
+ or 
+ >> dhelp
+ 
+For a menu of different GUI tools, type: 
+ >> dynamo;
+ 
+ [ok] The Matlab version of Dynamo is installed and operative. 
+  
+------------------------------------------------------------
+ 
+Note: Dynamo is setting Matlab to use classical graphic controls.
+=== Dynamo HAC Classification ===
+Data:      /home/jblaser2/Research/STA/subtomos_mrc
+Output:    /home/jblaser2/Research/STA/outputs/hac_classification
+Classes:   2
+
+[1/4] Loading particles...
+  Found 672 particles
+  Box size: 80^3
+  Loaded 50 / 672
+  Loaded 100 / 672
+  Loaded 150 / 672
+  Loaded 200 / 672
+  Loaded 250 / 672
+  Loaded 300 / 672
+  Loaded 350 / 672
+  Loaded 400 / 672
+  Loaded 450 / 672
+  Loaded 500 / 672
+  Loaded 550 / 672
+  Loaded 600 / 672
+  Loaded 650 / 672
+  Done loading.
+
+[2/4] Building spherical mask (radius=20 voxels)...
+  Active voxels: 42691 / 512000 (8.3%)
+
+[3/4] Computing 672x672 CC matrix (~225456 pairs)...
+  Found existing ccmatrix, loading it.
+
+[4/4] Running HAC (N=2 classes)...
+[Warning: ward's linkage specified with non-Euclidean dissimilarity matrix.] 
+[> In linkage (line 183)
+In hac_classification (line 106)
+In run (line 112)] 
+  Cophenetic correlation: 0.2820  (closer to 1 = better hierarchy)
+  Dendrogram saved.
+
+  Class sizes:
+    Class 1: 231 particles
+    Class 2: 441 particles
+
+=== Done ===
+Class averages: /home/jblaser2/Research/STA/outputs/hac_classification/class_averages/
+Assignments:    /home/jblaser2/Research/STA/outputs/hac_classification/class_assignments.txt
+Dendrogram:     /home/jblaser2/Research/STA/outputs/hac_classification/dendrogram.png
+
+To re-run with a different number of classes without recomputing
+the CC matrix, set N_CLASSES and run the script again
+(the saved ccmatrix.mat will be reloaded automatically).
+[delete:pmodelpool.Manager] Deletion of model pool manager from memory.

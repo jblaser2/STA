@@ -1,0 +1,97 @@
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2024 The MathWorks, Inc.
+             R2024a Update 8 (24.1.0.3050227) 64-bit (glnxa64)
+                              October 13, 2025
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+ 
+   An installation of  Dynamo has been located with home folder:    /home/jblaser2/Research/dynamo   
+ 
+[warning] Path conflict detected 
+  A total of 1 Dynamo shorthand function names are now shadowing previous functions in your previous Matlab path
+dvput 
+ 
+   Checking operativity of MEX files in your architecture...
+Launching a sample mex file...
+If the screen is stuck here, there is some problem...
+ 
+ MEX files are ok: Dynamo is ready.
+ 
+------------------------------------------------------------
+ 
+ Dynamo version: v-1.1.558 
+ 
+For general help on the available commands, type:
+ >> doc Dynamo
+ or 
+ >> dhelp
+ 
+For a menu of different GUI tools, type: 
+ >> dynamo;
+ 
+ [ok] The Matlab version of Dynamo is installed and operative. 
+  
+------------------------------------------------------------
+ 
+Note: Dynamo is setting Matlab to use classical graphic controls.
+A preference file has been located.
+=== HAC Mask Radius Sweep ===
+Radii:    3  4  5  6  7  8
+Classes:  2
+
+[Setup] Loading 0 particles...
+  Loaded 100 / 672
+  Loaded 200 / 672
+  Loaded 300 / 672
+  Loaded 400 / 672
+  Loaded 500 / 672
+  Loaded 600 / 672
+  Done: 672 particles, box 80^3
+
+--- radius=3, N_CLASSES=2 ---
+[1/4] Using pre-loaded 672 particles (box 80^3)
+[2/4] Building spherical mask (radius=3)...
+  Active voxels: 437 / 512000 (0.1%)
+[3/4] CC matrix...
+  Row 33/672  (10%, ETA ~20 s)
+  Row 66/672  (19%, ETA ~18 s)
+  Row 99/672  (27%, ETA ~16 s)
+  Row 132/672  (35%, ETA ~14 s)
+  Row 165/672  (43%, ETA ~13 s)
+  Row 198/672  (50%, ETA ~11 s)
+  Row 231/672  (57%, ETA ~10 s)
+  Row 264/672  (63%, ETA ~8 s)
+  Row 297/672  (69%, ETA ~7 s)
+  Row 330/672  (74%, ETA ~6 s)
+  Row 363/672  (79%, ETA ~5 s)
+  Row 396/672  (83%, ETA ~4 s)
+  Row 429/672  (87%, ETA ~3 s)
+  Row 462/672  (90%, ETA ~2 s)
+  Row 495/672  (93%, ETA ~2 s)
+  Row 528/672  (95%, ETA ~1 s)
+  Row 561/672  (97%, ETA ~1 s)
+  Row 594/672  (99%, ETA ~0 s)
+  Row 627/672  (100%, ETA ~0 s)
+  Row 660/672  (100%, ETA ~0 s)
+  CC matrix computed in 22 s
+[4/4] HAC (N=2 classes)...
+[Warning: ward's linkage specified with non-Euclidean dissimilarity matrix.] 
+[> In linkage (line 183)
+In hac_run_single (line 74)
+In hac_run_sweep (line 42)
+In run (line 112)] 
+  Cophenetic: 0.2485
+  Class sizes: 1(323) 2(349) 
+  Saved: /home/jblaser2/Research/STA/dynamo/outputs/hac_sweep_small/radius_03/class_comparison_2class.png
+  Total: 25 s
+
+--- radius=4, N_CLASSES=2 ---
+[1/4] Using pre-loaded 672 particles (box 80^3)
+[2/4] Building spherical mask (radius=4)...
+  Active voxels: 751 / 512000 (0.1%)
+[3/4] CC matrix...
+  Row 33/672  (10%, ETA ~21 s)
