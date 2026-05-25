@@ -5,7 +5,7 @@
 %         dynamo_final_results/fsc/resolution.txt     (summary)
 
 DATA_DIR   = '/home/jblaser2/Research/STA/subtomos_mrc';
-R72_DIR    = '/home/jblaser2/Research/STA/dynamo/dynamo_outputs/hac_sweep_fine/radius_7p2';
+R72_DIR    = '/home/jblaser2/Research/STA/dynamo/dynamo_outputs/hac_sweep_final_pick/radius_8p9';
 OUTPUT_DIR = '/home/jblaser2/Research/STA/dynamo/dynamo_final_results';
 PIXEL_ANG  = 13.328;   % Angstroms per voxel
 

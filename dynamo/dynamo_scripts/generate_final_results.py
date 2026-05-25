@@ -29,11 +29,11 @@ from sklearn.manifold import TSNE
 import umap
 
 BASE        = '/home/jblaser2/Research/STA/dynamo'
-R72_DIR     = os.path.join(BASE, 'dynamo_outputs/hac_sweep_fine/radius_7p2')
+R72_DIR     = os.path.join(BASE, 'dynamo_outputs/hac_sweep_final_pick/radius_8p9')
 FINAL_DIR   = os.path.join(BASE, 'dynamo_final_results')
 PIXEL_ANG   = 13.328
-MASK_RADIUS = 7.2
-COPH        = 0.3727
+MASK_RADIUS = 8.9
+COPH        = 0.3574
 
 os.makedirs(os.path.join(FINAL_DIR, 'class_averages'), exist_ok=True)
 os.makedirs(os.path.join(FINAL_DIR, 'fsc'), exist_ok=True)

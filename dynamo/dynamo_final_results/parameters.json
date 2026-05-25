@@ -5,22 +5,22 @@
   "box_size_voxels": 80,
   "pixel_size_angstrom": 13.328,
   "mask_type": "spherical",
-  "mask_radius_voxels": 7.2,
-  "mask_radius_angstrom": 95.96,
+  "mask_radius_voxels": 8.9,
+  "mask_radius_angstrom": 118.62,
   "mask_active_voxels": 2144,
   "mask_active_fraction": 0.0042,
   "linkage": "Ward",
   "distance_metric": "1 - Pearson_CC",
   "n_classes": 2,
   "missing_wedge_correction": false,
-  "cophenetic_correlation": 0.3727,
+  "cophenetic_correlation": 0.3574,
   "class_sizes": {
-    "1": 192,
-    "2": 480
+    "1": 447,
+    "2": 225
   },
   "resolution_fsc05_angstrom": {
-    "1": 96.93,
-    "2": 62.72
+    "1": 62.72,
+    "2": 96.93
   },
   "resolution_fsc0143_angstrom": {
     "1": 26.66,

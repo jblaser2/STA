@@ -111,7 +111,7 @@ save(fullfile(OUTPUT_DIR, 'hac_result.mat'), 'Z', 'T', 'coph', 'MASK_RADIUS', 'N
 
 % PNG comparison
 PYTHON  = '/home/jblaser2/conda-envs/napari-0.4-env/bin/python3';
-PNG_SCR = '/home/jblaser2/Research/STA/dynamo/scripts/save_comparison_png.py';
+PNG_SCR = '/home/jblaser2/Research/STA/dynamo/dynamo_scripts/save_comparison_png.py';
 cmd = sprintf('DISPLAY=:0 QT_QPA_PLATFORM=xcb %s %s "%s" 2>&1', PYTHON, PNG_SCR, OUTPUT_DIR);
 [~, png_out] = system(cmd);
 % extract the "Saved:" line only

@@ -2,15 +2,15 @@
 %
 % Run after activating Dynamo:
 %   run /home/jblaser2/Research/dynamo/dynamo_activate.m
-%   run /home/jblaser2/Research/STA/dynamo/scripts/hac_run_sweep.m
+%   run /home/jblaser2/Research/STA/dynamo/dynamo_scripts/hac_run_sweep.m
 
 % -------------------------------------------------------------------------
 % SETTINGS
 % -------------------------------------------------------------------------
 DATA_DIR  = '/home/jblaser2/Research/STA/subtomos_mrc';
-SWEEP_DIR = '/home/jblaser2/Research/STA/dynamo/outputs/hac_sweep_fine';
+SWEEP_DIR = '/home/jblaser2/Research/STA/dynamo/dynamo_outputs/hac_sweep_final_pick';
 N_CLASSES = 2;
-RADII     = 7.0 : 0.2 : 9.0;
+RADII     = [8.7, 8.8, 8.9];
 % -------------------------------------------------------------------------
 
 if ~exist(SWEEP_DIR, 'dir'), mkdir(SWEEP_DIR); end
@@ -62,7 +62,7 @@ end
 
 %% Call Python for the comparison grid
 PYTHON  = '/home/jblaser2/conda-envs/napari-0.4-env/bin/python3';
-CMP_SCR = '/home/jblaser2/Research/STA/dynamo/scripts/hac_sweep_compare.py';
+CMP_SCR = '/home/jblaser2/Research/STA/dynamo/dynamo_scripts/hac_sweep_compare.py';
 cmd = sprintf('DISPLAY=:0 QT_QPA_PLATFORM=xcb %s %s "%s" 2>&1', PYTHON, CMP_SCR, SWEEP_DIR);
 fprintf('\nGenerating sweep comparison grid...\n');
 [~, out] = system(cmd);

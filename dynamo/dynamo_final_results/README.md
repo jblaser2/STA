@@ -14,13 +14,13 @@ These results are intended for comparison against other classification packages.
 | Particles | 672 |
 | Box size | 80³ voxels |
 | Pixel size | 13.328 Å/vox |
-| Mask | Spherical, radius **7.2 voxels** (95.96 Å) |
+| Mask | Spherical, radius **8.9 voxels** (118.6 Å) |
 | Linkage | Ward |
 | Distance metric | 1 − Pearson CC (no missing-wedge correction) |
 | N classes | 2 |
-| Cophenetic correlation | **0.3727** |
+| Cophenetic correlation | **0.3574** |
 
-The mask radius r=7.2 was selected by sweeping r=3–25 in steps of 1 (coarse) and r=7.0–9.0 in steps of 0.2 (fine), maximising the cophenetic correlation coefficient. See `../dynamo_outputs/hac_sweep_fine/summary/` for the full sweep results.
+The mask radius r=8.9 was selected by sweeping r=3–25 in steps of 1 (coarse), r=7.0–9.0 in steps of 0.2 (fine), and r=[8.7, 8.8, 8.9] (final pick), maximising the cophenetic correlation coefficient. See `../dynamo_outputs/hac_sweep_final_pick/summary/` for the final pick sweep results.
 
 Missing-wedge correction was not applied because the original tomogram acquisition geometry was not available. Particles were pre-aligned prior to classification.
 
@@ -49,10 +49,10 @@ Missing-wedge correction was not applied because the original tomogram acquisiti
 
 ## Class Sizes
 
-| Class | Particles | Fraction |
-|-------|-----------|----------|
-| Class 1 | 192 | 28.6% | 96.9 Å (FSC=0.5) |
-| Class 2 | 480 | 71.4% | 62.7 Å (FSC=0.5) |
+| Class | Particles | Fraction | Resolution (FSC=0.5) |
+|-------|-----------|----------|----------------------|
+| Class 1 | 447 | 66.5% | 62.7 Å |
+| Class 2 | 225 | 33.5% | 96.9 Å |
 
 Both classes reach 26.7 Å at FSC=0.143 (Nyquist for this box/pixel size).
 See `fsc/fsc_curves.png` and `fsc/resolution.txt` for full details.
@@ -98,5 +98,5 @@ df = pd.read_csv('embedding_coords.csv')
 
 - The CC matrix (`ccmatrix.npy`) is the fundamental pairwise similarity computed by Dynamo. Other packages may use different similarity measures; the CC matrix here is **not** wedge-corrected.
 - `embedding_coords.csv` allows direct overlay of other packages' class labels onto the Dynamo embedding space.
-- The cophenetic correlation (0.3727) is modest — the two classes are not sharply separated in CC-space. This is expected for similar pili conformations at this resolution.
+- The cophenetic correlation (0.3574) is modest — the two classes are not sharply separated in CC-space. This is expected for similar pili conformations at this resolution.
 - Resolution estimates are split-half FSC (not gold-standard half-maps), providing a rough reproducibility measure rather than a true structural resolution.
