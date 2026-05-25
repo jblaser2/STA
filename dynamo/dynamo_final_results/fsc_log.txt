@@ -1,0 +1,57 @@
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2024 The MathWorks, Inc.
+             R2024a Update 8 (24.1.0.3050227) 64-bit (glnxa64)
+                              October 13, 2025
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+ 
+   An installation of  Dynamo has been located with home folder:    /home/jblaser2/Research/dynamo   
+ 
+[warning] Path conflict detected 
+  A total of 1 Dynamo shorthand function names are now shadowing previous functions in your previous Matlab path
+dvput 
+ 
+   Checking operativity of MEX files in your architecture...
+Launching a sample mex file...
+If the screen is stuck here, there is some problem...
+ 
+ MEX files are ok: Dynamo is ready.
+ 
+------------------------------------------------------------
+ 
+ Dynamo version: v-1.1.558 
+ 
+For general help on the available commands, type:
+ >> doc Dynamo
+ or 
+ >> dhelp
+ 
+For a menu of different GUI tools, type: 
+ >> dynamo;
+ 
+ [ok] The Matlab version of Dynamo is installed and operative. 
+  
+------------------------------------------------------------
+ 
+Note: Dynamo is setting Matlab to use classical graphic controls.
+A preference file has been located.
+Loaded assignments: 672 particles, 2 classes
+Loading particles...
+Loaded 672 particles (box 80^3)
+
+Class 1: 192 particles
+  Half1: 96   Half2: 96
+  Resolution (FSC=0.5): 7.3 vox = 96.9 Ang
+  Resolution (FSC=0.143): 26.7 Ang
+
+Class 2: 480 particles
+  Half1: 240   Half2: 240
+  Resolution (FSC=0.5): 4.7 vox = 62.7 Ang
+  Resolution (FSC=0.143): 26.7 Ang
+
+FSC files written to /home/jblaser2/Research/STA/dynamo/dynamo_final_results/fsc
+[delete:pmodelpool.Manager] Deletion of model pool manager from memory.
