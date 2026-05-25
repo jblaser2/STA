@@ -8,9 +8,9 @@
 % SETTINGS
 % -------------------------------------------------------------------------
 DATA_DIR  = '/home/jblaser2/Research/STA/subtomos_mrc';
-SWEEP_DIR = '/home/jblaser2/Research/STA/dynamo/outputs/hac_sweep_small';
+SWEEP_DIR = '/home/jblaser2/Research/STA/dynamo/outputs/hac_sweep_fine';
 N_CLASSES = 2;
-RADII     = [3, 4, 5, 6, 7, 8];
+RADII     = 7.0 : 0.2 : 9.0;
 % -------------------------------------------------------------------------
 
 if ~exist(SWEEP_DIR, 'dir'), mkdir(SWEEP_DIR); end
@@ -38,7 +38,7 @@ t_sweep = tic;
 
 for ri = 1:length(RADII)
     r          = RADII(ri);
-    output_dir = fullfile(SWEEP_DIR, sprintf('radius_%02d', r));
+    output_dir = fullfile(SWEEP_DIR, sprintf('radius_%s', strrep(sprintf('%.1f', r), '.', 'p')));
     coph_scores(ri) = hac_run_single(DATA_DIR, output_dir, r, N_CLASSES, data, files);
 end
 
