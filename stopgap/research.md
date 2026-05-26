@@ -2,81 +2,67 @@
 
 ## Table of Contents
 
+- [Shared Files Setup](#shared-files-setup)
 - [Overview](#overview)
 - [Repository Layout](#repository-layout)
 - [Central Data Structures](#central-data-structures)
-  - [The Motivelist (motl)](#the-motivelist-motl)
-  - [The Wedgelist](#the-wedgelist)
-  - [The Reflist](#the-reflist)
 - [Euler Angle Convention](#euler-angle-convention)
 - [File Formats](#file-formats)
-  - [MRC](#mrc)
-  - [EM](#em)
-  - [STAR](#star)
-  - [Parameter Files (`.star`)](#parameter-files-star)
 - [The Execution Model](#the-execution-model)
-  - [Parallelization Architecture](#parallelization-architecture)
-  - [Synchronization via Filesystem Markers](#synchronization-via-filesystem-markers)
-  - [The Watcher Pattern](#the-watcher-pattern)
-  - [Local Data Copying (HPC Optimization)](#local-data-copying-hpc-optimization)
 - [Pipeline Modules in Detail](#pipeline-modules-in-detail)
-  - [1. Template Matching (`src/tm/`)](#1-template-matching-srctm)
-  - [2. Subtomogram Alignment & Averaging (`src/subtomo/`)](#2-subtomogram-alignment--averaging-srcsubtomo)
-  - [3. Subtomogram Extraction (`src/extract/`)](#3-subtomogram-extraction-srcextract)
-  - [4. PCA Classification (`src/pca/`)](#4-pca-classification-srcpca)
-  - [5. Variance Mapping (`src/vmap/`)](#5-variance-mapping-srcvmap)
-  - [6. Tube Power Spectrum (`src/tube_ps/`)](#6-tube-power-spectrum-srctube_ps)
 - [Signal Processing](#signal-processing)
-  - [Fast Local Correlation Function (FLCF)](#fast-local-correlation-function-flcf)
-  - [Fourier Shell Correlation (FSC)](#fourier-shell-correlation-fsc)
-  - [CTF Correction](#ctf-correction)
-  - [Exposure (Dose) Weighting](#exposure-dose-weighting)
-  - [Score-Based Weighting](#score-based-weighting)
 - [Filtering Infrastructure](#filtering-infrastructure)
 - [Parameter Configuration System](#parameter-configuration-system)
-  - [Directory Layout Convention](#directory-layout-convention)
-  - [Parameter File Structure](#parameter-file-structure)
-  - [Global Settings](#global-settings)
 - [Toolbox (`sg_toolbox/`)](#toolbox-sg_toolbox)
-  - [Motl Manipulation](#motl-manipulation)
-  - [Geometry & Math](#geometry--math)
-  - [Volume I/O & Processing](#volume-io--processing)
-  - [FSC & Resolution](#fsc--resolution)
-  - [IMOD Integration](#imod-integration)
 - [Notable Implementation Details](#notable-implementation-details)
-  - [Packet-Based Dynamic Load Balancing](#packet-based-dynamic-load-balancing)
-  - [FFT Wisdom Caching](#fft-wisdom-caching)
-  - [Fourier Cropping](#fourier-cropping)
-  - [Supersampling for Averaging](#supersampling-for-averaging)
-  - [Core Naming in Logs](#core-naming-in-logs)
-  - [Crash Recovery](#crash-recovery)
-  - [Random Seed per Iteration](#random-seed-per-iteration)
-  - [Partial Motivelist Pattern](#partial-motivelist-pattern)
 - [Typical User Workflow](#typical-user-workflow)
 - [Version History Highlights](#version-history-highlights-from-changestxt-and-stopgap_075md)
 - [Summary](#summary)
 - [Compilation Notes (BYU HPC, R2023b)](#compilation-notes-byu-hpc-r2023b)
-  - [Cluster-specific paths](#cluster-specific-paths)
-  - [Binary names produced by mcc](#binary-names-produced-by-mcc)
-  - [`compile_toolbox.m` must be bypassed](#compile_toolboxm-must-be-bypassed)
-  - [Multiline `-r "..."` quoting fails on this cluster's MATLAB wrapper](#multiline--r--quoting-fails-on-this-clusters-matlab-wrapper)
-  - [Stale binaries mask compilation failures](#stale-binaries-mask-compilation-failures)
-  - [`rootdir` must have a trailing slash](#rootdir-must-have-a-trailing-slash)
-  - [Motivelist `halfset` field must be `'A'` or `'B'` — NOT `'h1'`/`'h2'`](#motivelist-halfset-field-must-be-a-or-b--not-h1h2)
-  - [File names in `subtomoParams.sh` must NOT include their directory prefix](#file-names-in-subtomoparamssh-must-not-include-their-directory-prefix)
-  - [Initial reference must be written as two per-halfset files `_A_1.mrc` / `_B_1.mrc`](#initial-reference-must-be-written-as-two-per-halfset-files-_a_1mrc--_b_1mrc)
-  - [`stopgap_config_slurm.sh` fails with "unbound variable" under `set -o nounset`](#stopgap_config_slurmsh-fails-with-unbound-variable-under-set--o-nounset)
-  - [`stopgap_parser.sh` sources `stopgap_config_slurm.sh` directly](#stopgap_parsersh-sources-stopgap_config_slurmsh-directly)
-  - [Non-deployable toolbox warnings are harmless](#non-deployable-toolbox-warnings-are-harmless)
 - [Practical Setup Guide for Classification (BYU HPC)](#practical-setup-guide-for-classification-byu-hpc)
-  - [Prerequisites](#prerequisites)
-  - [Step 1 — Compile STOPGAP](#step-1--compile-stopgap)
-  - [Step 2 — Set up the project directory](#step-2--set-up-the-project-directory)
-  - [Step 3 — Run `createStopgapInputs.m`](#step-3--run-createstopgapinputsm)
-  - [Step 4 — Generate the subtomo parameter file](#step-4--generate-the-subtomo-parameter-file)
-  - [Step 5 — Submit the classification job](#step-5--submit-the-classification-job)
-  - [Step 6 — Generate per-class averages](#step-6--generate-per-class-averages)
-  - [Data flow summary](#data-flow-summary)
+
+---
+
+## Shared Files Setup
+
+Place files from the shared archive into a fresh STOPGAP 0.7.5 source tree as described below. For step-by-step usage instructions see the [Practical Setup Guide for Classification (BYU HPC)](#practical-setup-guide-for-classification-byu-hpc); for the general end-to-end pipeline see [Typical User Workflow](#typical-user-workflow).
+
+### Classification scripts → `STOPGAP/`
+
+Copy each script to the root of the STOPGAP source directory.
+
+| File | What it does |
+|------|-------------|
+| `compileStopgap.sh` | Compiles all four STOPGAP binaries from source using MATLAB R2023b `mcc`. Submit as a SLURM job. Only needed if binaries are missing or MCR is updated. |
+| `createStopgapInputs.m` | MATLAB script run once per project from `subtomo_project/`. Reads pre-extracted subvolumes, creates numbered symlinks, and writes the initial motivelist, wedgelist, per-halfset references, and masks. |
+| `subtomoParams.sh` | Calls the STOPGAP parser three times to write `params/subtomo_param.star`: a 9-iteration alignment schedule in three angular-refinement blocks (coarse → medium → fine). |
+| `runClassification.sh` | Main SLURM job. Runs the full pipeline sequentially: 9-iteration subtomogram alignment → PCA covariance decomposition → k-means clustering into 3 classes. |
+
+### Edited STOPGAP files → replace in-place
+
+Modified versions of files that ship with STOPGAP 0.7.5. Copy them over the originals before running anything.
+
+| File | Destination in `STOPGAP/` | Why it was changed |
+|------|--------------------------|-------------------|
+| `stopgap_config_slurm.sh` | `exec/lib/stopgap_config_slurm.sh` | Fixes `${LD_LIBRARY_PATH}` unbound-variable crash under `set -o nounset` (see [Compilation Notes](#compilation-notes-byu-hpc-r2023b)) |
+| `stopgap_parser.sh` | `exec/bin/stopgap_parser.sh` | Updated to source `stopgap_config_slurm.sh` instead of the nonexistent `stopgap_config.sh` |
+
+### Compiled binaries → `STOPGAP/exec/lib/`
+
+Pre-compiled against MATLAB R2023b MCR. Copy all four files into `exec/lib/` and mark them executable.
+
+| Binary | Role |
+|--------|------|
+| `stopgap` | Main alignment/averaging worker |
+| `stopgap_watcher` | Job orchestrator — reads param file, dispatches workers, monitors completion |
+| `stopgap_parser` | Generates and updates parameter STAR files |
+| `sg_toolbox` | Standalone toolbox binary for post-processing utilities |
+
+```bash
+cp matlabr2023bCompiledBinaries/* STOPGAP/exec/lib/
+chmod +x STOPGAP/exec/lib/stopgap STOPGAP/exec/lib/stopgap_watcher \
+         STOPGAP/exec/lib/stopgap_parser STOPGAP/exec/lib/sg_toolbox
+```
 
 ---
 
