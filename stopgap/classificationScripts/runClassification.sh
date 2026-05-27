@@ -19,10 +19,10 @@
 #   This is fully supported by SLURM and requires no nested sbatch calls.
 
 #SBATCH --job-name=stopgap_classify
-#SBATCH --ntasks=32                        # must match n_cores below
+#SBATCH --ntasks=16                        # must match n_cores below
 #SBATCH --cpus-per-task=1
-#SBATCH --mem-per-cpu=7G
-#SBATCH --time=2:00:00                    # adjust; subtomo dominates runtime
+#SBATCH --mem-per-cpu=16G
+#SBATCH --time=24:00:00                    # adjust; subtomo dominates runtime
 #SBATCH --output=logs/classify_%j.log
 #SBATCH --error=logs/classify_%j.err
 
@@ -37,8 +37,8 @@ MATLAB_TOOLBOX=/home/ejl62/summerResearch/STOPGAP/sg_toolbox  # for clustering s
 SUBTOMO_ROOT='/home/ejl62/nobackup/autodelete/stopgapClassification/subtomo_project'
 PCA_ROOT='/home/ejl62/nobackup/autodelete/stopgapClassification/pca_project'
 
-n_cores=32        # must match #SBATCH --ntasks
-copy_local=0      # set 1 if nodes have fast local SSD
+n_cores=16        # must match #SBATCH --ntasks
+copy_local=1      # /tmp is local LVM (209 GB) on BYU HPC nodes — not NFS
 
 # Final iteration number: 9 iterations → output motl is motl_10.star
 FINAL_ITER=10
