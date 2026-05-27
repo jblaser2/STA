@@ -1,0 +1,46 @@
+# PEET parameter file — single stacked tomogram
+# 672 pre-aligned subtomograms stacked into one MRC along Z
+# Particles at (40, 40, 40+i*80) for i=0..671
+
+fnVolume = {'/home/jblaser2/Research/peet/results/stacked_all.mrc'}
+fnModParticle = {'/home/jblaser2/Research/peet/results/stacked_all.mod'}
+
+initMOTL = {'/home/jblaser2/Research/peet/results/peet_single_MOTL_Tom1_Iter1.csv'}
+
+fnOutput = 'peet_single'
+szVol = [78 78 78]
+
+maskType = 'sphere'
+insideMaskRadius = 0
+outsideMaskRadius = 9
+
+yaxisType = 0
+sampleSphere = 'none'
+
+dPhi   = {[0], [0]}
+dTheta = {[0], [0]}
+dPsi   = {[0], [0]}
+searchRadius = {[0], [0]}
+
+lowCutoff = {[0.05 0.05], [0.05 0.05]}
+hiCutoff  = {[0.45 0.05], [0.45 0.05]}
+
+flgFairReference = 0
+reference = 'reference_znorm78.mrc'
+
+refThreshold  = [672, 672]
+refFlagAllTom = 1
+
+tiltRange = {}
+flgWedgeWeight = 0
+nWeightGroup = 8
+
+lstThresholds = [672]
+lstFlagAllTom = 1
+
+pixelSpacing = 13.328
+CCMode      = 0
+flgAbsValue = 1
+particlePerCPU = 8
+debugLevel = 1
+nIter = 2
