@@ -1,9 +1,7 @@
 # STA
 Creating a benchmark evaluation of sub-tomogram classification packages for CryoET.
 
-# Project Overview
-
-# Benchmark Dataset for Subtomogram Averaging Conformational Heterogeneity Classification Packages Using Sparse 3D Data of Membrane-Embedded Complexes
+# Project Overview: Benchmark Dataset for Subtomogram Averaging Conformational Heterogeneity Classification Packages Using Sparse 3D Data of Membrane-Embedded Complexes
 
 ---
 
