@@ -3,7 +3,7 @@ Creating a benchmark evaluation of sub-tomogram classification packages for Cryo
 
 # Project Overview
 
-# Benchmark Dataset for Subtomogram Averaging Particle Conformational Heterogeneity Classification
+# Benchmark Dataset for Subtomogram Averaging Particle Conformational Heterogeneity Classification Packages
 ### Using Sparse 3D Data of Membrane-Embedded Complexes
 
 ---
