@@ -1,0 +1,40 @@
+{
+  "$comment": "PROPOSED shared project permissions for the STA benchmark. Review, then activate with:  mv .claude/settings.json.proposed .claude/settings.json   (or run /fewer-permission-prompts to derive from your real transcripts). Applies when Claude Code is launched from within the STA repo. Machine-specific rules go in settings.local.json (gitignored).",
+  "permissions": {
+    "allow": [
+      "Bash(conda run -n pytom_env:*)",
+      "Bash(conda run -n eman2:*)",
+      "Bash(conda run -n etsim:*)",
+      "Bash(conda run -n relion-5.0:*)",
+      "Bash(conda run -n napari-env:*)",
+      "Bash(conda run -n napari-0.4-env:*)",
+      "Bash(conda env list)",
+      "Bash(conda list:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(wc:*)",
+      "Bash(file:*)",
+      "Bash(stat:*)",
+      "Bash(du:*)",
+      "Bash(df:*)",
+      "Bash(nproc)",
+      "Bash(free:*)",
+      "Bash(nvidia-smi:*)",
+      "Bash(header:*)",
+      "Bash(mrcinfo:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch)"
+    ],
+    "deny": [],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(rm:*)"
+    ]
+  }
+}

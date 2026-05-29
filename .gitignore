@@ -26,3 +26,11 @@
 *.gz
 *.bz2
 *.7z
+
+# PyTom / EM binary volumes (large)
+
+*.em
+
+# Claude Code machine-specific settings (keep shared settings.json committed)
+
+.claude/settings.local.json

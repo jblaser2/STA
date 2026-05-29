@@ -57,5 +57,23 @@ STA/
 | Cross-package agreement (pairwise ARI/NMI, co-occurrence matrix) | 20% |
 | FSC resolution gain (gold-standard FSC per class) | 20% |
 
-## Current Focus
-*(Update this section as the project progresses — to be filled in by Josh/Eben)*
+## Cross-Session Workflow (read this every session)
+- **`STATUS.md` is the single source of truth** for project state — what's installed, what's run,
+  what's blocked. Read it first; keep it current. Do NOT track status in memory files.
+- **Start** each session with `/status` (briefs you from STATUS.md + latest session-log).
+- **End** each session with `/handoff` (updates STATUS.md, writes a `.session-log/` entry, updates
+  durable memory, stages changes).
+- **Pick up a package** with `/pkg <name>` (loads that package's row + guide + memory).
+- **One workstream per session** — don't blend a package install with analysis of another.
+- `.session-log/YYYY-MM-DD-<topic>.md` holds dated handoff notes (committed, small markdown).
+- **Memory role split:** memory = *durable knowledge* (install quirks, fixed bugs, run commands);
+  STATUS.md = *current status*. When you learn a durable fact, save it to memory; when state
+  changes, update STATUS.md.
+
+## Config & Launch
+- Launch Claude Code from **inside `~/Research/STA`** so this CLAUDE.md, `.claude/commands/`, and
+  `.claude/settings.json` all apply (and Eben inherits them via git). Large data and some package
+  source live in the parent `~/Research/` (reachable by absolute path; add it as an additional
+  working directory if needed).
+- Shared permissions: `.claude/settings.json`. Machine-specific: `.claude/settings.local.json`
+  (gitignored).
