@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# sta — launch (or reattach to) the STA benchmark tmux session with a standard window layout.
+# Usage:  sta            attach if running, else build the layout and attach
+#         sta kill       tear the session down
+#
+# Windows: 1 claude | 2 shell | 3 etsim
+# Add more anytime with Ctrl-b c; rename with Ctrl-b ,
+
+set -euo pipefail
+SESSION="sta"
+PROJECT="$HOME/Research/STA"
+
+if [[ "${1:-}" == "kill" ]]; then
+    tmux kill-session -t "$SESSION" 2>/dev/null && echo "killed session '$SESSION'" || echo "no session '$SESSION'"
+    exit 0
+fi
+
+# If the session already exists, just attach to it (preserves whatever you were doing).
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+    exec tmux attach -t "$SESSION"
+fi
+
+# Otherwise build it fresh. -d = detached so we can set up all windows before attaching.
+tmux new-session  -d -s "$SESSION" -n claude -c "$PROJECT"
+tmux new-window   -t "$SESSION":2  -n shell  -c "$PROJECT"
+tmux new-window   -t "$SESSION":3  -n etsim  -c "$HOME/Research/synthetic_sta"  # synthetic-data pipeline runs live here
+
+# Window 1 auto-starts Claude.
+tmux send-keys -t "$SESSION":1 'claude' C-m
+
+# Land in the claude window and attach.
+tmux select-window -t "$SESSION":1
+exec tmux attach -t "$SESSION"
