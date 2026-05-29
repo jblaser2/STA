@@ -55,24 +55,19 @@ def create_cylindrical_mask(box_size: int, height_pos: float, height_neg: float,
 
 def write_em(mask: np.ndarray, filename: str) -> None:
     """
-    Write a float32 volume in EM (TOM/PyTom) format.
-
-    EM format header is 512 bytes; data follows immediately in
-    x-fastest order, which matches C-order for a (nz, ny, nx) array
-    (last axis = x varies fastest).
+    Write a float32 volume in PyTom EM format using PyTom's own vol.write().
+    PyTom's C++ reader is strict about the header; using vol.write() guarantees
+    a header it will accept. Must be run in pytom_env.
     """
+    from pytom.lib.pytom_volume import vol
     nz, ny, nx = mask.shape
-    header = bytearray(512)
-    header[0] = 6                              # Machine type: Linux little-endian
-    struct.pack_into('<i', header, 4,  nx)     # columns (x)
-    struct.pack_into('<i', header, 8,  ny)     # rows    (y)
-    struct.pack_into('<i', header, 12, nz)     # sections(z)
-    struct.pack_into('<i', header, 16, 5)      # data type: float32
-
-    with open(filename, 'wb') as f:
-        f.write(bytes(header))
-        # C-order flatten: last axis (x) varies fastest = EM convention
-        f.write(mask.astype(np.float32).flatten().tobytes())
+    v = vol(nx, ny, nz)
+    m = mask.astype(np.float32)
+    for iz in range(nz):
+        for iy in range(ny):
+            for ix in range(nx):
+                v.setV(float(m[iz, iy, ix]), ix, iy, iz)
+    v.write(filename)
 
 
 def write_mrc(mask: np.ndarray, filename: str, voxel_size: float) -> None:

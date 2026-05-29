@@ -5,8 +5,8 @@ Ncluster   =  2
 frequency  =  10
 offset     =  None
 binning    =  1
-mask       =  /home/jblaser2/Research/STA/PyTom/cylindrical_mask.em
-fmask      =  /home/jblaser2/Research/STA/PyTom/cylindrical_mask.em
+mask       =  /home/jblaser2/Research/STA/T4P_mask/cylindrical_mask.em
+fmask      =  /home/jblaser2/Research/STA/T4P_mask/cylindrical_mask.em
 niteration =  10
 dispersion =  None
 threshold  =  0.4
@@ -18,14 +18,14 @@ noise      =  None
 
 Initializing the class centroids ...
 done
-sum distances:  485.9146101578422
+sum distances:  575.7641884333356
 done
-7.5950140953063965
+7.827740907669067
 Starting iteration 0 ...
 Calculate difference maps ...
 it0 time: 0.0
 Start alignments ...
-calculation time: 5.808546304702759 sec
+calculation time: 6.062547445297241 sec
 Class changes:
       0   1  -1 
   0 322 350   0 
@@ -33,182 +33,105 @@ Class changes:
  -1   0   0   0 
 Number of class 0: 322
 Number of class 1: 350
-it0 time: 13.3
+it0 time: 13.9
 Calculate averages ...
 done
 Resolution of class 0: 10
 Resolution of class 1: 10
 len particlelist, 672, 672
-it0 time: 3.9
+it0 time: 4.0
 Starting iteration 1 ...
 Calculate difference maps ...
 it1 time: 0.0
 Start alignments ...
-calculation time: 5.778768301010132 sec
+calculation time: 6.033458471298218 sec
 Class changes:
       0   1  -1 
-  0 300  22   0 
-  1  34 316   0 
+  0 285  37   0 
+  1  88 262   0 
  -1   0   0   0 
-Number of class 0: 334
-Number of class 1: 338
-it1 time: 13.3
+Number of class 0: 373
+Number of class 1: 299
+it1 time: 13.8
 Calculate averages ...
 done
 Resolution of class 0: 10
 Resolution of class 1: 10
 len particlelist, 672, 672
-it1 time: 3.8
+it1 time: 4.0
 Starting iteration 2 ...
 Calculate difference maps ...
 it2 time: 0.0
 Start alignments ...
-calculation time: 5.938354730606079 sec
+calculation time: 6.2562971115112305 sec
 Class changes:
       0   1  -1 
-  0 327   7   0 
-  1  20 318   0 
+  0 353  20   0 
+  1  32 267   0 
  -1   0   0   0 
-Number of class 0: 347
-Number of class 1: 325
-it2 time: 13.9
+Number of class 0: 385
+Number of class 1: 287
+it2 time: 14.3
 Calculate averages ...
 done
 Resolution of class 0: 10
 Resolution of class 1: 10
 len particlelist, 672, 672
-it2 time: 4.4
+it2 time: 4.3
 Starting iteration 3 ...
 Calculate difference maps ...
 it3 time: 0.0
 Start alignments ...
-calculation time: 6.326634645462036 sec
+calculation time: 6.249204158782959 sec
 Class changes:
       0   1  -1 
-  0 344   3   0 
-  1  11 314   0 
+  0 373  12   0 
+  1   9 278   0 
  -1   0   0   0 
-Number of class 0: 355
-Number of class 1: 317
-it3 time: 14.6
+Number of class 0: 382
+Number of class 1: 290
+it3 time: 14.3
 Calculate averages ...
 done
 Resolution of class 0: 10
 Resolution of class 1: 10
 len particlelist, 672, 672
-it3 time: 4.4
+it3 time: 4.3
 Starting iteration 4 ...
 Calculate difference maps ...
 it4 time: 0.0
 Start alignments ...
-calculation time: 6.440553188323975 sec
+calculation time: 6.218917608261108 sec
 Class changes:
       0   1  -1 
-  0 351   4   0 
-  1   7 310   0 
+  0 377   5   0 
+  1   3 287   0 
  -1   0   0   0 
-Number of class 0: 358
-Number of class 1: 314
-it4 time: 14.6
+Number of class 0: 380
+Number of class 1: 292
+it4 time: 14.2
 Calculate averages ...
 done
 Resolution of class 0: 10
 Resolution of class 1: 10
 len particlelist, 672, 672
-it4 time: 4.4
+it4 time: 4.3
 Starting iteration 5 ...
 Calculate difference maps ...
 it5 time: 0.0
 Start alignments ...
-calculation time: 6.263883113861084 sec
+calculation time: 6.220297813415527 sec
 Class changes:
       0   1  -1 
-  0 355   3   0 
-  1   2 312   0 
+  0 377   3   0 
+  1   0 292   0 
  -1   0   0   0 
-Number of class 0: 357
-Number of class 1: 315
-it5 time: 14.1
+Number of class 0: 377
+Number of class 1: 295
+it5 time: 14.2
 Calculate averages ...
 done
 Resolution of class 0: 10
 Resolution of class 1: 10
 len particlelist, 672, 672
-it5 time: 4.2
-Starting iteration 6 ...
-Calculate difference maps ...
-it6 time: 0.0
-Start alignments ...
-calculation time: 5.989962100982666 sec
-Class changes:
-      0   1  -1 
-  0 354   3   0 
-  1   2 313   0 
- -1   0   0   0 
-Number of class 0: 356
-Number of class 1: 316
-it6 time: 13.7
-Calculate averages ...
-done
-Resolution of class 0: 10
-Resolution of class 1: 10
-len particlelist, 672, 672
-it6 time: 4.2
-Starting iteration 7 ...
-Calculate difference maps ...
-it7 time: 0.0
-Start alignments ...
-calculation time: 6.071202516555786 sec
-Class changes:
-      0   1  -1 
-  0 353   3   0 
-  1   7 309   0 
- -1   0   0   0 
-Number of class 0: 360
-Number of class 1: 312
-it7 time: 13.8
-Calculate averages ...
-done
-Resolution of class 0: 10
-Resolution of class 1: 10
-len particlelist, 672, 672
-it7 time: 4.2
-Starting iteration 8 ...
-Calculate difference maps ...
-it8 time: 0.0
-Start alignments ...
-calculation time: 6.059699773788452 sec
-Class changes:
-      0   1  -1 
-  0 354   6   0 
-  1   3 309   0 
- -1   0   0   0 
-Number of class 0: 357
-Number of class 1: 315
-it8 time: 13.9
-Calculate averages ...
-done
-Resolution of class 0: 10
-Resolution of class 1: 10
-len particlelist, 672, 672
-it8 time: 4.2
-Starting iteration 9 ...
-Calculate difference maps ...
-it9 time: 0.0
-Start alignments ...
-calculation time: 6.110200643539429 sec
-Class changes:
-      0   1  -1 
-  0 348   9   0 
-  1   3 312   0 
- -1   0   0   0 
-Number of class 0: 351
-Number of class 1: 321
-it9 time: 13.9
-Calculate averages ...
-done
-Resolution of class 0: 10
-Resolution of class 1: 10
-len particlelist, 672, 672
-it9 time: 4.1
-total time: 189.14142990112305 sec
+total time: 118.03712224960327 sec
