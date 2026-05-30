@@ -2,15 +2,17 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-05-29** by Claude (Protomo session).
+> Last updated: **2026-05-29** by Claude (RELION session).
 
 ## Now / Next / Parked
 
-- **Now:** Protomo (I3) initial classification done. Two classes found; inter-class CC = 0.921
-  (very similar). See session log for full interpretation.
-- **Next:** (a) Consult Stefano on whether T4P shows discrete heterogeneity at all — both PyTom
-  and Protomo found near-identical class averages; (b) try k=3/k=4 in Protomo; (c) ETSimulations
-  synthetic data production; (d) RELION classification.
+- **Now:** RELION 3D-subtomo classification done (k=2/3/4 × wedge/uniform). Like PyTom & Protomo,
+  RELION finds **no discrete split** — one dominant class (85–98%) + small outliers, inter-class
+  CC = 0.97–0.997. **Three independent packages now converge on "no strong discrete heterogeneity"
+  in T4P.** See `scripts/markdown_instructions/RELION.md` §9 + `outputs/relion/results/`.
+- **Next:** (a) **Consult Stefano** — the convergent null across PyTom/Protomo/RELION makes "is T4P
+  discrete at all?" the gating question; (b) **ETSimulations** synthetic ground-truth datasets
+  (needed to distinguish "no real classes" from "can't find them"); (c) continue package coverage.
 - **Parked (need expert input):** missing-wedge standardization; whether T4P is discrete vs.
   continuous heterogeneity; how to discretize continuous-classifier outputs. → Stefano / Braxton.
 
@@ -20,15 +22,15 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · — n/a/unknown
 
 | Package | Installed | Env | Data-prep | k=2 | k=3 | k=4 | Pushed | Notes / blockers |
 |---|---|---|---|---|---|---|---|---|
-| RELION 3.1–4.0 | 🟡 | `relion-5.0` | 🟡 `prepare_relion.sh` | ⬜ | ⬜ | ⬜ | — | env present; classification not run yet |
-| STOPGAP | 🟡 | — | ⬜ | ⬜ | ⬜ | ⬜ | — | scripts/binaries in `stopgap/`; setup in progress |
+| RELION 3.1–4.0 | ✅ | `relion-5.0` | ✅ `build_relion_star.py` | ✅ | ✅ | ✅ | — | classic 3D-subtomo path **retained in RELION 5** `relion_refine` (no 3.1 build needed); k=2/3/4 × wedge/uniform run; no discrete split (CC 0.97–0.997); see `RELION.md` §9 |
+| STOPGAP | 🟡 | — | ⬜ | ⬜ | ⬜ | ⬜ | — | **owned by Eben**; scripts/binaries in `stopgap/` |
 | OPUS-TOMO | ⬜ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | not started |
-| Dynamo | 🟡 | MATLAB | ⬜ | ⬜ | ⬜ | ⬜ | — | workspace in `dynamo/`; `DYNAMO.md` guide |
+| Dynamo | ✅ | MATLAB | ✅ | ✅ | — | — | — | classification run on subtomos, decent results (Josh); workspace in `dynamo/`, `DYNAMO.md` |
 | PEET | ✅ | IMOD | ✅ | — | — | — | ✅ | clusterPca + central-slice figures committed |
 | MDTOMO | ⬜ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | not started |
 | TomoFlow | ⬜ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | not started |
 | I3 / ProTomo | ✅ | (native) | ✅ | ✅ | — | — | ✅ | 3.1.0 installed; 2-class run on 234 centered particles (438 edge filtered); CC=0.921; see `protomo/research.md` + session log |
-| EMAN2 | 🟡 | `eman2` | ⬜ | ⬜ | ⬜ | ⬜ | — | env + workspace ready; `EMAN2.md` |
+| EMAN2 | 🟡 | `eman2` | ⬜ | ⬜ | ⬜ | ⬜ | — | **owned by Eben**; env + workspace ready; `EMAN2.md` |
 | emClarity | ⬜ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | `EMCLARITY.md` notes only; not installed |
 | PyTom | ✅ | `pytom_env` | ✅ | ✅ | ✅ | ⬜ | ✅ | **blocker:** k=2 & k=3 averages look identical — classification not separating structure |
 | DISCA | ⬜ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | not started |
