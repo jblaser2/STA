@@ -41,7 +41,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 | PyTom | ✅ | `pytom_env` | ✅ | ✅ | ✅ | ⬜ | ✅ | **blocker:** k=2 & k=3 averages look identical — classification not separating structure |
 | DISCA | ✅ | `disca` | ✅ `build_disca_input.py` | ✅ | ✅ | ✅ | ✅ | template-free unsupervised deep clustering (torch, native sm_120); k=2/3/4 → one dominant ~94% class + small noisy outliers — **missed the two real phases** (cf. Dynamo). `disca/research.md` + `disca/results/` |
 | HEMNMA-3D | ❌ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | Requires initial atomic model/reference map; cannot sort datasets like we're doing right now. |
-| AC3D | ⬜ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | not started |
+| AC3D | ❌ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | Implemented as part of PyTom, run with that one. |
 | TomoNet | ⬜ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | not started |
 
 ## Datasets
