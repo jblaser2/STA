@@ -685,21 +685,25 @@ The particles are **pili** subtomograms — bacterial appendages imaged by cryo-
 
 **RHEL PATH:** On RHEL, `conda activate` does not always prepend the environment's `bin/` ahead of `/usr/bin`, so `python` may resolve to the system Python. The manual step-by-step below includes `export PATH=".../envs/eman2/bin:$PATH"` — always include this when running steps outside the pipeline script.
 
-**Disk:** Budget approximately: raw MRC stack (~400 MB for 672 × 80³ float32) + `particles.hdf` (~same) + `spt_01/` refinement outputs (~1–2 GB including half-maps) + each `sptcls_XX/` (~500 MB). A few GB is sufficient for a full run.
+**Disk:** Budget approximately: `particles.hdf` (~1.4 GB for 672 × 80³ float32) + `spt_seed/` (~30 MB, 50-particle subset) + `spt_02/` (~150–200 MB for 10 iterations) + each `sptcls_XX/` (~20 MB) + each `spt_cls*/` (~30 MB per class). ~2 GB total beyond the particle stack. `/home` has 874 GB and is 8% used — not a concern.
 
 ### Pipeline Logic
 
-The pipeline has three phases:
+The pipeline has five phases:
 
-1. **Data ingestion** — 672 individual MRC files are stacked into a single EMAN2 HDF file, a particle list (LST) is built, and a simple mean average is computed as an initial reference. No structural analysis happens here.
+1. **Data ingestion** — 672 individual MRC files are stacked into a single EMAN2 HDF file, a particle list (LST) is built, and a simple arithmetic mean is computed as `initial_ref.hdf`. No structural analysis happens here. Skip-checked — safe to re-run.
 
-2. **Alignment refinement (1 iteration)** — `e2spt_refine.py` aligns each particle to the reference using cross-correlation in Fourier space. After one iteration every particle has a `xform.align3d` transform stored in `spt_01/particle_parms_01.json`. The post-processing step also produces `spt_01/mask_tight.hdf`, an auto-generated mask that concentrates the PCA on the particle density rather than surrounding noise.
+2. **Seed refinement (Step 3a)** — A 50-particle subset is extracted (`subset50.lst`) and refined for 5 iterations against `initial_ref.hdf`. The result (`spt_seed/threed_05.hdf`) is a structurally meaningful starting reference. This matters because the arithmetic mean of all 672 unaligned particles is a featureless blob; even a short refinement on a small subset produces a dramatically better seed because particles are averaged in a common orientation frame.
 
-3. **PCA classification** — `e2spt_pcasplit.py` reads the aligned particles and the mask, transforms each particle to Fourier space, low-pass filters to 30 Å, normalises per shell, and assembles a data matrix. Scikit-learn PCA reduces this to `nbasis` eigenvectors; K-Means then partitions the particles into `nclass` clusters.
+3. **Full-dataset refinement (Step 3b)** — All 672 particles are refined for 10 iterations against the seed reference, with `--goldstandard 30` (phase randomisation beyond 30 Å prevents reference overfitting). Output is `spt_02/`. After each iteration, `e2refine_postprocess.py` produces masked FSC curves and `mask_tight.hdf`. With properly converged alignment, expect FSC<0.143 at ~50–80 Å.
 
-**Why align before classifying?** PCA on unaligned particles finds orientation differences rather than structural heterogeneity. The one refinement iteration brings all particles to a common frame of reference so that the PCA captures conformational variance instead of rotational variance.
+4. **PCA classification (interactive loop)** — `e2spt_pcasplit.py` reads `spt_02/particle_parms_10.json` (the last iteration), applies the mask, transforms each particle to Fourier space, low-passes to `--maxres` (default 60 Å — set to match actual signal range, not Nyquist), normalises per shell, and runs PCA + K-Means. The interactive loop lets you adjust `--nclass`, `--nbasis`, and `--maxres` and re-run without repeating the refinement.
 
-**Why Fourier-PCA?** Operating in Fourier space and normalising per shell makes the analysis resolution-dependent and de-emphasises shot noise at high spatial frequencies. The low-pass filter (`--maxres 30`) further suppresses noise beyond the expected information limit. This is more principled than voxel-space K-Means (see the Alternative below).
+5. **Per-class refinement (Step 6, automated)** — Once you accept the classification, the pipeline automatically runs `e2spt_refine.py` for each class (5 iterations, `--goldstandard 20`) using the PCA class average as seed. Output goes to `spt_cls01/`, `spt_cls02/`, etc. This step produces the final publishable maps.
+
+**Why align before classifying?** PCA on unaligned particles finds orientation differences rather than structural heterogeneity. Converged alignment (10 iterations) brings all particles to a common frame so PCA captures conformational variance instead of rotational variance.
+
+**Why Fourier-PCA at 60 Å and not 30 Å?** The first pipeline run (1 iteration from an arithmetic-mean reference) achieved only ~133 Å resolution by FSC — meaning there was no coherent signal below ~130 Å. Running PCA at `--maxres 30` decomposed pure noise, making the class split arbitrary. The 60 Å cutoff is tuned to the resolution range where real signal exists after proper alignment. If the FSC after the 10-iteration run extends to better resolution, `--maxres` can be tightened accordingly.
 
 ### Missing Wedge Handling
 
@@ -714,11 +718,11 @@ Two consequences for every pipeline run:
 
 | File | Purpose |
 |------|---------|
-| `run_pipeline.sh` | Master pipeline: patches `np.int`, ingests data, runs refinement + PCA, enters interactive loop for re-running PCA with different parameters. Configuration variables (`NCLASS`, `NBASIS`, `MAXRES`, `THREADS`, `CLEAN`) are at the top of the file. Steps 2 (ingestion) and 3 (refinement) are skipped if their output files already exist — safe to re-run after interruption. |
+| `run_pipeline.sh` | Master pipeline (5 phases — see Pipeline Logic above). Key parameters at the top: `NCLASS`, `NBASIS` (default 12), `MAXRES` (default 60 Å), `THREADS`, `CLEAN` (default on), `NITER` (default 10), `SEED_N` (default 50), `SEED_NITER` (default 5), `NITER_PERCLASS` (default 5), `GOLDSTANDARD` (default 30 Å), `PKEEP` (default 0.8). Each step is skip-checked against its expected output — safe to re-run after interruption. |
 | `make_project.py` | Reads all `aligned_tom*.mrc` files, stacks into `particles.hdf` with pixel size set to 13.328 Å, writes `ptcls.lst`, and computes a simple arithmetic mean as `initial_ref.hdf`. Takes ~1–2 min. If `particles.hdf` already exists it is deleted and rebuilt. |
 | `patch_scripts.py` | Locates `e2spt_pcasplit.py` on PATH and replaces `r = r.astype(np.int)` with `r = r.astype(np.int64)` (NumPy 2.4.6 removed `np.int`). Backs up the original to `.bak` on first run. Idempotent — exits without changes if the patch is already applied. |
 | `plot_pca.py` | Reads `pca_ptcls.txt` from the specified path (or auto-detects the latest `sptcls_XX/`). Plots pairwise scatter of the first three PCA components, saves `pca_scatter.png`. Uses non-interactive matplotlib backend (no display required). |
-| `plot_class_averages.py` | Loads each `threed_NN.hdf` class average from the specified `sptcls_XX/` directory, extracts the central XY, XZ, and YZ slices, and saves a contrast-stretched PNG grid as `class_averages.png`. No display required. |
+| `plot_class_averages.py` | Loads each `threed_NN.hdf` class average from the specified `sptcls_XX/` directory (excludes `_even`/`_odd` half-datasets), extracts the central XY, XZ, YZ slices **and** the corresponding maximum intensity projections (MIPs), and saves a 6-column contrast-stretched PNG grid as `class_averages.png`. No display required. |
 
 ### Directory Layout
 
@@ -731,28 +735,34 @@ Two consequences for every pipeline run:
 ├── plot_class_averages.py     # class average slice images
 ├── particles.hdf              # stacked HDF (672 particles)
 ├── ptcls.lst                  # EMAN2 particle list
-├── initial_ref.hdf            # simple average used as refinement seed
-├── refine.log                 # stdout from e2spt_refine.py
+├── subset50.lst               # 50-particle subset for seed refinement
+├── initial_ref.hdf            # arithmetic mean — seed for Step 3a only
+├── seed_refine.log            # stdout from Step 3a seed refinement
+├── refine.log                 # stdout from Step 3b full refinement
 ├── pca_classify.log           # stdout from e2spt_pcasplit.py
-├── spt_01/                    # refinement output
-│   ├── particle_parms_01.json # per-particle xform.align3d + score
-│   ├── threed_01.hdf          # refined average
-│   ├── threed_01_even.hdf
-│   ├── threed_01_odd.hdf
+├── spt_01/                    # legacy: 1-iteration run (kept for reference)
+├── spt_seed/                  # Step 3a: seed refinement (50 particles, 5 iters)
+│   └── threed_05.hdf          # seed reference used by Step 3b
+├── spt_02/                    # Step 3b: full refinement (672 particles, 10 iters)
+│   ├── particle_parms_10.json # per-particle xform.align3d + score (last iter)
+│   ├── threed_10.hdf          # refined global average
+│   ├── threed_10_even.hdf
+│   ├── threed_10_odd.hdf
 │   ├── mask_tight.hdf         # auto-generated mask (used by pcasplit)
-│   ├── fsc_masked_01.txt
-│   └── fsc_unmasked_01.txt
-└── sptcls_XX/                 # pcasplit output (auto-numbered per run, zero-based)
-    ├── ptcls_cls01.lst        # class 1 particle list (one-based)
-    ├── ptcls_cls02.lst        # class 2 particle list
-    ├── pca_ptcls.txt          # particle IDs + PCA coordinates
-    ├── pca_scatter.png        # scatter plot (written by plot_pca.py)
-    ├── class_averages.png     # central slices grid (written by plot_class_averages.py)
-    ├── pca_basis.hdf          # PCA eigenvector volumes
-    ├── particle_parms_01.json # class 1 alignment subset
-    ├── particle_parms_02.json # class 2 alignment subset
-    ├── threed_01.hdf          # class 1 average (one-based)
-    └── threed_02.hdf          # class 2 average
+│   └── fsc_masked_10.txt      # gold-standard FSC
+├── sptcls_XX/                 # pcasplit output (auto-numbered, zero-based)
+│   ├── ptcls_cls01.lst        # class 1 particle list (one-based)
+│   ├── ptcls_cls02.lst        # class 2 particle list
+│   ├── pca_ptcls.txt          # particle IDs + PCA coordinates
+│   ├── pca_scatter.png        # scatter plot (written by plot_pca.py)
+│   ├── class_averages.png     # slice + MIP grid (written by plot_class_averages.py)
+│   ├── pca_basis.hdf          # PCA eigenvector volumes
+│   ├── threed_01.hdf          # class 1 average (one-based)
+│   └── threed_02.hdf          # class 2 average
+├── spt_cls01/                 # Step 6: per-class refinement, class 1 (5 iters)
+│   ├── threed_05.hdf          # final class 1 map
+│   └── fsc_masked_05.txt      # gold-standard FSC for class 1
+└── spt_cls02/                 # Step 6: per-class refinement, class 2 (5 iters)
 ```
 
 ### How to Run
@@ -775,17 +785,41 @@ export PATH="/home/ejl62/miniforge3/envs/eman2/bin:$PATH"
 # The export is required — without it, `python` may resolve to the system Python
 
 python patch_scripts.py
-python make_project.py
+python make_project.py          # creates particles.hdf, ptcls.lst, initial_ref.hdf
 
-e2spt_refine.py ptcls.lst --ref initial_ref.hdf --path spt_01 \
-  --niter 1 --sym c1 --threads 24 --verbose 1
+# Step 3a: build seed reference from a 50-particle subset
+python3 -c "
+from EMAN2 import LSXFile
+src = LSXFile('ptcls.lst', True)
+dst = LSXFile('subset50.lst', False)
+for i in range(50):
+    entry = src.read(i); dst.write(-1, entry[0], entry[1])
+src.close(); dst.close()
+"
+e2spt_refine.py subset50.lst --ref initial_ref.hdf --path spt_seed \
+  --niter 5 --sym c1 --threads 24 --pkeep 0.8 --verbose 1
 
-e2spt_pcasplit.py --path spt_01 --iter 1 \
-  --nclass 2 --nbasis 8 --maxres 30 --sym c1 --nowedgefill --verbose 1
+# Step 3b: full-dataset refinement seeded from spt_seed/threed_05.hdf
+e2spt_refine.py ptcls.lst --ref spt_seed/threed_05.hdf --path spt_02 \
+  --niter 10 --sym c1 --threads 24 --pkeep 0.8 --goldstandard 30 --verbose 1
+
+# Step 4: PCA classification (use --iter 10 to select last iteration's alignment)
+e2spt_pcasplit.py --path spt_02 --iter 10 \
+  --nclass 2 --nbasis 12 --maxres 60 --sym c1 --nowedgefill --clean --verbose 1
 
 python plot_pca.py
 python plot_class_averages.py
+
+# Step 6: per-class refinement (run for each class)
+for CLS in 01 02; do
+    e2spt_refine.py sptcls_XX/ptcls_cls${CLS}.lst \
+      --ref sptcls_XX/threed_${CLS}.hdf \
+      --path spt_cls${CLS} \
+      --niter 5 --sym c1 --threads 24 --pkeep 0.8 --goldstandard 20 --verbose 1
+done
 ```
+
+**Note on `--iter 10` in pcasplit:** The default `--iter -2` selects the second-to-last iteration (iteration 9 of 10). Pass `--iter 10` explicitly to use the final, most-converged alignment JSON.
 
 **Interactive classification loop** (entered automatically by `run_pipeline.sh` after each PCA run):
 
@@ -806,11 +840,11 @@ Each re-run of PCA creates a new auto-numbered `sptcls_XX/` directory; previous 
 | Parameter | Default | Notes |
 |-----------|---------|-------|
 | `--nclass` | 2 | Number of K-Means clusters. Start with 2; try 3 if the scatter shows three distinct groups. |
-| `--nbasis` | 8 | PCA components retained before clustering. 5–10 is typical; more components capture subtler variance. |
-| `--maxres` | 30 Å | Low-pass filter applied before PCA. 30 Å is a safe margin above the 26.7 Å Nyquist. Try 40 Å if structure is not visible. |
+| `--nbasis` | 12 | PCA components retained before clustering. 12 captures subtler variance than the old default of 8. Try 16 if structure is still indistinct. |
+| `--maxres` | 60 Å | Low-pass filter applied before PCA. Set to match the actual signal range, not Nyquist. The first pipeline run confirmed useful signal only at ~130 Å or worse; 60 Å is appropriate after a properly converged 10-iteration refinement. Tighten to 40–50 Å if FSC shows signal there. |
 | `--sym` | c1 | No symmetry imposed — pili may have helical symmetry but classify without it first. |
 | `--nowedgefill` | always on | **Required for this dataset** — wedge is not at EMAN2's expected Y-axis orientation. |
-| `--clean` | off | Remove statistical outliers (>2σ from PCA centroid) before fitting K-Means. Enable if scatter shows a fringe of isolated points. |
+| `--clean` | on | Remove statistical outliers (>2σ from PCA centroid) before fitting K-Means. On by default — suppresses junk particles from distorting the cluster fit. |
 
 **Interpreting the scatter plot:**
 
@@ -818,8 +852,8 @@ Each re-run of PCA creates a new auto-numbered `sptcls_XX/` directory; previous 
 |---------|---------------|--------|
 | 2–3 tight clusters | Distinct structural classes | Accept; `--nclass` should match cluster count |
 | Continuous cloud | Conformational continuum | Classes are still meaningful; boundaries are soft |
-| Outlier fringe | Junk/damaged particles | Re-run with `--clean` |
-| Uniform noise | No separable signal | Try `--maxres 40` or `--nbasis 12` |
+| Outlier fringe | Junk/damaged particles | `--clean` is already on; try `--nbasis 16` to expose them more clearly |
+| Uniform noise | No separable signal | Try `--maxres 80` or `--nbasis 16`; if still no signal, check global FSC |
 
 ### Alternative: Direct K-Means
 
@@ -831,13 +865,39 @@ e2classifykmeans.py particles.hdf --ncls 2 --normalize --verbose 1
 
 ### Expected Resolution After Per-Class Refinement
 
-With ~300–400 particles per class at 13.328 Å/px, expect **~30–50 Å resolution** from gold-standard FSC after 3–5 iterations of per-class refinement.
+With ~300–400 particles per class at 13.328 Å/px, expect **~50–80 Å resolution** from gold-standard FSC after 5 iterations of per-class refinement. If helical symmetry is identified and applied (see Post-Classification Next Steps §1.5), this could improve to **~30–40 Å** because each asymmetric unit in the box acts as an independent observation.
+
+### First Run Analysis and Pipeline Improvements
+
+The initial run (`spt_01/`, 1 iteration) produced an FSC resolution of ~133 Å — essentially a featureless blob. Three compounding root causes were identified:
+
+1. **Only 1 refinement iteration.** Alignments had not converged. A single pass from a featureless reference is nowhere near the fixed point of the alignment-averaging cycle.
+2. **Arithmetic-mean initial reference.** 672 unaligned particles averaged directly produce a symmetric blob with no structural detail to guide alignment.
+3. **PCA at `--maxres 30 Å` when signal only existed at ~130 Å.** The PCA decomposed noise, making the class split arbitrary.
+
+**What was changed:**
+- Reference seeding: 50-particle subset refined for 5 iterations → `spt_seed/threed_05.hdf` (structurally meaningful seed)
+- Refinement: 10 iterations with `--goldstandard 30` → `spt_02/`
+- PCA: `--maxres 60`, `--nbasis 12`, `--clean` enabled
+- Per-class refinement (5 iters, `--goldstandard 20`) now runs automatically after classification is accepted
+
+**Score distribution check** (useful before or after classification to assess alignment quality):
+```bash
+conda run -n eman2 python3 -c "
+import json, numpy as np
+d = json.load(open('spt_02/particle_parms_10.json'))
+scores = np.array([v['score'] for v in d.values()])
+print(f'N={len(scores)}, mean={scores.mean():.4f}, std={scores.std():.4f}')
+print(f'5th pct={np.percentile(scores,5):.4f}, 95th pct={np.percentile(scores,95):.4f}')
+"
+```
+Scores are negative (lower = better alignment). If the 5th percentile is much worse than the median, there are many junk particles; reduce `PKEEP` to 0.7 to discard them.
 
 ### Current Pipeline State
 
-- `spt_01/` — refinement complete (1 iteration); `particle_parms_01.json` and `mask_tight.hdf` present
-- `sptcls_00/` — first PCA run (2 classes, `--nowedgefill`)
-- `sptcls_01/` — second PCA run (2 classes, `--nowedgefill`); includes `pca_scatter.png`
+- `spt_01/` — legacy: 1-iteration run from arithmetic mean; FSC ~133 Å; kept for reference
+- `sptcls_00/` — legacy: PCA run against `spt_01/` with `--maxres 30`, `--nbasis 8`; class split was noise-driven
+- New pipeline (`spt_seed/`, `spt_02/`, `sptcls_01+/`) — in progress or pending first run
 
 ---
 
@@ -857,11 +917,11 @@ Each run of the PCA classification step (`e2spt_pcasplit.py`) produces a new aut
 
 **Notes on numbering:** `e2spt_pcasplit.py` uses one-based numbering for class files inside each `sptcls_XX/` directory, but zero-based numbering for the directory itself (`sptcls_00`, `sptcls_01`, …). The `threed_NN.hdf` files use a two-digit zero-padded suffix matching the class index (e.g. `threed_01.hdf` = class 1).
 
-**Downstream use:** The `ptcls_clsNN.lst` files are the intended input for per-class refinement:
+**Downstream use:** The `ptcls_clsNN.lst` files are the intended input for per-class refinement. The pipeline script (Step 6) runs this automatically; the equivalent manual command is:
 ```bash
 e2spt_refine.py sptcls_XX/ptcls_cls01.lst \
   --ref sptcls_XX/threed_01.hdf \
-  --path spt_cls01 --niter 3 --sym c1 --threads 24 --goldstandard 30
+  --path spt_cls01 --niter 5 --sym c1 --threads 24 --pkeep 0.8 --goldstandard 20
 ```
 
 ---
@@ -874,23 +934,50 @@ After accepting a classification result in `sptcls_XX/`, the following steps are
 
 ### 1. Per-Class Iterative Refinement
 
-Run independent refinement on each class to improve alignment and resolution. Use the class average as the starting reference and the class particle list as input. Gold-standard FSC requires at least ~100 particles per class to be meaningful.
+**This step is now automated** — `run_pipeline.sh` Step 6 runs it automatically after you accept the PCA classification. The pipeline runs 5 iterations with `--goldstandard 20` for each class. Output: `spt_cls01/threed_05.hdf` (final map), `spt_cls01/fsc_masked_05.txt` (gold-standard FSC).
 
+Manual equivalent (if running outside the pipeline):
 ```bash
-# Repeat for each class (adjust CLS= and path accordingly)
 CLS=01
 e2spt_refine.py sptcls_XX/ptcls_cls${CLS}.lst \
   --ref sptcls_XX/threed_${CLS}.hdf \
   --path spt_cls${CLS} \
-  --niter 5 \
-  --sym c1 \
-  --threads 24 \
-  --goldstandard 30 \
-  --verbose 1 \
+  --niter 5 --sym c1 --threads 24 --pkeep 0.8 --goldstandard 20 --verbose 1 \
   2>&1 | tee refine_cls${CLS}.log
 ```
 
-After refinement, `spt_cls01/threed_05.hdf` (final iteration) is the refined class average and `spt_cls01/fsc_masked_05.txt` gives the gold-standard resolution.
+Gold-standard FSC requires at least ~100 particles per class (50 per half). With this dataset (~300–400 per class), it is meaningful. The pipeline uses `--goldstandard 20` (tighter than the 30 Å used for global refinement) because the per-class reference is already well-formed.
+
+### 1.5 Helical Symmetry Investigation
+
+Pili are helical polymers. Each 80-voxel box (106 nm) likely contains multiple helical subunit repeats. Applying helical symmetry during refinement multiplies the effective particle count by N subunits per box, potentially improving resolution by √N. This is the highest-impact next step after the initial per-class refinement converges.
+
+**Step 1 — detect periodicity from the Z-density profile:**
+```bash
+conda run -n eman2 python3 -c "
+from EMAN2 import EMData, EMNumPy
+import numpy as np
+vol = EMData('spt_cls01/threed_05.hdf', 0)
+arr = EMNumPy.em2numpy(vol)
+nz, ny, nx = arr.shape
+profile = arr[:, ny//2-5:ny//2+5, nx//2-5:nx//2+5].mean(axis=(1,2))
+np.savetxt('z_profile.txt', profile)
+print('Z profile written.')
+"
+```
+Plot `z_profile.txt` and look for evenly spaced peaks along Z. The peak spacing in voxels × 13.328 Å/px = helical rise in Å. The rotational twist per subunit can be estimated from the angular cross-correlation of Z-shifted copies. Known values for type IV pili: rise ~10 Å, twist ~100°.
+
+**Step 2 — run refinement with helical symmetry:**
+```bash
+e2spt_refine.py sptcls_XX/ptcls_cls01.lst \
+  --ref spt_cls01/threed_05.hdf \
+  --path spt_cls01_hel \
+  --niter 5 --sym h1 \
+  --helicalrise <rise_Å> --helicaltwist <twist_deg> \
+  --threads 24 --goldstandard 20 --verbose 1
+```
+
+Use `--sym h1` (one helical start) for simple helices. If the symmetry is approximately known from literature, supply it directly; the refinement will tolerate 10–15% error in the initial guess.
 
 ---
 
@@ -1001,7 +1088,33 @@ e2display.py sptcls_XX/threed_01.hdf sptcls_XX/threed_02.hdf
 
 # View PCA basis volumes
 e2display.py sptcls_XX/pca_basis.hdf
+
+# Open the file browser (no arguments) — navigate directories interactively
+e2display.py
 ```
+
+**Controls in the 3D isosurface view:**
+- **Mouse wheel** — raise/lower the isosurface threshold (scroll down to show more density)
+- **Left-click drag** — rotate
+- **`I` key** — open the Inspector panel (threshold slider, lighting, colour controls)
+
+**Known issue — black 3D window on RHEL/Wayland + NVIDIA:** `e2display.py` shows a black window for 3D volumes because `EMGLWidget` never requests a stencil buffer from Qt, but the isosurface renderer requires one. Fix by patching `emapplication.py` in the eman2 conda environment:
+
+```python
+# File: $CONDA_PREFIX/lib/python3.12/site-packages/eman2_gui/emapplication.py
+# In EMGLWidget.__init__, replace:
+QtOpenGL.QGLWidget.__init__(self, self.qt_parent)
+# With:
+_fmt = QtOpenGL.QGLFormat()
+_fmt.setStencil(True)
+_fmt.setDepth(True)
+_fmt.setDoubleBuffer(True)
+QtOpenGL.QGLWidget.__init__(self, _fmt, self.qt_parent)
+```
+
+A backup of the original is saved as `emapplication.py.bak`. This patch must be reapplied after any `eman2` conda package update. The 2D slice viewer works without the patch; only the 3D isosurface view is affected.
+
+**Non-interactive alternative:** `plot_class_averages.py` generates a static PNG with central slices and MIP projections — useful when `e2display.py` is unavailable or as a quick overview.
 
 ---
 
