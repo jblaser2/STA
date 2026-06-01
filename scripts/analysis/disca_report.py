@@ -8,7 +8,7 @@ particle sets, builds class averages from the FULL-resolution 80^3 originals
 (DISCA itself worked on 32^3 downsampled copies), computes inter-class
 normalised cross-correlation, and renders central XY/XZ/YZ slices per class.
 
-Outputs: outputs/disca/results/RESULTS.md + PNG figures (small, committable).
+Outputs: disca/results/RESULTS.md + PNG figures (small, committable).
 
 Mirrors scripts/analysis/relion_class_report.py so DISCA slots into the same
 benchmark comparison (RELION/PyTom/Protomo).
@@ -113,7 +113,7 @@ def main():
     ap.add_argument("--model-dir", default=os.path.expanduser("~/Research/disca_work/model"))
     ap.add_argument("--input-pickle", default=os.path.expanduser("~/Research/disca_work/disca_input_672.pickle"))
     ap.add_argument("--subtomo-dir", default="subtomos_mrc")
-    ap.add_argument("--out-dir", default="outputs/disca/results")
+    ap.add_argument("--out-dir", default="disca/results")
     ap.add_argument("--ks", default="2,3,4")
     args = ap.parse_args()
 

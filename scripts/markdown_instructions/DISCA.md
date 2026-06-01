@@ -78,7 +78,7 @@ saved `labels_k{K}.pickle` is DISCA's *best-validity* solution, not necessarily 
 
 **`scripts/analysis/disca_report.py`** maps the saved labels back to particles (same container order),
 builds class averages from the **full-resolution 80³ originals**, computes inter-class normalised
-cross-correlation, and renders central XY/XZ/YZ slices per class → `outputs/disca/results/`
+cross-correlation, and renders central XY/XZ/YZ slices per class → `disca/results/`
 (`RESULTS.md` + PNGs).
 
 ## 7. Results (672 T4P particles)
@@ -105,12 +105,16 @@ single-cluster solutions during training. But its DDBI model-selection criterion
 the one-dominant-plus-outliers solution, i.e. it does **not** certify a balanced discrete split as the
 better clustering.
 
-**Bottom line — four-package convergent null.** RELION, PyTom, Protomo, **and** DISCA — spanning
-template matching, ML alignment, and template-free deep clustering — all converge on **no strong
-discrete conformational heterogeneity in this T4P set**. DISCA being the most methodologically
-independent makes this the strongest evidence yet that the answer is a property of the data, not of
-any one algorithm. This points the open scientific question ("is T4P discrete at all?") squarely at
-Stefano + the synthetic ground-truth datasets.
+**Bottom line — these four packages failed to recover the two real classes (corrected 2026-06-01).**
+RELION, PyTom, Protomo, **and** DISCA all converged on one-dominant-class-plus-outliers. Initially
+read as "no discrete heterogeneity," but **Stefano's expert consult is that this dataset contains two
+distinct, obvious pili-phase classes, and Dynamo recovers them well** (`dynamo/`). So the convergent
+result is a **shared failure to separate the two known phases**, not a true null — a real and useful
+benchmark signal: at our settings these four packages underperform Dynamo on real data with (expert)
+ground truth. Possible causes to probe: DISCA's coarse 32³ (~33 Å/px) sampling may wash out the
+phase difference; the template/ML-alignment packages may need different masks / lowpass / parameters;
+the phase difference may be subtle relative to the missing wedge. The **ETSimulations synthetic sets**
+(known ground truth) will pin down "method limitation" vs "parameter choice."
 
 **Caveats.** 32³ downsampling (~33 Å/px) limits DISCA to coarse features — fine (~10 Å) heterogeneity
 could be invisible at this sampling; the synthetic benchmark (with a known small-difference class)
