@@ -2,14 +2,17 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-05-29** by Claude (RELION session).
+> Last updated: **2026-06-01** by Claude (emClarity install/GPU-test session; not yet committed).
 
 ## Now / Next / Parked
 
-- **Now:** RELION 3D-subtomo classification done (k=2/3/4 × wedge/uniform). Like PyTom & Protomo,
-  RELION finds **no discrete split** — one dominant class (85–98%) + small outliers, inter-class
-  CC = 0.97–0.997. **Three independent packages now converge on "no strong discrete heterogeneity"
-  in T4P.** See `scripts/markdown_instructions/RELION.md` §9 + `outputs/relion/results/`.
+- **Now:** **emClarity installed + GPU-verified** (1.5.3.11 + MCR R2019a; runs on the RTX 5080/sm_120
+  via driver PTX-JIT — the CUDA-10 kernels work on Blackwell, no source build needed). **But it can't
+  classify the real T4P set:** emClarity is a tilt-series pipeline with no path to ingest our
+  pre-extracted, tilt-series-free subtomos → it's a **synthetic-data-track** package. See `EMCLARITY.md`.
+- **Prior result (still standing):** RELION/PyTom/Protomo all find **no discrete split** in T4P
+  (inter-class CC 0.97–0.997) — three packages converge on "no strong discrete heterogeneity."
+  See `RELION.md` §9 + `outputs/relion/results/`.
 - **Next:** (a) **Consult Stefano** — the convergent null across PyTom/Protomo/RELION makes "is T4P
   discrete at all?" the gating question; (b) **ETSimulations** synthetic ground-truth datasets
   (needed to distinguish "no real classes" from "can't find them"); (c) continue package coverage.
@@ -31,7 +34,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · — n/a/unknown
 | TomoFlow | ⬜ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | not started |
 | I3 / ProTomo | ✅ | (native) | ✅ | ✅ | — | — | ✅ | 3.1.0 installed; 2-class run on 234 centered particles (438 edge filtered); CC=0.921; see `protomo/research.md` + session log |
 | EMAN2 | 🟡 | `eman2` | ⬜ | ⬜ | ⬜ | ⬜ | — | **owned by Eben**; env + workspace ready; `EMAN2.md` |
-| emClarity | ⬜ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | `EMCLARITY.md` notes only; not installed |
+| emClarity | ✅ | MCR R2019a | ⬜ (real data n/a) | — | — | — | — | **installed + GPU-verified on RTX 5080/sm_120** (1.5.3.11 + MCR R2019a; CUDA-10 kernels JIT to Blackwell via the 13.2 driver). **Cannot run on real T4P:** tilt-series pipeline, no path to ingest pre-extracted subtomos → **synthetic-data track only**. See `EMCLARITY.md` |
 | PyTom | ✅ | `pytom_env` | ✅ | ✅ | ✅ | ⬜ | ✅ | **blocker:** k=2 & k=3 averages look identical — classification not separating structure |
 | DISCA | ⬜ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | not started |
 | HEMNMA-3D | ⬜ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | not started |

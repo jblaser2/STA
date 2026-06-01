@@ -75,3 +75,15 @@ is not masking a real signal. **Three independent packages (PyTom, Protomo, RELI
   can't find them."
 - Local outputs (not on GitHub): `~/Research/STA/outputs/relion/{Class3D,particles_*.star,ctf,
   initial_ref.mrc}`.
+
+## Where I stopped
+
+All scripts/docs/figures + STATUS + this log committed as **`69d1c1e`** and **pushed to
+`origin/main`** (in sync). Memory `project_relion_classification.md` written + indexed.
+
+## Next step
+
+Consult **Stefano** on whether T4P is discretely heterogeneous at all (3-package convergent null),
+then proceed to **ETSimulations** synthetic ground-truth datasets. Untracked repo leftovers
+(PyTom `*.xml`, root-level `review_alignment.py`/`masked_average.py`/etc.) predate this session and
+are unrelated — triage separately.
