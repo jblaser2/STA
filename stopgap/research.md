@@ -37,6 +37,8 @@ Copy each script to the root of the STOPGAP source directory.
 | `createStopgapInputs.m` | MATLAB script run once per project from `subtomo_project/`. Reads pre-extracted subvolumes, creates numbered symlinks, and writes the initial motivelist, wedgelist, per-halfset references, and masks. |
 | `subtomoParams.sh` | Calls the STOPGAP parser three times to write `params/subtomo_param.star`: a 9-iteration alignment schedule in three angular-refinement blocks (coarse → medium → fine). |
 | `runClassification.sh` | Main SLURM job. Runs the full pipeline sequentially: 9-iteration subtomogram alignment → PCA covariance decomposition → k-means clustering into 3 classes. |
+| `plotPCA.py` | Python script (requires conda env `stopgap` with numpy + matplotlib). Reads `eigenfac.star` and `motl_classified.star`; saves pairwise PC scatter plots (PC1–PC4) and a scree plot to a specified output directory. |
+| `runPostClassification.sh` | Post-classification SLURM job. Phase A: activates conda env `stopgap` and runs `plotPCA.py`. Phase B: seeds per-class references from the final consensus halfset refs, generates `params/multiclass_param.star`, and runs `ali_multiclass` (no angular search) to produce one averaged reference per class. |
 
 ### Edited STOPGAP files → replace in-place
 
@@ -142,7 +144,7 @@ The motivelist is the spine of the entire package. Every particle tracked by STO
 
 ### The Wedgelist
 
-One row per tomogram; stores imaging metadata needed to compute missing-wedge masks and CTF filters:
+One row per tomogram; stores imaging metadata needed to compute missing-wedge masks and CTF filters. Every unique `tomo_num` value in the motivelist must have a corresponding wedgelist entry — missing entries cause worker crashes at runtime.
 
 | Field | Description |
 |-------|-------------|
@@ -438,6 +440,8 @@ FLCF is the default and is significantly faster. Pearson is more flexible and ca
 - k-means or hierarchical clustering in PC space assigns class labels
 - Class labels written back into the motivelist `class` field
 
+**Dataset-size notes**: `calc_covar` scales as O(N²) in particle count — for 672 particles this is trivial. With 672 particles, reliable separation into more than ~3–5 classes is statistically marginal; fewer classes yield more trustworthy results.
+
 ---
 
 ### 5. Variance Mapping (`src/vmap/`)
@@ -671,7 +675,7 @@ The toolbox is a standalone MATLAB library providing utility functions used both
 - `sg_rotate_vol.m`, `sg_rotate_cubic.m`, `sg_rotate_linear.m` — 3D interpolated rotation
 - `sg_symmetrize_volume.m` — apply point-group symmetry to a volume
 - `sg_sharpen_reference.m` — B-factor sharpening of reference maps
-- `sg_normalize_under_mask.m` — normalize density statistics under a mask
+- `sg_normalize_under_mask.m` — normalize density statistics under a mask; returns `[mref, n_pix, m_idx]` — use only the first output
 - `sg_bandpass_filter_tomogram.m`, `sg_gaussian_filter_tomogram.m` — tomogram preprocessing
 
 ### FSC & Resolution
@@ -1123,15 +1127,62 @@ Key parameters (edit at the top of `runClassification.sh` before submitting):
 
 ---
 
-### Step 6 — Generate per-class averages
+### Step 6 — Create the conda environment (one-time)
 
-After classification, run a single subtomo averaging iteration per class with no angular search:
+`plotPCA.py` requires Python with numpy and matplotlib. Create the `stopgap` conda environment before submitting `runPostClassification.sh`:
 
+```bash
+conda create -n stopgap python=3.11 numpy matplotlib -y
 ```
-subtomo_mode='ali_multiclass', iterations=1, angincr=1, angiter=0
+
+This only needs to be done once. `runPostClassification.sh` sources `~/miniconda3/etc/profile.d/conda.sh` and activates the environment automatically at job start.
+
+---
+
+### Step 7 — Generate per-class averages and PCA plots
+
+After `runClassification.sh` completes, submit the post-classification job:
+
+```bash
+sbatch /home/<USER_ID>/summerResearch/STOPGAP/runPostClassification.sh
 ```
 
-This applies the class labels from `motl_classified.star` to produce one averaged reference per class without changing any orientations.
+**Phase A — PCA scatter plots** (`plotPCA.py`): reads `pca_project/pca/eigenfac.star` (per-particle PC scores) and `pca_project/lists/motl_classified.star` (class labels); saves pairwise scatter plots for all PC1–PC4 combinations plus a scree plot with cumulative variance to `pca_project/plots/`. If the classes overlap heavily in PC space, the classification may not reflect real structural heterogeneity.
+
+**Phase B — Per-class averages** (`ali_multiclass`, `angiter=0`):
+
+With `angiter=0` and `phi_angiter=0`, no angular search is performed — each particle is averaged at its current refined orientation from Phase 1 alignment.
+
+**Reference naming convention** (confirmed from `refresh_reflist.m` and `load_subtomo_references.m`):
+
+When `ref_name` is a bare string (no `.star` extension), STOPGAP auto-generates a reflist with one entry per unique class in the motivelist, all sharing the same `ref_name`. It loads input references named:
+```
+ref/{ref_name}_{A,B}_{iteration}_{class}.mrc
+```
+And writes output references named:
+```
+ref/{ref_name}_{A,B}_{iteration+1}_{class}.mrc    (per-halfset)
+ref/{ref_name}_{iteration+1}_{class}.mrc           (FOM-weighted merged)
+```
+With `ref_name=ref_multiclass` and `startidx=1`, the script seeds `ref/ref_multiclass_{A,B}_1_{1..N}.mrc` from the final consensus halfset refs (`ref_class1_{A,B}_10.mrc`), and the job writes `ref/ref_multiclass_2_{1..N}.mrc` as the final merged per-class averages.
+
+**ccmask is required even with `angiter=0`**: it is applied unconditionally in `flcf_subtomo_scoring_function.m` for peak finding regardless of angular search depth. The script copies `ccmask.mrc` from `subtomo_project/masks/` to `pca_project/masks/` before running the watcher.
+
+**Expected outputs:**
+```
+pca_project/
+  plots/
+    pca_pc1_vs_pc2.png
+    pca_pc1_vs_pc3.png
+    pca_pc2_vs_pc3.png
+    pca_scree.png              (requires eigenval.star in pca/; added automatically)
+  ref/
+    ref_multiclass_2_1.mrc    ← class 1 average (open in ChimeraX)
+    ref_multiclass_2_2.mrc    ← class 2 average
+    ref_multiclass_2_3.mrc    ← class 3 average
+```
+
+**Wall time**: the multiclass averaging step is fast — comparable to a single `p_avg` step (seconds to low minutes at 32 cores for 672 particles). Total job time under 30 minutes.
 
 ---
 
@@ -1161,4 +1212,11 @@ pca_project/
   pca/eigenfac.star            (per-particle PC scores, N×10)
         ↓  runClassification.sh Phase 3 (k-means, MATLAB)
   lists/motl_classified.star   (class labels assigned; 3 classes)
+        ↓  runPostClassification.sh Phase A (plotPCA.py, conda stopgap)
+  plots/pca_pc1_vs_pc2.png     (pairwise PC scatter plots, colored by class)
+  plots/pca_scree.png           (variance explained per component)
+        ↓  runPostClassification.sh Phase B (ali_multiclass, angiter=0)
+  ref/ref_multiclass_2_1.mrc   (class 1 average, FOM-weighted merged halfsets)
+  ref/ref_multiclass_2_2.mrc   (class 2 average)
+  ref/ref_multiclass_2_3.mrc   (class 3 average)
 ```

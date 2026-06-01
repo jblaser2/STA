@@ -19,16 +19,18 @@
 #   This is fully supported by SLURM and requires no nested sbatch calls.
 
 #SBATCH --job-name=stopgap_classify
-#SBATCH --ntasks=16                        # must match n_cores below
+#SBATCH --ntasks=32                        # must match n_cores below
 #SBATCH --cpus-per-task=1
-#SBATCH --mem-per-cpu=16G
-#SBATCH --time=24:00:00                    # adjust; subtomo dominates runtime
+#SBATCH --mem-per-cpu=10G
+#SBATCH --time=2-0:00:00                    # adjust; subtomo dominates runtime
 #SBATCH --output=logs/classify_%j.log
 #SBATCH --error=logs/classify_%j.err
 
 set -e
 set -o nounset
 mkdir -p logs
+
+log() { echo "[$(date '+%H:%M:%S')] $*"; }
 
 # ---- USER CONFIGURATION ----------------------------------------------------
 export STOPGAPHOME=/home/ejl62/summerResearch/STOPGAP/exec
@@ -37,7 +39,7 @@ MATLAB_TOOLBOX=/home/ejl62/summerResearch/STOPGAP/sg_toolbox  # for clustering s
 SUBTOMO_ROOT='/home/ejl62/nobackup/autodelete/stopgapClassification/subtomo_project'
 PCA_ROOT='/home/ejl62/nobackup/autodelete/stopgapClassification/pca_project'
 
-n_cores=16        # must match #SBATCH --ntasks
+n_cores=32        # must match #SBATCH --ntasks
 copy_local=1      # /tmp is local LVM (209 GB) on BYU HPC nodes — not NFS
 
 # Final iteration number: 9 iterations → output motl is motl_10.star
@@ -55,7 +57,8 @@ stopgap="${STOPGAPHOME}/bin/stopgap_mpi_slurm.sh"
 submit_cmd="srun ${stopgap} \${rootdir} \${paramfilename} ${n_cores} ${copy_local} slurm"
 
 # ============================================================================
-echo "=== PHASE 1: Subtomogram alignment ==="
+log "=== PHASE 1: Subtomogram alignment (9 iterations) ==="
+log "Iteration progress: ls ${SUBTOMO_ROOT}/lists/motl_*.star"
 # ============================================================================
 # The watcher reads subtomo_param.star and runs all 9 task blocks in sequence.
 # Each task block: align → average → FSC. Completion is signalled via
@@ -64,26 +67,32 @@ echo "=== PHASE 1: Subtomogram alignment ==="
 ${watcher} "${SUBTOMO_ROOT}" "params/subtomo_param.star" ${n_cores} slurm \
     "srun ${stopgap} ${SUBTOMO_ROOT} params/subtomo_param.star ${n_cores} ${copy_local} slurm"
 
-echo "Subtomogram alignment complete. Final motl: motl_${FINAL_ITER}.star"
+log "Phase 1 complete. Final motl: motl_${FINAL_ITER}.star"
 
 # ============================================================================
-echo "=== Setting up PCA project ==="
+log "=== Setting up PCA project ==="
 # ============================================================================
 # Copy final outputs from subtomo project into PCA project.
 mkdir -p "${PCA_ROOT}/lists" "${PCA_ROOT}/ref" "${PCA_ROOT}/masks"
 
+log "Copying motl_${FINAL_ITER}.star to pca_project/lists/"
 cp "${SUBTOMO_ROOT}/lists/motl_${FINAL_ITER}.star"       "${PCA_ROOT}/lists/"
+log "Copying wedgelist.star to pca_project/lists/"
 cp "${SUBTOMO_ROOT}/lists/wedgelist.star"                 "${PCA_ROOT}/lists/"
+log "Copying ref_class1_${FINAL_ITER}.mrc to pca_project/ref/"
 cp "${SUBTOMO_ROOT}/ref/ref_class1_${FINAL_ITER}.mrc"    "${PCA_ROOT}/ref/"
+log "Copying ali_mask.mrc to pca_project/masks/pca_mask.mrc"
 cp "${SUBTOMO_ROOT}/masks/ali_mask.mrc"                   "${PCA_ROOT}/masks/pca_mask.mrc"
 
 # Subtomograms: symlink to avoid duplicating 672 files
 if [ ! -d "${PCA_ROOT}/subtomograms" ]; then
+    log "Symlinking subtomograms directory"
     ln -s "${SUBTOMO_ROOT}/subtomograms" "${PCA_ROOT}/subtomograms"
 fi
+log "PCA project setup complete."
 
 # ============================================================================
-echo "=== PHASE 2: PCA ==="
+log "=== PHASE 2: PCA (4 tasks) ==="
 # ============================================================================
 # PCA param files are NOT appended — each call to the parser overwrites the
 # previous file. We run each task separately: parse → watcher → parse → ...
@@ -117,11 +126,11 @@ pca_common_args="pca \
 
 run_pca_task() {
     local task=$1
-    echo "--- PCA task: ${task} ---"
+    log "PCA task start: ${task}"
     eval "${parser} ${pca_common_args} pca_task ${task}"
     ${watcher} "${PCA_ROOT}" "params/pca_param.star" ${n_cores} slurm \
         "srun ${stopgap} ${PCA_ROOT} params/pca_param.star ${n_cores} ${copy_local} slurm"
-    echo "PCA task ${task} complete."
+    log "PCA task done: ${task}"
 }
 
 run_pca_task rot_vol       # pre-rotate all particles into reference frame
@@ -130,7 +139,7 @@ run_pca_task calc_eigenval # compute eigenvalues
 run_pca_task calc_eigenvec # compute eigenvectors and per-particle factor scores
 
 # ============================================================================
-echo "=== PHASE 3: Clustering ==="
+log "=== PHASE 3: Clustering (k-means, n_classes=${N_CLASSES:-3}) ==="
 # ============================================================================
 # Run k-means in MATLAB using the compiled toolbox (no interactive MATLAB needed).
 # The toolbox binary exposes sg_pca_kmeans_cluster for command-line use.
@@ -142,6 +151,7 @@ MOTL_IN="${PCA_ROOT}/lists/motl_${FINAL_ITER}.star"
 MOTL_OUT="${PCA_ROOT}/lists/motl_classified.star"
 
 module load matlab/r2023b 2>/dev/null || true
+log "Starting MATLAB k-means (${N_CLASSES} classes, 10 replicates)..."
 
 matlab -nodisplay -nosplash -r "
     addpath(genpath('${MATLAB_TOOLBOX}'));
@@ -183,7 +193,6 @@ matlab -nodisplay -nosplash -r "
     exit;
 "
 
-echo "=== Classification pipeline complete ==="
-echo "Classified motivelist: ${MOTL_OUT}"
-echo "To generate per-class averages, run subtomo averaging with:"
-echo "  subtomo_mode='ali_multiclass', iterations=1, angincr=1, angiter=0"
+log "=== Classification pipeline complete ==="
+log "Classified motivelist: ${MOTL_OUT}"
+log "To generate per-class averages: subtomo_mode=ali_multiclass, iterations=1, angincr=1, angiter=0"
