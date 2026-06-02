@@ -78,3 +78,11 @@ installed. `run_mra.m` is already configured (`destination='matlab_parfor'`) to 
 
 ### Where I stopped (final)
 Run complete, evaluated, results recorded. Side-track is **closed** — no Dynamo follow-up pending.
+
+**Pushed to GitHub** (commit `6e3f782`, on `origin/main`): the 6 `.m` scripts, `README.md`,
+small result figures/text/logs, and `mra_aligned.tbl` (~1 MB total, largest file 288 K). Heavy
+regenerable workspaces (`ttest128/`, `mra_ttest128/`, `*.PCA/`, `*.mat`, ~405 MB) excluded via a
+local `.gitignore`. Rebased onto Eben's OPUS-TOMO push (`fcef97b`); resolved a STATUS.md conflict
+keeping **both** updates (Eben's OPUS-TOMO Now/Next + my Dynamo DONE bullet). Memory updated:
+`dynamo-execution-needs-pct` (PCT now installed → resolved), `dynamo-mra-project-scripting`
+(embedded-MRA collapse + col-22 GT-carryover trap + cold-start result).
