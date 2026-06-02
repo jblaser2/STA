@@ -2,7 +2,7 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-01** by Claude (TomoFlow port+run; emClarity + DISCA earlier same day) + Eben (AC3D/EMAN2/STOPGAP/OPUS-TOMO status); a parallel Dynamo-methodology session is also logged.
+> Last updated: **2026-06-02** by Claude (TomoNet evaluation: rejected, not suitable for out-of-box benchmark)
 
 ## Now / Next / Parked
 
@@ -18,7 +18,8 @@
   pilus (CC 0.956) → TomoFlow **also misses the two phases**. **Five packages now miss the split
   (RELION, PyTom, Protomo, DISCA, TomoFlow) vs Dynamo recovering it.** Earlier same session: DISCA
   done (`disca/`); emClarity installed + GPU-verified but tilt-series-only → synthetic-track
-  (`EMCLARITY.md`).
+  (`EMCLARITY.md`). **TomoNet evaluated (2026-06-02) and rejected:** IsoNet-based denoising only;
+  would require custom autoencoder training, contrary to benchmark scope (out-of-box packages).
 - **Next:** (a) **continue package coverage** — next 3D-input classifier (e.g. MDTOMO, OPUS-TOMO);
   (b) chase the two-phase split using Dynamo's labels as reference (DISCA at 64³; phase-aware
   mask/lowpass for the alignment + OF packages); (c) **ETSimulations** synthetic ground-truth sets
@@ -54,7 +55,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 | DISCA | ✅ | `disca` | ✅ `build_disca_input.py` | ✅ | ✅ | ✅ | ✅ | template-free unsupervised deep clustering (torch, native sm_120); k=2/3/4 → one dominant ~94% class + small noisy outliers — **missed the two real phases** (cf. Dynamo). `disca/research.md` + `disca/results/` |
 | HEMNMA-3D | ❌ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | Part of Scipion3 ContinuousFlex plug-in; requires initial atomic model/reference map; cannot sort datasets like we're doing right now. |
 | AC3D | ❌ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | Implemented as part of PyTom, run with that one. |
-| TomoNet | ⬜ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | not started |
+| TomoNet | ❌ | — | ❌ | — | — | — | — | **evaluated, rejected** — IsoNet denoising only, no classification workflow built-in. Would require custom autoencoder training (see `TomoNet/research.md`), contrary to benchmark scope (out-of-box packages). Denoising as pre-processing could be explored separately if needed. |
 
 ## Datasets
 
