@@ -1,26 +1,28 @@
-# Plan: Unsupervised Classification of Pre-Picked Subtomograms with OPUS-ET
+# OPUS-ET Pili Subtomogram Classification — Research Notes
 
-_Date: 2026-06-02_
-
----
-
-## Feasibility Assessment
-
-**Yes, OPUS-ET is well-suited for this task.** Unsupervised heterogeneity analysis of subtomogram volumes is the tool's primary purpose. The dataset described — pre-picked, centered particles with the symmetry axis aligned to z — matches the exact input convention OPUS-ET expects.
-
-Key compatibility points:
-- The 3D CNN encoder takes raw subtomogram volumes and learns per-particle latent codes.
-- Z-axis alignment is native: OPUS-ET handles in-plane rotation (`euler2`) separately via `rotate_2d`. Since particles are already z-aligned, tilt/rot Euler angles can be set to zero.
-- K-means and GMM clustering of the learned latent codes provide the unsupervised classification output.
-- Since particles are previously picked (volumes already extracted), no particle picking or subtomogram extraction step is needed.
-
-**Important constraints for this dataset:**
-- `templateres` must be N×16 where N ∈ {8,...,16}, making 128 the minimum valid value. The 80³ box experimental volumes are compared against a 128³ template that is internally cropped to match the render resolution.
-- No CTF metadata is available — CTF modulation will be disabled.
+_Last updated: 2026-06-02_  
+_Status: Pipeline completed successfully (20 epochs, K=8 clusters)_
 
 ---
 
-## Workstation Specifications
+## Overview
+
+This document describes an end-to-end unsupervised classification of 672 pili subtomograms using OPUS-ET (opusTomo), a beta-VAE framework for cryo-ET heterogeneity analysis. It is written to be self-contained: a lab member should be able to replicate the full pipeline from raw MRC files to per-class STAR files and 3D density maps.
+
+---
+
+## What OPUS-ET Does
+
+OPUS-ET trains a **HetOnlyVAE** — a 3D CNN encoder that maps each subtomogram to an 8-dimensional latent code, and a ConvTemplate decoder that reconstructs a 3D density from that code. After training, k-means clustering on the latent codes partitions particles into structural classes, and the decoder generates one 3D volume per class center.
+
+Architecture (61M parameters):
+- **Encoder**: 3D conv stack → 512-d FC → μ and log σ (zdim=8)
+- **Decoder**: FC → ConvTranspose3d stack → 128³ template → SpatialTransformer → z-projection → CTF → MSE loss
+- **Loss**: reconstruction MSE + KL divergence (beta-VAE) + optional contrastive term (`c_mmd`, disabled here with `--lamb 0`)
+
+---
+
+## Hardware and Software
 
 | Resource | Value |
 |---|---|
@@ -28,400 +30,400 @@ Key compatibility points:
 | CUDA driver | 13.2 |
 | CPU cores | 24 |
 | RAM | 62 GB |
-| Disk (/home) | 874 GB total, ~805 GB free |
-| Active conda env | `gen` (Python 3.13 — incompatible with OPUS-ET) |
-| Other conda env | `eman2` |
+| OS | RHEL 10.1 x86_64 |
+| Conda env | `opuset` (Python 3.10) |
+| PyTorch | 2.11.0+cu128 |
 
-**Note**: OPUS-ET's `environment.yml` pins PyTorch 1.11 + CUDA 11.3, which is incompatible with the RTX 5080 (Blackwell architecture). A new conda environment with PyTorch 2.6+ built for CUDA 12.8 (`cu128`) is required — CUDA 12.8 PyTorch wheels run correctly under the installed CUDA 13.2 driver.
+**Why not use the bundled `environment.yml`**: It pins PyTorch 1.11 + CUDA 11.3, which has no compiled kernels for the RTX 5080 (Blackwell SM_120 architecture). A cu128 wheel is required.
 
 ---
 
-## Dataset Summary
+## Dataset
 
 | Property | Value |
 |---|---|
 | Location | `~/src/particles/` |
-| Number of particles | 672 |
-| Number of source tomograms | 294 |
-| Average particles per tomogram | ~2.3 |
+| Particles | 672 |
+| Source tomograms | 294 (~2.3 particles/tomogram) |
 | Box size | 80 × 80 × 80 voxels |
 | Pixel size | 13.33 Å/voxel |
 | Data type | float32 (MRC mode 2) |
 | Filename convention | `aligned_tomNNN_PNNNN.mrc` |
-| CTF metadata | None available |
-| Pose metadata | None (particles are z-axis aligned; Euler angles set to zero) |
+| CTF metadata | None |
+| Pose metadata | None — particles are z-axis aligned; Euler angles set to zero |
 
 ---
 
-## Step 0: Create the OPUS-ET Conda Environment
-
-PyTorch 2.6+ is required for RTX 5080 (Blackwell) support. Install from the `cu128` wheel index, which is forward-compatible with the installed CUDA 13.2 driver.
+## Environment Setup
 
 ```bash
-# Create a new environment with Python 3.10 (compatible with OPUS-ET dependencies)
 conda create -n opuset python=3.10 -c conda-forge -y
 conda activate opuset
 
-# Install PyTorch 2.6+ with CUDA 12.8 wheels (runs on CUDA 13.2 driver)
+# PyTorch cu128 — forward-compatible with CUDA 13.2 driver
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
 
-# Verify GPU is accessible
-python -c "import torch; print(torch.__version__); print(torch.cuda.get_device_name(0))"
-# Expected: ... NVIDIA GeForce RTX 5080
+# Verify GPU
+python -c "import torch; print(torch.__version__, torch.cuda.get_device_name(0))"
+# Expected: 2.11.0+cu128  NVIDIA GeForce RTX 5080
 
-# Install OPUS-ET dependencies (relax strict pins to avoid conflicts)
+# OPUS-ET dependencies (setup.py has install_requires commented out — install manually)
 pip install mrcfile numpy scipy scikit-learn umap-learn healpy seaborn adjustText \
     monty starfile pyarrow astropy biopython tqdm typeguard
 
-# Install OPUS-ET itself (editable install registers 'dsd' and 'dsdsh' CLIs)
+# Editable install registers 'dsd' and 'dsdsh' CLIs
 cd ~/opusSrc/opusTomo
 pip install -e .
-
-# Confirm installation
 dsd --help
 ```
 
-> **If any dependency fails with Python 3.10**: the most likely culprits are `healpy` (requires numpy <2) and `umap-learn`. Install them with `--no-deps` and manage transitive deps manually.
-
----
-*Feedback:* The installation instructions say to create the invironment using the provided `environment.yml` file. Why do you not recommend doing this? Will not using the yaml file create any problems?
-
-*Response:* The `environment.yml` pins `pytorch=1.11.0=py3.9_cuda11.3_cudnn8.2.0_0` — a build that predates the RTX 5080 (Blackwell architecture) by several years. CUDA 11.3 PyTorch wheels have no compiled kernels for Blackwell's SM architecture (`sm_120`), so using that environment would cause PyTorch to fail to use the GPU entirely. It would either crash on import or silently fall back to CPU, making training impractically slow. This is why a new environment with PyTorch 2.6+ (`cu128` wheels) is necessary.
-
-Not using the yml will not break the OPUS-ET code itself. The codebase uses only standard PyTorch operations (`grid_sample`, 3D convolutions, FFT) whose APIs are stable across PyTorch 1.11→2.x. The main risk from using newer package versions is subtle numerical differences in rarely-used paths, which are not a concern for this use case.
-## Step 1: Create the RELION STAR File
-
-No STAR file exists for this dataset. Generate one from the filename convention (`aligned_tomNNN_PNNNN.mrc`). Since particles are z-axis aligned with no known in-plane rotation, all Euler angles are set to zero.
-
-```python
-# ~/opusSrc/write_star.py
-import glob, os
-
-particle_dir = os.path.expanduser('~/src/particles')
-out_star = os.path.expanduser('~/opusSrc/particles.star')
-apix = 13.33
-
-mrc_paths = sorted(glob.glob(os.path.join(particle_dir, 'aligned_tom*.mrc')))
-
-lines = [
-    'data_',
-    'loop_',
-    '_rlnImageName',
-    '_rlnAngleRot',
-    '_rlnAngleTilt',
-    '_rlnAnglePsi',
-    '_rlnOriginX',
-    '_rlnOriginY',
-    '_rlnOriginZ',
-    '_rlnMicrographName',
-]
-
-for p in mrc_paths:
-    # e.g. 'aligned_tom100_P0001.mrc' -> tomogram name 'aligned_tom100'
-    basename = os.path.basename(p)                  # aligned_tom100_P0001.mrc
-    tomo_name = '_'.join(basename.split('_')[:2])   # aligned_tom100
-    lines.append(f'{p}\t0.0\t0.0\t0.0\t0.0\t0.0\t0.0\t{tomo_name}')
-
-with open(out_star, 'w') as f:
-    f.write('\n'.join(lines) + '\n')
-
-print(f'Wrote {len(mrc_paths)} particles to {out_star}')
-```
-
-Run with:
-```bash
-conda activate opuset
-python ~/opusSrc/write_star.py
-```
-
 ---
 
-## Step 2: Create the Pose Pickle
+## Pipeline
+
+All scripts live in `~/opusSrc/opus_project/`. The master orchestrator is `~/opusSrc/runClassification.sh`.
+
+### Run everything end-to-end
 
 ```bash
-conda activate opuset
 cd ~/opusSrc
+conda activate opuset
+bash runClassification.sh 2>&1 | tee opus_project/logs/pipeline_$(date +%Y%m%d_%H%M%S).log
+```
 
-# Box size is 80; pass 80 here (the internal lattice will be 81)
-dsd parse_pose_star particles.star \
-    -D 80 \
-    --Apix 13.33 \
-    -o pose_euler.pkl
+The script skips steps whose outputs already exist, so it is safe to re-run after interruption. Options:
+
+```bash
+bash runClassification.sh --k 10         # use 10 clusters
+bash runClassification.sh --epoch 14     # analyse a specific epoch
+bash runClassification.sh --skip-train   # skip training, re-run analysis only
 ```
 
 ---
-*Feedback:* What is the pose pickle? Why do I need it?
 
-*Response:* The pose pickle is a binary file (`.pkl`) that stores the 3D orientation (as a rotation matrix) and translation offset for each particle. OPUS-ET needs this because its training loop works by taking each particle's 3D template, rotating and translating it into the particle's known orientation, projecting it along z, and comparing that projection to the experimental subtomogram slice. Without knowing each particle's orientation, it cannot make that comparison.
+### Step 0: Dummy CTF File (CRITICAL — required even with no CTF)
 
-In a normal cryo-ET workflow these orientations come from prior subtomogram alignment (e.g. template matching or STA refinement). In our case, since the particles are already z-axis aligned with no known in-plane rotation, all orientations are identity (zero Euler angles). The `parse_pose_star` command simply reads those zero angles from the STAR file and converts them into the 3×3 rotation matrix format that PyTorch uses internally during training. Think of it as translating "zero rotation" from human-readable degrees into the matrix math the model expects.
-## Step 3: Create a Solvent Mask
+`dataset.load_subtomos()` unconditionally calls `star.get_3dctfs()`, which requires `_rlnCtfImage` in the STAR file **regardless of `--ctfalpha`/`--ctfbeta`**. Training crashes at startup with `RuntimeError: '_rlnCtfImage'` if this column is absent.
 
-### Option A: Average all subtomograms then threshold (recommended)
+**Workaround**: create a single shared placeholder CTF file in the particle directory:
+
+```
+# ~/src/particles/dummy_ctf.star
+data_images
+
+loop_
+_rlnAngleTilt
+_rlnDefocusU
+_rlnVoltage
+_rlnSphericalAberration
+_rlnAmplitudeContrast
+_rlnCtfBfactor
+_rlnCtfScalefactor
+0.0	20000.0	300.0	2.7	0.07	0.0	1.0
+```
+
+Key details:
+- `get_3dctfs()` takes `_rlnCtfImage = dummy_ctf.mrc`, changes extension `.mrc`→`.star`, and reads CTF parameters from the resulting `dummy_ctf.star`.
+- Path resolution: `prefix_paths()` tries `datadir/basename(path)` first — so the file must live in `~/src/particles/dummy_ctf.star` and the STAR column must be the bare filename `dummy_ctf.mrc` (no directory prefix).
+- With `--ctfalpha 0 --ctfbeta 0`, the loaded CTF values are **never applied**; the file is read but ignored. Placeholder values are fine.
+
+---
+
+### Step 1: STAR File (`opus_project/01_write_star.py`)
+
+Creates `opus_project/particles.star` with all required columns including `_rlnCtfImage`.
 
 ```python
-# ~/opusSrc/make_mask.py
-import glob, os
-import numpy as np
-import mrcfile
-
-particle_dir = os.path.expanduser('~/src/particles')
-files = sorted(glob.glob(os.path.join(particle_dir, 'aligned_tom*.mrc')))
-
-print(f'Averaging {len(files)} volumes ...')
-acc = None
-for f in files:
-    with mrcfile.open(f, permissive=True) as m:
-        v = m.data.astype(np.float32)
-    acc = v if acc is None else acc + v
-avg = acc / len(files)
-
-# Write consensus average
-with mrcfile.new(os.path.expanduser('~/opusSrc/consensus.mrc'), overwrite=True) as m:
-    m.set_data(avg)
-    m.voxel_size = 13.33
-
-# Threshold at 1 sigma above mean to create mask, then dilate 2 voxels
-from scipy.ndimage import binary_dilation
-thresh = avg.mean() + avg.std()
-mask = (avg > thresh).astype(np.float32)
-mask = binary_dilation(mask, iterations=2).astype(np.float32)
-
-with mrcfile.new(os.path.expanduser('~/opusSrc/mask.mrc'), overwrite=True) as m:
-    m.set_data(mask)
-    m.voxel_size = 13.33
-
-print(f'Mask covers {mask.sum():.0f} / {mask.size} voxels ({100*mask.mean():.1f}%)')
+PARTICLE_DIR = os.path.expanduser('~/src/particles')
+# columns: _rlnImageName _rlnCtfImage _rlnAngleRot _rlnAngleTilt _rlnAnglePsi
+#          _rlnOriginX _rlnOriginY _rlnOriginZ _rlnMicrographName
+# All angles and offsets are zero. _rlnCtfImage = 'dummy_ctf.mrc' for all particles.
 ```
+
+Run: `python opus_project/01_write_star.py`
+
+---
+
+### Step 2: Pose Pickle (`opus_project/02_make_pose.sh`)
 
 ```bash
-python ~/opusSrc/make_mask.py
+dsd parse_pose_star opus_project/particles.star -D 80 --Apix 13.33 -o opus_project/pose_euler.pkl
 ```
 
-### Option B: Spherical mask (quick start if averaging is slow)
+Converts zero Euler angles to 3×3 identity rotation matrices stored in a pickle. The `-D 80` argument sets the effective box size; internally the lattice is D+1=81.
+
+---
+
+### Step 3: Consensus Map + Mask (`opus_project/03_make_mask.py`)
+
+Averages all 672 subtomograms → `opus_project/consensus.mrc`, then thresholds at mean+1σ with 2-voxel binary dilation → `opus_project/mask.mrc`.
+
+Cylindrical masks are appropriate for pili and work fine. If the averaged mask looks fragmented, inspect `consensus.mrc` in ChimeraX and use an explicit cylinder:
 
 ```python
-# ~/opusSrc/make_sphere_mask.py
-import numpy as np, mrcfile, os
-
-D, apix = 80, 13.33
-radius = 35   # voxels — adjust to your particle; 35 covers ~467 Å radius
-
-c = D // 2
-zz, yy, xx = np.ogrid[:D, :D, :D]
-mask = ((zz-c)**2 + (yy-c)**2 + (xx-c)**2 <= radius**2).astype(np.float32)
-
-with mrcfile.new(os.path.expanduser('~/opusSrc/mask.mrc'), overwrite=True) as m:
-    m.set_data(mask)
-    m.voxel_size = apix
-print(f'Sphere mask: radius={radius} px ({radius*apix:.0f} Å)')
-```
-*Feedback:* I know my partical are pili, could I use a cylindrical mask instead? Is OpusTomo set up for that? Or is averaging all subtomograms still better?
-
-*Response:* A cylindrical mask is absolutely appropriate for pili and OPUS-ET supports it — the mask is just a binary MRC volume (1 inside, 0 outside) and the code doesn't care about its shape. However, **averaging all subtomograms first is still the better approach**, because the threshold of that average will naturally produce a cylindrical mask shaped to your actual data (correct diameter, length, and centering). A hand-drawn cylinder risks getting the radius or length wrong and either masking out real density or including too much solvent noise.
-
-If the averaged mask looks too noisy to threshold cleanly, use the averaging script to generate `consensus.mrc`, inspect it in ChimeraX, then replace the thresholding block with an explicit cylinder:
-
-```python
-# Drop-in replacement for the thresholding block in make_mask.py
-from scipy.ndimage import binary_dilation
-
-D, apix = 80, 13.33
-radius_xy = 12   # voxels — ~160 Å; adjust to pilus diameter in ChimeraX
-length_z  = 70   # voxels — adjust to pilus length visible in the average
-
+radius_xy = 12   # voxels (~160 Å)
+length_z  = 70   # voxels
 c = D // 2
 zz, yy, xx = np.mgrid[:D, :D, :D]
-mask = (
-    ((yy - c)**2 + (xx - c)**2 <= radius_xy**2) &
-    (np.abs(zz - c) <= length_z // 2)
-).astype(np.float32)
-mask = binary_dilation(mask, iterations=1).astype(np.float32)
+mask = (((yy-c)**2 + (xx-c)**2 <= radius_xy**2) & (np.abs(zz-c) <= length_z//2)).astype(np.float32)
 ```
-
-Start with Option A (averaging + threshold) and only fall back to the explicit cylinder if the averaged mask is fragmented or too noisy.
 
 ---
 
-## Step 4: Training
-
-Single-GPU training on the RTX 5080. The dataset is small (672 particles), so training will be fast — expect 10–30 minutes for 20 epochs.
+### Step 4: Training (`opus_project/04_train.sh`)
 
 ```bash
-conda activate opuset
-cd ~/opusSrc
-
-dsd train_tomo particles.star \
-    --poses pose_euler.pkl \
-    -n 20 \
-    -b 16 \
-    --zdim 8 \
-    --zaffinedim 0 \
-    --lr 1e-4 \
-    --beta-control 1.0 \
-    --lamb 0 \
-    -o output_dir \
-    -r mask.mrc \
-    --downfrac 1.0 \
-    --templateres 128 \
-    --angpix 13.33 \
+dsd train_tomo opus_project/particles.star \
+    --poses opus_project/pose_euler.pkl \
+    -n 20 -b 16 --zdim 8 --zaffinedim 0 \
+    --lr 1e-4 --beta-control 1.0 --lamb 0 \
+    -o opus_project/output \
+    -r opus_project/mask.mrc \
+    --downfrac 1.0 --templateres 128 --angpix 13.33 \
     --datadir ~/src/particles \
-    --ctfalpha 0. --ctfbeta 0.
+    --ctfalpha 0. --ctfbeta 0. \
+    --split opus_project/output/split.pkl
 ```
 
-### Parameter rationale for this dataset
+**`--split` is required**: without it, `args.split` is `None` and `os.path.exists(None)` crashes at `train_tomo.py:898`.
+
+#### Parameter rationale
 
 | Parameter | Value | Rationale |
 |---|---|---|
-| `-b 16` | 16 | 80³ volumes are small; 16 GB VRAM on RTX 5080 easily handles this |
-| `--zdim 8` | 8 | Start here for 672 particles; drop to 4 if classes blend, raise to 16 if too coarse |
-| `--zaffinedim 0` | 0 | Classification only — no conformational (deformation) analysis needed |
-| `--downfrac 1.0` | 1.0 | Box is already small (80 px); keep full resolution (render_size = 80) |
-| `--templateres 128` | 128 | Minimum valid value (N×16, N≥8); template is cropped internally to render_size=80 |
-| `--angpix 13.33` | 13.33 | Matches MRC voxel size header |
-| `--ctfalpha 0. --ctfbeta 0.` | 0, 0 | No CTF metadata available; disables CTF modulation entirely |
-| `--lamb 0` | 0 | With ~2.3 particles per tomogram, tomogram-based disentanglement has little signal |
-| `-n 20` | 20 | Monitor loss; 672 particles at batch 16 = 42 steps/epoch, so 20 epochs is ~840 steps |
+| `-b 16` | 16 | 80³ is small; 16 GB VRAM handles this easily |
+| `--zdim 8` | 8 | Good starting point for 672 particles |
+| `--zaffinedim 0` | 0 | Classification only, no conformational deformation |
+| `--downfrac 1.0` | 1.0 | Keep full resolution (render_size = 80) |
+| `--templateres 128` | 128 | Minimum valid value (N×16, N≥8); cropped internally to 80 |
+| `--angpix 13.33` | 13.33 | Matches MRC header |
+| `--ctfalpha 0 --ctfbeta 0` | 0, 0 | No CTF metadata; disables CTF modulation |
+| `--lamb 0` | 0 | ~2.3 particles/tomogram — contrastive loss has little signal |
 
-> **No `--multigpu`**: only one GPU is available. Do not add `--multigpu` or `--num-gpus`.
+#### Actual training results (epoch 0–19)
 
-### Monitor training loss
+- Train split: 537 particles / 33 batches per epoch
+- Val split: 135 particles / 8 batches per epoch
+- Epoch 1 avg train gen_loss: −0.980, SNR²: 1.17
+- Epoch 2 avg train gen_loss: −1.230, SNR²: 1.64
+- Loss steadily decreasing through epoch 20 — no divergence, no NaN
 
-```bash
-# In a separate terminal while training runs
-python ~/opusSrc/opusTomo/analysis_scripts/plot_loss.py ~/opusSrc/output_dir/run.log
-```
-
-Stop training early if the reconstruction loss plateaus before epoch 20.
-
-### Resume training if interrupted
+#### Resume training if interrupted
 
 ```bash
-dsd train_tomo particles.star \
-    --poses pose_euler.pkl \
-    ... [same args] ... \
-    --load output_dir/weights.19.pkl \
-    --latents output_dir/z.19.pkl
+dsd train_tomo ... --load opus_project/output/weights.19.pkl --latents opus_project/z.19.pkl
 ```
 
 ---
 
-## Step 5: Latent Space Analysis and Clustering
+### Step 5: Latent Analysis + Clustering (`opus_project/05_analyze.sh`)
 
 ```bash
-conda activate opuset
-cd ~/opusSrc
-
-EPOCH=19   # or whichever epoch had the lowest reconstruction loss
-K=8        # number of classes; with 672 particles, 5–10 is reasonable
-NUMPC=2
-
-dsdsh analyze output_dir $EPOCH $NUMPC $K
-# Omit --skip-umap to get the UMAP embedding (adds ~2 min for 672 particles — worth it)
+dsdsh analyze opus_project/output 19 2 8
 ```
 
-Output in `output_dir/analyze.$EPOCH/`:
-- `z_pca.png` — PCA of latent codes, colored by cluster
-- `umap.png` — UMAP 2D embedding colored by k-means cluster
-- `kmeans$K/labels.pkl` — integer array (672,) of cluster assignments
-- `kmeans$K/centers.txt` — latent codes at cluster centers
-- `kmeans$K/centers_ind.txt` — indices of particles closest to each center
+Outputs in `opus_project/output/analyze.19/`:
+- `z_pca.png`, `z_pca_hex.png` — PCA of latent codes
+- `umap.png`, `umap_hex.png` — UMAP embedding
+- `kmeans8/labels.pkl` — integer array (672,) of cluster IDs
+- `kmeans8/centers.txt` — latent vectors at cluster centers
+- `kmeans8/centers_ind.txt` — particle indices closest to each center
+
+**Known non-fatal warning**: `analyze_zN` runs a second PCA on the affine-z component (shape=(672,0) since `--zaffinedim 0`), producing `ValueError: Found array with 0 feature(s)`. This does not affect the main z-latent PCA, UMAP, or k-means — they all complete successfully.
 
 ---
 
-## Step 6: Generate 3D Volumes per Class
+### Step 6: Generate Class Volumes (`opus_project/06_eval_vol.sh`)
 
 ```bash
-APIX=13.33
-
-dsdsh eval_vol output_dir $EPOCH kmeans $K $APIX
+dsdsh eval_vol opus_project/output 19 kmeans 8 13.33
 ```
 
-Produces `output_dir/analyze.$EPOCH/kmeans$K/vol_k0XX.mrc` for each class. Open in ChimeraX or UCSF Chimera to compare structures.
+Produces `reference0.mrc` – `reference7.mrc` in `opus_project/output/analyze.19/kmeans8/`.
+
+**Note**: volumes are named `reference*.mrc`, NOT `vol_k0XX.mrc` as the OPUS-ET docs suggest. Any skip-condition checks must use this naming.
 
 ---
 
-## Step 7: Split Particles by Class
+### Step 7: Split STAR by Class (`opus_project/07_split_star.sh`)
 
 ```bash
-# Read the correct D from config (should be 80, i.e., lattice D=81, effective D=80)
-dsd view_config output_dir/config.pkl | grep "'D'"
-# If lattice_args['D'] == 81, use -D 80 below
-
-dsd parse_pose_star particles.star \
-    -D 80 \
-    --Apix 13.33 \
-    --labels output_dir/analyze.$EPOCH/kmeans$K/labels.pkl \
-    --outdir output_dir/split_star/
+dsd parse_pose_star opus_project/particles.star \
+    -D 80 --Apix 13.33 \
+    --labels opus_project/output/analyze.19/kmeans8/labels.pkl \
+    --outdir opus_project/split_star/
 ```
 
-Produces `pre0.star` … `pre{K-1}.star` — one STAR file per class. Each can be used for further refinement, re-extraction, or re-training with `--encode-mode fixed` for a higher-resolution reconstruction of a single class.
+Produces `pre0.star` – `pre7.star` in `opus_project/split_star/`.
 
 ---
 
-## Step 8: Evaluate and Iterate
+## Actual Results (K=8, Epoch 19)
 
-### Interpreting results
-
-| Observation | Likely cause | Fix |
+| Class | Particles | Fraction |
 |---|---|---|
-| All volumes look identical | `zdim` too small, or `beta-control` too high | Reduce `--beta-control` to 0.5, or increase `--zdim` to 16 |
-| Volumes look like noise | `zdim` too large, or underfitting | Reduce `--zdim` to 4 or train more epochs |
-| Classes split by tomogram rather than structure | Tomogram-level batch effects | Add `--lamb 1.0` |
-| One class contains most particles | Heterogeneity is low, or KL collapse | Reduce `--beta-control` to 0.1 |
-| Loss diverges | Learning rate too high | Reduce `--lr` to 5e-5 |
+| 0 | 44 | 6.5% |
+| 1 | 85 | 12.6% |
+| 2 | 67 | 10.0% |
+| 3 | 120 | 17.9% |
+| 4 | 126 | 18.8% |
+| 5 | **6** | **0.9%** |
+| 6 | 146 | 21.7% |
+| 7 | 78 | 11.6% |
 
-### Refining K (number of classes)
+Class 5 (6 particles) is very small and may represent outliers.
 
-Try K=5, 8, 12 and compare cluster volume quality. With 672 particles, avoid K > 15 (too few particles per class for stable volumes).
-
-### Interactive filtering notebook
-
-```bash
-conda activate opuset
-jupyter notebook ~/opusSrc/opusTomo/cryodrgn/templates/cryoDRGN_filtering_template.ipynb
-```
-
-Set `workdir = '~/opusSrc/output_dir'` and `epoch = 19` in the first cell. Use the polygon lasso tool on the UMAP/PCA scatter to select subpopulations or exclude outliers manually.
+3D density maps: `opus_project/output/analyze.19/kmeans8/reference{0..7}.mrc`
+Split STAR files: `opus_project/split_star/pre{0..7}.star`
 
 ---
 
-## Summary Workflow
+## OPUS-ET Source Code Bugs and Fixes
+
+Four bugs were found in `opusTomo/cryodrgn/` that are triggered by the all-zero-pose, no-CTF use case. All fixes are minimal and targeted.
+
+### Bug 1: `_rlnCtfImage` unconditionally required
+
+**File**: `cryodrgn/dataset.py` → `load_subtomos()` → `star.get_3dctfs()`  
+**Symptom**: `RuntimeError: '_rlnCtfImage'` at startup, even with `--ctfalpha 0 --ctfbeta 0`  
+**Fix**: Create `dummy_ctf.star` in the particle datadir and add `_rlnCtfImage = dummy_ctf.mrc` to every particle row in the STAR file (see Step 0 above). Do NOT modify the source — the dummy workaround is cleaner and survives updates.
+
+### Bug 2: `args.split = None` crash
+
+**File**: `cryodrgn/commands/train_tomo.py`, line 898  
+**Symptom**: `TypeError: stat: path should be string, bytes, os.PathLike or integer, not NoneType`  
+**Cause**: `args.split` defaults to `None`; `os.path.exists(args.split)` is called unconditionally  
+**Fix**: Always pass `--split <path>` explicitly (e.g. `--split opus_project/output/split.pkl`)
+
+### Bug 3: HEALPix single-bin crash in contrastive loss
+
+**File**: `cryodrgn/pose.py`, functions `sample_full_neighbors()` and `sample_neighbors()`  
+**Symptom**: `ValueError: need at least one array to concatenate` at `pose.py:180`  
+**Cause**: All 672 particles have identical zero poses → all land in HEALPix bin 3 (of 48). `sample_full_neighbors` removes the current bin from `pose_sample`, leaving an empty list. `np.concatenate([])` fails.  
+**Fix applied to both functions**:
+```python
+# Before:
+pose_sample = list(self.valid_poses)
+pose_sample.remove(cur_idx)           # crashes if cur_idx not in list
+num_pose = min(len(pose_sample), num_pose)
+
+# After:
+pose_sample = list(self.valid_poses)
+if cur_idx in pose_sample:
+    pose_sample.remove(cur_idx)
+# When all particles share one bin, sample within it (lamb=0 zeroes out c_mmd anyway)
+if len(pose_sample) == 0:
+    pose_sample = list(self.valid_poses)
+num_pose = min(len(pose_sample), num_pose)
+```
+Safe because `--lamb 0` multiplies `c_mmd` by zero — the fallback sampling has no effect on training.
+
+### Bug 4: NaN in loss from CTF exponent
+
+**File**: `cryodrgn/models.py`, line ~1720  
+**Symptom**: `AssertionError: assert torch.isnan(gen_loss).item() is False` at `train_tomo.py:434`  
+**Cause**: `ctf_beta_rand = (np.random.randn()/4.) * 0.01` (std≈0.0025) is added to `ctf_beta=0.0`. When `ctf_beta_rand < 0`, the exponent `ctf_beta + ctf_beta_rand < 0`. Then `|c|^{negative}` = `1/|c|^{positive}` → `Inf` at CTF zeros (|c|=0) → NaN in loss.  
+**Fix**:
+```python
+# Before:
+image_fft = image_fft * c[i:i+1].abs().pow(self.ctf_beta + ctf_beta_rand)
+
+# After:
+image_fft = image_fft * c[i:i+1].abs().pow(max(self.ctf_beta + ctf_beta_rand, 0.0))
+```
+`0^0 = 1`, so clamping to ≥0 means CTF zeros become identity at those frequencies, which is correct behaviour with no CTF.
+
+---
+
+## Complete Gotcha List
+
+1. **`_rlnCtfImage` is always required** — `get_3dctfs()` is called unconditionally. `--ctfalpha 0 --ctfbeta 0` does NOT bypass the load. Always provide a dummy CTF file.
+
+2. **`_rlnCtfImage` is a per-particle CTF STAR, not an MRC** — `get_3dctfs()` changes the `.mrc` extension to `.star` and reads a `data_images` block. Required columns: `_rlnAngleTilt`, `_rlnDefocusU`, `_rlnVoltage`, `_rlnSphericalAberration`, `_rlnAmplitudeContrast`, `_rlnCtfBfactor`, `_rlnCtfScalefactor`.
+
+3. **`prefix_paths` resolution**: tries `datadir/basename(path)` first. Use a bare filename (no directory) in `_rlnCtfImage` so it reliably resolves to `datadir/filename.star`.
+
+4. **`--split` must always be provided** — `args.split = None` by default causes a crash at `train_tomo.py:898`.
+
+5. **`templateres` minimum is 128** — must be N×16 with N∈{8..16}. Box size 80 still requires `--templateres 128`; the template is cropped internally to the 80-voxel render size.
+
+6. **Volume output names are `reference*.mrc`** — not `vol_k0XX.mrc` as implied by some docs. Any file-existence checks or glob patterns must use `reference*.mrc`.
+
+7. **`analyze` raises non-fatal PCA error with `--zaffinedim 0`** — the `analyze_zN` call tries to run PCA on a (N,0) array. The traceback appears in the log but analysis completes successfully.
+
+8. **D vs D-1**: `parse_pose_star -D 80` and the split step use `-D 80`. After training, `config.pkl` shows `lattice_args['D'] == 81` (D+1 convention). This is expected.
+
+9. **`refine_pose=False` is broken** — do not set this flag. The default (True) is the only working path.
+
+10. **Single GPU only** — one RTX 5080. Do not pass `--multigpu` or `--num-gpus`.
+
+11. **All poses are zero** — no in-plane rotation variation is assumed. If particles have known psi angles from template matching, supply them for better results.
+
+12. **PyTorch 2.6+ required** — the bundled `environment.yml` pins PyTorch 1.11+CUDA 11.3, which has no Blackwell (SM_120) kernels. Install cu128 wheels.
+
+---
+
+## Troubleshooting Training
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `RuntimeError: '_rlnCtfImage'` | Missing CTF column | Add dummy CTF (Step 0) |
+| `TypeError: stat: ... NoneType` | `args.split` is None | Add `--split <path>` |
+| `ValueError: need at least one array` | Single HEALPix bin | Applied fix in `pose.py` |
+| `AssertionError: NaN in gen_loss` | Negative CTF exponent | Applied fix in `models.py` |
+| All class volumes identical | KL collapse or zdim too small | Reduce `--beta-control` to 0.5 or increase `--zdim` |
+| Volumes look like noise | Underfitting | Reduce `--zdim` or train more epochs |
+| Classes correlate with tomogram | Batch effects | Enable `--lamb 1.0` |
+| Loss diverges | LR too high | Reduce `--lr` to 5e-5 |
+
+---
+
+## File Map
 
 ```
-~/src/particles/aligned_tom*.mrc   (672 files, 80³, 13.33 Å/px)
-        |
-        v
-[conda activate opuset]
-[python write_star.py]        ->  particles.star
-[dsd parse_pose_star]         ->  pose_euler.pkl
-[python make_mask.py]         ->  mask.mrc
-        |
-        v
-[dsd train_tomo ...]
-  -b 16, --zdim 8, --zaffinedim 0
-  --templateres 128, --downfrac 1.0
-  --angpix 13.33, --ctfalpha 0 --ctfbeta 0
-        |
-        v  (output_dir/weights.N.pkl + z.N.pkl)
-        |
-[dsdsh analyze output_dir 19 2 8]
-  -> labels.pkl, centers.txt, UMAP/PCA plots
-        |
-[dsdsh eval_vol output_dir 19 kmeans 8 13.33]
-  -> vol_k000.mrc ... vol_k007.mrc
-        |
-[dsd parse_pose_star --labels labels.pkl]
-  -> pre0.star ... pre7.star
+~/opusSrc/
+├── runClassification.sh          # master orchestrator (run this)
+├── opusTomo/                     # OPUS-ET source (pip install -e .)
+│   └── cryodrgn/
+│       ├── pose.py               # PATCHED: single-bin HEALPix fallback
+│       └── models.py             # PATCHED: CTF exponent clamped to >=0
+└── opus_project/
+    ├── 01_write_star.py          # generates particles.star + dummy_ctf.star
+    ├── 02_make_pose.sh           # dsd parse_pose_star -> pose_euler.pkl
+    ├── 03_make_mask.py           # average subtomograms -> mask.mrc
+    ├── 04_train.sh               # dsd train_tomo
+    ├── 05_analyze.sh             # dsdsh analyze -> PCA/UMAP/kmeans
+    ├── 06_eval_vol.sh            # dsdsh eval_vol -> reference*.mrc
+    ├── 07_split_star.sh          # dsd parse_pose_star --labels -> pre*.star
+    ├── logs/                     # pipeline run logs
+    ├── particles.star            # RELION 3.0 STAR file (672 particles)
+    ├── pose_euler.pkl            # rotation matrices (all identity)
+    ├── consensus.mrc             # average of all 672 subtomograms
+    ├── mask.mrc                  # binary solvent mask (1σ threshold + 2px dilation)
+    ├── output/                   # training outputs
+    │   ├── weights.N.pkl         # model weights per epoch
+    │   ├── z.N.pkl               # latent codes per epoch
+    │   ├── config.pkl            # model/data config
+    │   └── analyze.19/
+    │       ├── z_pca.png         # PCA plot
+    │       ├── umap.png          # UMAP plot
+    │       └── kmeans8/
+    │           ├── labels.pkl    # cluster assignments (672,)
+    │           ├── centers.txt   # latent codes at centers
+    │           └── reference*.mrc  # one 3D map per class
+    └── split_star/
+        └── pre{0..7}.star        # per-class particle lists
+
+~/src/particles/
+    ├── aligned_tom*.mrc          # 672 subtomogram MRC files
+    └── dummy_ctf.star            # placeholder CTF file (required by OPUS-ET)
 ```
 
 ---
 
-## Known Gotchas (this dataset)
+## Iterating on Results
 
-1. **D vs D-1**: `parse_pose_star -D 80` is correct at the preparation stage. After training, verify with `dsd view_config output_dir/config.pkl` — if `lattice_args['D']` is 81, use `-D 80` in the post-training split step.
-2. **`templateres` minimum is 128**: The box is 80 voxels, but templateres must be N×16 with N≥8. Use `--templateres 128`; the template is internally cropped to the 80-voxel render size.
-3. **No CTF**: `--ctfalpha 0. --ctfbeta 0.` disables CTF entirely. If these flags are omitted and no CTF `.pkl` is provided, training will crash at the first batch.
-4. **`refine_pose=False` is broken**: Do not set this flag. The default internal path (`refine_pose=True`) is the only working branch.
-5. **Single GPU only**: Do not use `--multigpu` or `--num-gpus`. There is one RTX 5080 on this machine.
-6. **In-plane rotation**: All Euler angles are set to zero, which assumes no in-plane rotational variation. If particles have a preferred in-plane orientation (e.g., from template matching with a non-symmetric template), performance may improve by supplying the known psi angles instead of zeros.
+- **Try different K**: re-run with `bash runClassification.sh --skip-train --k 5` (or 12). Deletes nothing — creates new `kmeans5/` subdirectory.
+- **Interactive filtering**: `jupyter notebook opusTomo/cryodrgn/templates/cryoDRGN_filtering_template.ipynb` — polygon-lasso UMAP to manually curate subpopulations.
+- **More epochs**: re-run training without `--skip-train`; existing `split.pkl` is reused, epochs resume from checkpoint.
+- **Higher resolution**: take particles from one class's `pre*.star` and re-run STA refinement in RELION or EMAN2 on just that subpopulation.

@@ -106,7 +106,7 @@ else
 fi
 
 # Step 6: Volume generation
-VOL_EXAMPLE="$ANALYZE_DIR/kmeans${K}/vol_k000.mrc"
+VOL_EXAMPLE="$ANALYZE_DIR/kmeans${K}/reference0.mrc"
 if [[ ! -f "$VOL_EXAMPLE" ]]; then
     run_step "Step 6: Generate class volumes" \
         bash "$PROJ_DIR/06_eval_vol.sh" "$EPOCH" "$K"

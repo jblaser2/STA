@@ -33,5 +33,5 @@ dsdsh eval_vol "$OUTDIR" "$EPOCH" kmeans "$K" "$APIX"
 
 echo ""
 echo "Volumes written to $KMEANS_DIR/"
-ls "$KMEANS_DIR"/vol_k*.mrc 2>/dev/null | head -10
+ls "$KMEANS_DIR"/reference*.mrc 2>/dev/null | head -10
 echo "Open in ChimeraX to inspect class structures."

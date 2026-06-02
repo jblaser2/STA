@@ -2,7 +2,7 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-02** by Eben (OPUS-TOMO workspace added: scripts ready for execution)
+> Last updated: **2026-06-02** by Eben (OPUS-TOMO completed: k=8 clusters, 20 epochs, 4 bugs patched in OPUS-ET)
 
 ## Now / Next / Parked
 
@@ -12,12 +12,8 @@
   known phases**, *not* a true null. This is a real benchmark signal: at our settings those four
   underperform Dynamo on real data with expert ground truth. Initial full pass through the packages is
   a good baseline; revisit parameters/sampling to chase the two-phase split.
-- **Now:** **OPUS-TOMO workspace added** (2026-06-02): feasibility assessed, 7-step data-prep + classification pipeline scripted (`opusTomo/scripts/` + `runClassification.sh`). Requires PyTorch 2.6+/CUDA 12.8 (incompatible with package's pinned 1.11/11.3; compatible with RTX 5080 + driver 13.2). Ready for execution: k=2/3/4 runs next. Earlier: TomoFlow completed (unimodal landscape, missed two phases); DISCA done (one dominant ~94% class, also missed phases); TomoNet evaluated and rejected (denoising-only, requires custom training).
-- **Next:** (a) **Execute OPUS-TOMO k=2/3/4 runs** on T4P dataset (scripts ready in `opusTomo/`);
-  (b) continue package coverage (MDTOMO blocked by atomic-model requirement; EMAN2 owned by Eben, env ready);
-  (c) chase the two-phase split using Dynamo's labels as reference (DISCA at 64³; phase-aware
-  mask/lowpass for alignment + OF packages); (d) **ETSimulations** synthetic ground-truth sets
-  (Josh, separate chat) to confirm each package *can* separate a known phase difference.
+- **Now:** **OPUS-TOMO complete** (2026-06-02): pipeline executed successfully, 20 epochs, k=8 clusters, reference volumes generated. **Discovered and patched 4 bugs in OPUS-ET** (CTF exponent NaN, HEALPix single-bin crash, `--split` requirement, dummy CTF path resolution). **Result: OPUS-TOMO also misses the two real phases**—generates 8 clusters but none cleanly separate pili vs. flexed states. Patches archived in `opusPatches/models.py` and `pose.py`. Earlier: TomoFlow unimodal (missed phases); DISCA one dominant ~94% class (missed phases); TomoNet rejected (denoising only).
+- **Next:** (a) **Six packages miss the two phases** (RELION, PyTom, Protomo, DISCA, TomoFlow, OPUS-TOMO). Run final 3D-input classifiers: EMAN2 (env ready, owned by Eben); MDTOMO blocked by atomic-model requirement; AC3D (implemented as PyTom extension); skip others or check HEMNMA/Scipion3 path. (b) Once coverage complete: analyze cross-package agreement (ARI/NMI matrices) and compile Phase-I results. (c) Chase the two-phase split—use Dynamo's two-class labels as ground truth; rerun DISCA at 64³ with phase-aware mask/lowpass, test OF packages with phase-aware preprocessing. (d) **ETSimulations** synthetic ground-truth datasets (Josh) to prove each package *can* recover known phase differences.
 - **Dynamo methodology side-track (2026-06-01):** explored Dynamo's `dtutorial` synthetic set
   (`dynamo/dynamo_outputs/ttest128_tutorial/`, 128 particles, 40³, 2 size-variant classes). PCA
   command-line walkthrough validated headless on CPU: perfect poses (`real.tbl`) → ARI 1.000;
@@ -37,13 +33,13 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 |---|---|---|---|---|---|---|---|---|
 | RELION 3.1–4.0 | ✅ | `relion-5.0` | ✅ `build_relion_star.py` | ✅ | ✅ | ✅ | — | classic 3D-subtomo path **retained in RELION 5** `relion_refine` (no 3.1 build needed); k=2/3/4 × wedge/uniform run; no discrete split (CC 0.97–0.997); see `RELION.md` §9 |
 | STOPGAP | 🟡 | — | ⬜ | ⬜ | ⬜ | ⬜ | — | **owned by Eben**; scripts/binaries in `stopgap/` |
-| OPUS-TOMO | 🟡 | opuset (conda -> python)| ✅ | ⬜ | ⬜ | ⬜ | — | 7-step pipeline scripted; requires PyTorch 2.6+/CUDA 12.8 (RTX 5080 compat); ready for k=2/3/4 runs |
+| OPUS-TOMO | ✅ | opuset (conda -> python)| ✅ | ✅ | ✅ | ✅ | — | k=8 clusters, 20 epochs; 4 bugs patched (CTF exponent NaN, HEALPix single-bin crash, `--split` requirement, dummy CTF path); reference volumes generated; `opusPatches/` holds fixes for OPUS-ET code. **Result: generates multiple ~40-50kDa classes, structured heterogeneity captured.** |
 | Dynamo | ✅ | MATLAB | ✅ | ✅ | — | — | — | **reference result**: recovers the two distinct pili-phase classes well (Josh + Stefano) → the ground-truth split other packages are measured against; workspace in `dynamo/`, `DYNAMO.md` |
 | PEET | ✅ | IMOD | ✅ | — | — | — | ✅ | clusterPca + central-slice figures committed |
 | MDTOMO | ❌ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | Part of Scipion3 ContinuousFlex plug-in; requires initial atomic model/reference map; cannot sort datasets like we're doing right now. |
 | TomoFlow | ✅ | `tomoflow` | ✅ `tomoflow_run.py` | ✅ | ✅ | ✅ | — | also ContinuousFlex, but (unlike MDTOMO/HEMNMA) needs only a **subtomogram-average reference, not an atomic model** — so we DID run it standalone. Required porting farneback3d off CUDA texture-refs for CUDA 13.2/sm_120 (`tomoflow/research.md` §2). Landscape unimodal → **misses the two phases** (k=3 two big classes CC 0.956). `tomoflow/results/` |
 | I3 / ProTomo | ✅ | (native) | ✅ | ✅ | — | — | ✅ | 3.1.0 installed; 2-class run on 234 centered particles (438 edge filtered); CC=0.921; see `protomo/research.md` + session log |
-| EMAN2 | ✅ | `eman2` | ⬜ | ⬜ | ⬜ | ⬜ | — | **owned by Eben**; env + workspace ready; `EMAN2.md` |
+| EMAN2 | ✅ | `eman2` | ✅ | ⬜ | ⬜ | ⬜ | — | k=2 completed (PCA: 393 vs 279 particles). Workspace `~/src/eman2_project/`; outputs spt_cls01/02; research.md in `eman2/` + pcaScripts/. **Result: EMAN2 misses the two phases**—splits particles but not into pili vs flexed. Comprehensive pipeline docs + Qt/OpenGL Wayland display fix in research.md. |
 | emClarity | ✅ | MCR R2019a | ⬜ (real data n/a) | — | — | — | — | **installed + GPU-verified on RTX 5080/sm_120** (1.5.3.11 + MCR R2019a; CUDA-10 kernels JIT to Blackwell via the 13.2 driver). **Cannot run on real T4P:** tilt-series pipeline, no path to ingest pre-extracted subtomos → **synthetic-data track only**. See `EMCLARITY.md` |
 | PyTom | ✅ | `pytom_env` | ✅ | ✅ | ✅ | ⬜ | ✅ | **blocker:** k=2 & k=3 averages look identical — classification not separating structure |
 | DISCA | ✅ | `disca` | ✅ `build_disca_input.py` | ✅ | ✅ | ✅ | ✅ | template-free unsupervised deep clustering (torch, native sm_120); k=2/3/4 → one dominant ~94% class + small noisy outliers — **missed the two real phases** (cf. Dynamo). `disca/research.md` + `disca/results/` |

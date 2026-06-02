@@ -55,6 +55,7 @@ dsd train_tomo "$STAR" \
     --angpix 13.33 \
     --datadir "$DATADIR" \
     --ctfalpha 0. --ctfbeta 0. \
+    --split "$OUTDIR/split.pkl" \
     "${RESUME_ARGS[@]}"
 
 echo "Training complete. Outputs in $OUTDIR/"

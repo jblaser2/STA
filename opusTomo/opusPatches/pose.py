@@ -1,0 +1,529 @@
+import torch
+import torch.nn as nn
+import numpy as np
+import pickle
+import inspect
+import healpy as hp
+from sklearn.cluster import KMeans
+
+from . import lie_tools
+from . import utils
+log = utils.log
+
+class PoseTracker(nn.Module):
+    def __init__(self, rots_np, trans_np=None, D=None, emb_type=None, deform=False, deform_emb_size=2, eulers_np=None,
+                 latents=None, batch_size=None, body_eulers_np=None, body_trans_np=None, affine_dim=4, rank=0,
+                 use_euler_group=True):
+        super(PoseTracker, self).__init__()
+        rots = torch.tensor(rots_np).float()
+        trans = torch.tensor(trans_np).float() if trans_np is not None else None
+        if trans is None:
+            trans = torch.zeros(rots.shape[0], 3)
+        self.eulers = torch.tensor(eulers_np).float() if eulers_np is not None else None
+        self.body_eulers = torch.tensor(body_eulers_np).float() if body_eulers_np is not None else None
+        self.body_trans = torch.tensor(body_trans_np).float() if body_trans_np is not None else None
+        self.rots = rots
+        self.trans = trans
+        self.use_trans = trans_np is not None
+        self.D = D
+        self.emb_type = emb_type
+        self.deform = deform
+        self.deform_emb = None
+        if emb_type is None:
+            pass
+        else:
+            if self.use_trans:
+                trans_emb = nn.Embedding(trans.shape[0], 3, sparse=True)
+                trans_emb.weight.data.copy_(trans)
+            if emb_type == 's2s2':
+                rots_emb = nn.Embedding(rots.shape[0], 6, sparse=True)
+                rots_emb.weight.data.copy_(lie_tools.SO3_to_s2s2(rots))
+            elif emb_type == 'quat':
+                rots_emb = nn.Embedding(rots.shape[0], 4, sparse=True)
+                rots_emb.weight.data.copy_(lie_tools.SO3_to_quaternions(rots))
+            else:
+                raise RuntimeError('Embedding type {} not recognized'.format(emb_type))
+            self.rots_emb = rots_emb
+            self.trans_emb = trans_emb if self.use_trans else None
+        if self.deform:
+            self.deform_emb_size = deform_emb_size
+            #deform_emb = torch.zeros(rots.shape[0], deform_emb_size)
+            #if encoding is not None:
+            #    emb_data = encoding.repeat(rots.shape[0], 1)
+            #    print(emb_data.shape)
+            #else:
+            #    emb_data = torch.randn(rots.shape[0], deform_emb_size)
+            #deform_emb.weight.data.copy_(emb_data)
+            #self.deform_emb = deform_emb
+
+            rots_from_euler = lie_tools.euler_to_SO3(self.eulers)
+            if rank == 0:
+                print(rots_from_euler[:5, ...], self.rots[:5, ...])
+            self.rots = rots_from_euler
+            self.rots_update = torch.eye(3).unsqueeze(0).repeat(self.rots.shape[0], 1, 1)
+            self.rots_resi = torch.eye(3).unsqueeze(0).repeat(self.rots.shape[0], 1, 1)
+            self.trans_update = torch.zeros_like(self.trans)
+            self.trans_resi = torch.zeros_like(self.trans)
+            self.trans_o = self.trans.clone()
+
+            # convert euler to hopf
+            self.hopfs = lie_tools.euler_to_hopf(self.eulers)
+            new_eulers = lie_tools.hopf_to_euler(self.hopfs)
+            #print(self.eulers[30, :], self.hopfs.numpy()[30,:], np.where(np.isnan(new_eulers.numpy())))
+            if rank == 0:
+                log(f"pose: euler difference: , {torch.sum((self.eulers - new_eulers).abs())/self.hopfs.shape[0]}, {self.hopfs.shape[0]}")
+                log(f"pose: max difference: {torch.max((self.eulers - new_eulers).abs(), dim=0)}")
+                # convert poses to healpix indices
+                log(f"{eulers_np[:5, :]}")
+                log(f"{self.hopfs[:5, :]}")
+
+            #reset euler using hopf style, now they are identical
+            self.eulers = self.hopfs
+            self.hp_order = 2
+            self.batch_size = batch_size
+            self.use_euler_group = use_euler_group
+
+            self.set_euler_groups()
+            #eulers_np = self.hopfs.cpu().numpy()
+            #euler0 = eulers_np[:, 0]*np.pi/180 #(-180, 180)
+            #euler1 = eulers_np[:, 1]*np.pi/180 #(0, 180)
+            #euler_pixs = hp.ang2pix(self.hp_order, euler1, euler0, nest=True)
+            #num_pixs   = self.hp_order**2*12
+            #self.poses_ind = [[] for i in range(num_pixs)]
+            #for i in range(len(euler_pixs)):
+            #    assert euler_pixs[i] < num_pixs
+            #    self.poses_ind[euler_pixs[i]].append(i)
+            #self.poses_ind = [torch.tensor(x) for x in self.poses_ind]
+            #self.euler_groups = euler_pixs
+            #self.ns = [(len(x) // self.batch_size)*self.batch_size for x in self.poses_ind]
+            #self.total_ns = sum(self.ns)
+            #self.valid_poses = []
+            #for i in range(num_pixs):
+            #    if self.ns[i] > 0:
+            #        self.valid_poses.append(i)
+            #print("poses_ind: ", self.poses_ind)
+            if rank == 0:
+                print(self.ns, self.valid_poses)
+
+            if latents is not None:
+                #self.mu = latents
+                self.mu = latents["mu"]
+                self.nearest_poses = latents["nn"]
+                if "multi_mu" in latents:
+                    self.multi_mu = latents["multi_mu"]
+                else:
+                    self.multi_mu = torch.randn(rots.shape[0], affine_dim)#None
+            else:
+                self.mu = torch.randn(rots.shape[0], self.deform_emb_size)
+                #self.nearest_poses = [np.array([], dtype=np.int64) for i in range(len(euler_pixs))]
+                self.nearest_poses = None
+                self.multi_mu = torch.randn(rots.shape[0], affine_dim)
+            #if rank == 0:
+            #    print("nn: ", len(self.nearest_poses), "batch_size: ", self.batch_size)
+
+    def set_euler_groups(self,):
+        eulers_np = self.hopfs.cpu().numpy()
+        euler0 = eulers_np[:, 0]*np.pi/180 #(-180, 180)
+        euler1 = eulers_np[:, 1]*np.pi/180 #(0, 180)
+        euler_pixs = hp.ang2pix(self.hp_order, euler1, euler0, nest=True)
+        num_pixs   = self.hp_order**2*12
+        if not self.use_euler_group:
+            num_pixs = 1
+            euler_pixs = np.zeros_like(euler_pixs)
+        self.poses_ind = [[] for i in range(num_pixs)]
+        for i in range(len(euler_pixs)):
+            assert euler_pixs[i] < num_pixs
+            self.poses_ind[euler_pixs[i]].append(i)
+        self.poses_ind = [torch.tensor(x) for x in self.poses_ind]
+        self.euler_groups = euler_pixs
+        self.ns = [(len(x) // self.batch_size)*self.batch_size for x in self.poses_ind]
+        self.total_ns = sum(self.ns)
+        self.valid_poses = []
+        for i in range(num_pixs):
+            if self.ns[i] > 0:
+                self.valid_poses.append(i)
+
+    def filter_poses_ind(self, split):
+        poses_ind_new = []
+        for x in self.poses_ind:
+            poses_ind_new.append(x[np.isin(x.numpy(), split.numpy())])
+        self.poses_ind = poses_ind_new
+        self.ns = [(len(x) // self.batch_size)*self.batch_size for x in self.poses_ind]
+
+    def sample_full_neighbors(self, euler, inds, num_pose=8):
+        cur_idx = self.euler_groups[inds[0]]
+        euler0 = euler[0, 0]*np.pi/180
+        euler1 = euler[0, 1]*np.pi/180
+        cur_idx_ = hp.ang2pix(self.hp_order, euler1, euler0, nest=True)
+        #assert cur_idx == cur_idx_
+        pose_sample = list(self.valid_poses)
+        # remove current pose
+        if cur_idx in pose_sample:
+            pose_sample.remove(cur_idx)
+        # fallback: when all particles share one pose group (e.g. all-zero poses),
+        # sample within the group so contrastive tensors stay non-empty.
+        # lamb=0 zeros out c_mmd in the loss so this has no training effect.
+        if len(pose_sample) == 0:
+            pose_sample = list(self.valid_poses)
+        num_pose = min(len(pose_sample), num_pose)
+        perm = np.random.choice(pose_sample, size=num_pose, replace=False)
+        total = sum([self.ns[i] for i in perm])
+        sample_idices = []
+        sample_mus = []
+        #print(cur_idx, perm)
+        total_samples = 256*50
+        for i in range(len(perm)):
+            #pose_idx = pose_sample[i] #
+            pose_idx = perm[i]
+            # sample from selected pose
+            samples = np.random.choice(self.ns[pose_idx],
+                    size=min(int(self.ns[pose_idx]/total*total_samples), self.ns[pose_idx]), replace=False)
+            #print(samples)
+            idx_ = self.poses_ind[pose_idx][samples]
+            sample_idices.append(idx_)
+            sample_mus.append(torch.cat([self.mu[idx_,:], self.multi_mu[idx_,:]], dim=-1))
+        #print(total)
+        sample_idices = np.concatenate(sample_idices, axis=0)
+        sample_mus = torch.cat(sample_mus, dim=0)
+
+        # compare with current nearest neighbors
+        mus = []
+        top_indices = []
+        top_mus = []
+        neg_mus = []
+        num_mu_samples = len(sample_mus)
+        num_samples = 64
+        num_samples = min(num_samples, num_mu_samples//4)
+        for i in range(len(inds)):
+            global_i  = inds[i]
+            n_i = sample_idices
+            mu_ = sample_mus[..., :]
+            mu_i = torch.cat([self.mu[global_i, :], self.multi_mu[global_i, :]], dim=-1)
+
+            diff = (mu_i - mu_).pow(2).sum(-1)
+            top = torch.topk(diff, k=num_samples, largest=False, sorted=True)
+            # gather output
+            top_mu_ = mu_[top.indices, :]
+            mus.append(top_mu_)
+
+            neg = torch.topk(diff, k=num_samples*4, largest=True, sorted=True)
+
+            # uniform sample
+            uni_sample = np.random.choice(len(diff), size=num_samples*4, replace=False)
+            uni_mu = mu_[uni_sample, :]
+
+            # mix samples
+            neg_mu = mu_[neg.indices, :]
+            neg_mu = 0.8*neg_mu + 0.2*uni_mu
+
+            neg_mus.append(neg_mu)
+            #cur_inds = np.delete(inds, [i])
+            #cur_mus = self.mu[cur_inds, :]
+            #diff = (mu_i - cur_mus).pow(2).sum(-1)
+            #top = torch.topk(diff, k=3, largest=False, sorted=True)
+            top_indices.append(torch.tensor(n_i[top.indices[0]]))
+            #top_indices.append(torch.tensor(n_i[top.indices[:6]]))
+            #top_mus.append(self.mu[cur_inds[top.indices], :])
+
+        mus = torch.stack(mus, dim=0)
+        neg_mus = torch.stack(neg_mus, dim=0)
+        top_indices = torch.stack(top_indices, dim=0).view(-1) #(B*k)
+        top_mus = None #torch.stack(top_mus, dim=0)
+        #print(mus.shape, top_indices.shape, top_mus.shape)
+        return mus, top_indices, top_mus, neg_mus
+
+    def sample_neighbors(self, euler, inds, num_pose=8):
+        cur_idx = self.euler_groups[inds[0]]
+        euler0 = euler[0, 0]*np.pi/180
+        euler1 = euler[0, 1]*np.pi/180
+        cur_idx_ = hp.ang2pix(self.hp_order, euler1, euler0, nest=True)
+        #assert cur_idx == cur_idx_
+        pose_sample = list(self.valid_poses)
+        # remove current pose
+        if cur_idx in pose_sample:
+            pose_sample.remove(cur_idx)
+        # fallback: when all particles share one pose group (e.g. all-zero poses),
+        # sample within the group so contrastive tensors stay non-empty.
+        # lamb=0 zeros out c_mmd in the loss so this has no training effect.
+        if len(pose_sample) == 0:
+            pose_sample = list(self.valid_poses)
+        num_pose = min(len(pose_sample), num_pose)
+        perm = np.random.choice(pose_sample, size=num_pose, replace=False)
+        total = sum([self.ns[i] for i in perm])
+        sample_idices = []
+        sample_mus = []
+        #print(cur_idx, perm)
+        total_samples = 256*50
+        for i in range(len(perm)):
+            #pose_idx = pose_sample[i] #
+            pose_idx = perm[i]
+            # sample from selected pose
+            samples = np.random.choice(self.ns[pose_idx],
+                    size=min(int(self.ns[pose_idx]/total*total_samples), self.ns[pose_idx]), replace=False)
+            #print(samples)
+            idx_ = self.poses_ind[pose_idx][samples]
+            sample_idices.append(idx_)
+            sample_mus.append(self.mu[idx_,:])
+        #print(total)
+        sample_idices = np.concatenate(sample_idices, axis=0)
+        sample_mus = torch.cat(sample_mus, dim=0)
+
+        # compare with current nearest neighbors
+        mus = []
+        top_indices = []
+        top_mus = []
+        neg_mus = []
+        num_samples = 64
+        num_mu_samples = len(sample_mus)
+        num_samples = min(num_samples, num_mu_samples//4)
+        for i in range(len(inds)):
+            global_i  = inds[i]
+            n_i = sample_idices
+            mu_ = sample_mus[..., :]
+            mu_i = self.mu[global_i, :]
+
+            diff = (mu_i - mu_).pow(2).sum(-1)
+            top = torch.topk(diff, k=num_samples, largest=False, sorted=True)
+            # gather output
+            top_mu_ = mu_[top.indices, :]
+            mus.append(top_mu_)
+
+            neg = torch.topk(diff, k=num_samples*4, largest=True, sorted=True)
+
+            # uniform sample
+            uni_sample = np.random.choice(len(diff), size=num_samples*4, replace=False)
+            uni_mu = mu_[uni_sample, :]
+
+            # mix samples
+            neg_mu = mu_[neg.indices, :]
+            neg_mu = 0.8*neg_mu + 0.2*uni_mu
+
+            neg_mus.append(neg_mu)
+            #cur_inds = np.delete(inds, [i])
+            #cur_mus = self.mu[cur_inds, :]
+            #diff = (mu_i - cur_mus).pow(2).sum(-1)
+            #top = torch.topk(diff, k=3, largest=False, sorted=True)
+            top_indices.append(torch.tensor(n_i[top.indices[0]]))
+            #top_indices.append(torch.tensor(n_i[top.indices[:6]]))
+            #top_mus.append(self.mu[cur_inds[top.indices], :])
+
+        mus = torch.stack(mus, dim=0)
+        neg_mus = torch.stack(neg_mus, dim=0)
+        top_indices = torch.stack(top_indices, dim=0).view(-1) #(B*k)
+        top_mus = None #torch.stack(top_mus, dim=0)
+        #print(mus.shape, top_indices.shape, top_mus.shape)
+        return mus, top_indices, top_mus, neg_mus
+
+    def set_emb(self, encodings, ind, mu=0.7):
+        #when the encoding dim is larger, we knew the multi-body refinement is on
+        if encodings.shape[-1] > self.deform_emb_size:
+            self.mu[ind] = self.mu[ind]*mu + (1-mu)*encodings[:, :self.deform_emb_size].detach().cpu()
+            self.multi_mu[ind] = self.multi_mu[ind]*mu + (1-mu)*encodings[:, self.deform_emb_size:].detach().cpu()
+        else:
+            self.mu[ind] = self.mu[ind]*mu + (1-mu)*encodings.detach().cpu()
+
+    def save_emb(self, filename):
+        torch.save({"mu": self.mu, "nn": self.nearest_poses, "multi_mu": self.multi_mu}, filename)
+
+    @classmethod
+    def load(cls, infile, Nimg, D, emb_type=None, ind=None, deform=False, deform_emb_size=2,
+             latents=None, batch_size=None, affine_dim=4, rank=0, use_euler_group=True):
+        '''
+        Return an instance of PoseTracker
+
+        Inputs:
+            infile (str or list):   One or two files, with format options of:
+                                    single file with pose pickle
+                                    two files with rot and trans pickle
+                                    single file with rot pickle
+            Nimg:               Number of particles
+            D:                  Box size (pixels)
+            emb_type:           SO(3) embedding type if refining poses
+            ind:                Index array if poses are being filtered
+        '''
+        # load pickle
+        if type(infile) is str: infile = [infile]
+        assert len(infile) in (1,2)
+        if len(infile) == 2: # rotation pickle, translation pickle
+            poses = (utils.load_pkl(infile[0]), utils.load_pkl(infile[1]))
+        else: # rotation pickle or poses pickle
+            poses = utils.load_pkl(infile[0])
+            if type(poses) != tuple: poses = (poses,)
+
+        # rotations
+        rots = poses[0]
+        if ind is not None:
+            if len(rots) > Nimg: # HACK
+                rots = rots[ind]
+        assert rots.shape == (Nimg,3,3), f"Input rotations have shape {rots.shape} but expected ({Nimg},3,3)"
+
+        body_eulers, body_trans = None, None
+
+        # translations if they exist
+        if len(poses) == 2:
+            trans = poses[1]
+            if ind is not None:
+                if len(trans) > Nimg: # HACK
+                    trans = trans[ind]
+            assert trans.shape == (Nimg,2), f"Input translations have shape {trans.shape} but expected ({Nimg},2)"
+            assert np.all(trans <= 1), "ERROR: Old pose format detected. Translations must be in units of fraction of box."
+            trans *= D # convert from fraction to pixels
+        elif len(poses) == 3:
+            trans = poses[1]
+            if ind is not None:
+                if len(trans) > Nimg: # HACK
+                    trans = trans[ind]
+            assert trans.shape == (Nimg,3), f"Input translations have shape {trans.shape} but expected ({Nimg},3)"
+            assert np.all(trans <= 1), "ERROR: Old pose format detected. Translations must be in units of fraction of box."
+            trans *= D # convert from fraction to pixels
+            log("loaded eulers")
+            eulers = poses[2]
+            if ind is not None:
+                if len(trans) > Nimg: # HACK
+                    eulers = eulers[ind]
+            assert eulers.shape == (Nimg,3), f"Input eulers have shape {trans.shape} but expected ({Nimg},3)"
+        elif len(poses) > 3:
+            trans = poses[1]
+            if ind is not None:
+                if len(trans) > Nimg: # HACK
+                    trans = trans[ind]
+            assert trans.shape == (Nimg,3), f"Input translations have shape {trans.shape} but expected ({Nimg},3)"
+            assert np.all(trans <= 1), "ERROR: Old pose format detected. Translations must be in units of fraction of box."
+            trans *= D # convert from fraction to pixels
+            log("loaded eulers")
+            eulers = poses[2]
+            if ind is not None:
+                if len(trans) > Nimg: # HACK
+                    eulers = eulers[ind]
+            assert eulers.shape == (Nimg,3), f"Input eulers have shape {eulers.shape} but expected ({Nimg},3)"
+            body_eulers = poses[3]
+            body_trans = poses[4]
+            assert body_eulers.shape[0] == Nimg and body_eulers.shape[2] == 3, f"Input eulers have shape {body_eulers.shape} but expected ({Nimg},3)"
+            assert body_trans.shape[0] == Nimg and body_trans.shape[2] == 3 and body_trans.shape[1] == body_eulers.shape[1], \
+                                f"Input translations have shape {body_trans.shape} but expected ({Nimg},3)"
+
+        else:
+            log('WARNING: No translations provided')
+            trans = None
+            eulers = None
+
+        if latents is not None:
+            load_kwargs = {}
+            if "weights_only" in inspect.signature(torch.load).parameters:
+                # PyTorch is new enough to support this arg (e.g. >= 2.x)
+                load_kwargs["weights_only"] = False  # or True, if you want safe weights-only loading
+            latents = torch.load(latents, **load_kwargs)
+        return cls(rots, trans, D, emb_type, deform, deform_emb_size, eulers, latents, batch_size,
+                   body_eulers_np=body_eulers, body_trans_np=body_trans, affine_dim=affine_dim, rank=rank,
+                   use_euler_group=use_euler_group)
+
+
+    def save(self, out_pkl):
+        if self.emb_type == 'quat':
+            r = lie_tools.quaternions_to_SO3(self.rots_emb.weight.data).cpu().numpy()
+        elif self.emb_type == 's2s2':
+            r = lie_tools.s2s2_to_SO3(self.rots_emb.weight.data).cpu().numpy()
+        else:
+            r = self.rots.cpu().numpy()
+
+        if self.use_trans:
+            if self.emb_type is None:
+                t = self.trans.cpu().numpy()
+            else:
+                t = self.trans_emb.weight.data.cpu().numpy()
+
+            #add update
+            t = self.trans_o.cpu().numpy() + self.trans_update.cpu().numpy() + self.trans_resi.cpu().numpy()
+
+            t = t/self.D # convert from pixels to extent
+
+            if self.eulers is not None:
+                r = self.rots.cpu().numpy()
+                rots_to_save = self.rots @ self.rots_update @ self.rots_resi
+                delta_angle, delta_axis = lie_tools.rot_to_axis(self.rots_update)
+                #print(delta_angle[:8], delta_axis[:8])
+                #convert rotation to hopfs
+                new_hopfs = lie_tools.so3_to_hopf(rots_to_save)
+                hopfs_diff = new_hopfs - self.hopfs
+                #print(hopfs_diff[:8, :])
+                #print(self.trans_o[:8, :] - self.trans[:8, :], self.trans_update[:8, :])
+                new_eulers = lie_tools.hopf_to_euler(new_hopfs)
+
+                # convert from hopf back to euler
+                #new_eulers = lie_tools.hopf_to_euler(self.eulers)
+                #e = self.eulers.cpu().numpy()
+                e = new_eulers.cpu().numpy()
+                poses = (r,t,e)
+            else:
+                poses = (r,t)
+        else:
+            poses = (r,)
+
+        pickle.dump(poses, open(out_pkl,'wb'))
+
+    def get_euler(self, ind):
+        if self.emb_type is None:
+            euler = self.eulers[ind]
+            return euler
+
+    def set_euler(self, euler, ind):
+        self.eulers[ind] = euler
+
+    def set_pose(self, rots, trans, ind, mu=0.7):
+        # the learning rate is 0.3
+        #doing slerp in for rotation
+        rot_o = self.rots_update[ind]
+        #print(rots.shape, rot_o.shape)
+        delta_R = lie_tools.hopf_to_SO3(rots.squeeze(1).cpu())
+
+        self.rots_resi[ind] = delta_R
+
+        delta_R = torch.transpose(rot_o, -1, -2) @ delta_R
+        #convert delta_R to axis angle
+        delta_angle, delta_axis = lie_tools.rot_to_axis(delta_R)
+        delta_R_mu = lie_tools.axis_rot(delta_angle*(1.-mu), delta_axis)
+        rot_n = rot_o @ delta_R_mu
+        #print(rot_n.shape, delta_R_mu.shape, trans.shape, rot_o.shape)
+        delta_t = self.rots[ind] @ trans.squeeze(1).unsqueeze(-1).cpu()
+        delta_t = delta_t.squeeze(-1).cpu()
+        #print(delta_angle, delta_axis, delta_t)#, delta_R_mu)
+        delta_angle, delta_axis = lie_tools.rot_to_axis(rot_n)
+        self.rots_update[ind] = rot_n
+        self.trans_update[ind] = self.trans_update[ind]*mu + delta_t[:, :]*(1-mu)
+
+        self.trans_resi[ind] = delta_t
+        #update euler and trans
+        new_rots = self.rots[ind] @ self.rots_update[ind]
+        new_eulers = lie_tools.so3_to_hopf(new_rots)
+        self.eulers[ind] = new_eulers
+        self.trans[ind] = self.trans_o[ind] + self.trans_update[ind]
+        #print(delta_t, delta_angle, delta_axis)
+
+    def set_body_euler(self, euler, trans, ind):
+        self.eulers[ind] = euler
+        self.trans[ind] = trans
+
+    def get_body_pose(self, ind):
+        if self.body_eulers is not None:
+            euler = self.body_eulers[ind]
+            trans = self.body_trans[ind]
+            return euler, trans
+        else:
+            return None, None
+
+    def get_pose(self, ind):
+        if self.emb_type is None:
+            rot = self.rots[ind]
+            tran = self.trans[ind] if self.use_trans else None
+        else:
+            if self.emb_type == 's2s2':
+                rot = lie_tools.s2s2_to_SO3(self.rots_emb(ind))
+            elif self.emb_type == 'quat':
+                rot = lie_tools.quaternions_to_SO3(self.rots_emb(ind))
+            else:
+                raise RuntimeError # should not reach here
+            tran = self.trans_emb(ind) if self.use_trans else None
+        #if self.deform:
+        #    defo = self.deform_emb(ind)
+        #    return rot, tran, defo
+        return rot, tran
