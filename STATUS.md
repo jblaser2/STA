@@ -2,7 +2,7 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-02** by Eben (OPUS-TOMO completed: k=8 clusters, 20 epochs, 4 bugs patched in OPUS-ET)
+> Last updated: **2026-06-02** by Eben (OPUS-TOMO completed: k=8 clusters, 20 epochs, 4 bugs patched in OPUS-ET) + Claude (Dynamo `dtutorial` cold-start MRA run completed + evaluated).
 
 ## Now / Next / Parked
 
@@ -14,14 +14,19 @@
   a good baseline; revisit parameters/sampling to chase the two-phase split.
 - **Now:** **OPUS-TOMO complete** (2026-06-02): pipeline executed successfully, 20 epochs, k=8 clusters, reference volumes generated. **Discovered and patched 4 bugs in OPUS-ET** (CTF exponent NaN, HEALPix single-bin crash, `--split` requirement, dummy CTF path resolution). **Result: OPUS-TOMO also misses the two real phases**—generates 8 clusters but none cleanly separate pili vs. flexed states. Patches archived in `opusPatches/models.py` and `pose.py`. Earlier: TomoFlow unimodal (missed phases); DISCA one dominant ~94% class (missed phases); TomoNet rejected (denoising only).
 - **Next:** (a) **Six packages miss the two phases** (RELION, PyTom, Protomo, DISCA, TomoFlow, OPUS-TOMO). Run final 3D-input classifiers: EMAN2 (env ready, owned by Eben); MDTOMO blocked by atomic-model requirement; AC3D (implemented as PyTom extension); skip others or check HEMNMA/Scipion3 path. (b) Once coverage complete: analyze cross-package agreement (ARI/NMI matrices) and compile Phase-I results. (c) Chase the two-phase split—use Dynamo's two-class labels as ground truth; rerun DISCA at 64³ with phase-aware mask/lowpass, test OF packages with phase-aware preprocessing. (d) **ETSimulations** synthetic ground-truth datasets (Josh) to prove each package *can* recover known phase differences.
-- **Dynamo methodology side-track (2026-06-01):** explored Dynamo's `dtutorial` synthetic set
-  (`dynamo/dynamo_outputs/ttest128_tutorial/`, 128 particles, 40³, 2 size-variant classes). PCA
-  command-line walkthrough validated headless on CPU: perfect poses (`real.tbl`) → ARI 1.000;
-  unaligned (`initial.tbl`, all-zero poses) → ARI 0.017 (chance) ⇒ **Dynamo PCA is post-alignment
-  only**. Two-stage MRA project `mra_ttest128` set up + validated. **BLOCKED:** in-MATLAB Dynamo
-  execution needs **Parallel Computing Toolbox** (licensed, not installed) — install it, then
-  `run_mra.m` runs as-is. (Also installed Image Processing Toolbox this session + patched a
-  `dynamo_mollify` IPT bug.) See session-log `2026-06-01-dynamo-dtutorial-pca-mra.md`.
+- **Dynamo methodology side-track (2026-06-01/02, DONE):** explored Dynamo's `dtutorial` synthetic
+  set (`dynamo/dynamo_outputs/ttest128_tutorial/`, 128 particles, 40³, 2 size-variant classes). PCA
+  command-line walkthrough (headless CPU): perfect poses (`real.tbl`) → ARI 1.000; unaligned
+  (`initial.tbl`, identity poses) → ARI 0.017 (chance) ⇒ **Dynamo PCA is post-alignment only**.
+  Two-stage cold-start MRA project `mra_ttest128` (6 rounds/18 ites, `nref=2`) **ran to completion**
+  (PCT installed 2026-06-02, unblocking it; IPT also installed + `dynamo_mollify` bug patched).
+  Result: the **embedded MRA's own 2-class assignment COLLAPSED** (final ref col 34 = all 1s; col-22
+  "64/64" is just passive carryover of the input GT labels — do not mistake for a recovered split).
+  But cold-start **alignment** partly worked (shift err 4.93→2.06 vox; 63/128 within 20° of truth,
+  bimodal), and **PCA on the MRA-aligned poses → ARI 0.878 / acc 0.969**, near the 1.0 ceiling.
+  ⇒ on this synthetic set Dynamo's classification power = alignment quality + PCA, NOT the MRA
+  class-swapping. Spectrum: `initial` 0.017 | cold-start 0.878 | `real` 1.000. See session-log
+  `2026-06-01-dynamo-dtutorial-pca-mra.md`.
 - **Parked (need expert input):** missing-wedge standardization; how to discretize continuous-
   classifier outputs. (Discrete-vs-continuous is **resolved: discrete, two phases**.) → Stefano / Braxton.
 

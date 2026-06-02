@@ -1,0 +1,126 @@
+ 
+   An installation of  Dynamo has been located with home folder:    /home/jblaser2/Research/dynamo   
+ 
+[warning] Path conflict detected 
+  A total of 1 Dynamo shorthand function names are now shadowing previous functions in your previous Matlab path
+dvput 
+ 
+   Checking operativity of MEX files in your architecture...
+Launching a sample mex file...
+If the screen is stuck here, there is some problem...
+ 
+ MEX files are ok: Dynamo is ready.
+ 
+------------------------------------------------------------
+ 
+ Dynamo version: v-1.1.558 
+ 
+For general help on the available commands, type:
+ >> doc Dynamo
+ or 
+ >> dhelp
+ 
+For a menu of different GUI tools, type: 
+ >> dynamo;
+ 
+ [ok] The Matlab version of Dynamo is installed and operative. 
+  
+------------------------------------------------------------
+ 
+Note: Dynamo is setting Matlab to use classical graphic controls.
+A preference file has been located.
+
+==== ALIGNMENT (vs real.tbl, c8-folded angles) ====
+ANGLE  initial: mean 89.9  med 87.0 deg | MRA cold-start: mean 87.1  med 22.3 deg
+SHIFT  initial: mean 4.93  med 4.76 vox | MRA cold-start: mean 2.06  med 1.49 vox
+ANGLE within 20 deg: init 9/128  MRA 63/128
+
+==== MRA OWN CLASSIFICATION (col 22) ====
+distinct class labels in final table: [1 2]  (n classes = 2)
+  class 1: 64 particles
+  class 2: 64 particles
+Workflow for PCA with name classtest128_mra
+PCA workflow saved
+Parameter 'table' in workflow has changed to: 'mra_aligned.tbl'
+Writing mask into workflow folder: classtest128_mra.PCA/input/mask.em
+Parameter 'mask' in workflow has changed to: 'classtest128_mra.PCA/input/mask.em'
+Creating an object to handle a classic Dynamo data folder.
+An object of class "dDataOld" has been created.
+Parameter 'data' in workflow has changed to: 'ttest128/data'
+Parameter 'bandpassNyquist' in workflow has changed to: '0         0.5           2'
+Parameter 'sym' in workflow has changed to: 'c8'
+Parameter 'bin' in workflow has changed to: '0'
+Parameter 'cores' in workflow has changed to: '*'
+Parameter 'useGpus' in workflow has changed to: 'no'
+No table found. You might need to unfold the PCA project to use this functionality
+[<unfold>] checking input files [data/table/mask]
+[<unfold>] Particle files to classify: 128 [a total of 128 tags in data container]
+[<unfold>] Initializing runtime
+------------------------------------------------------------------
+hello, man!
+Type dbup;dbup to access the point of assignemt of the variable 
+This can also be done with the stack browser in the Matlab editor
+Then type dbcont to follow!
+------------------------------------------------------------------
+[<unfold>] Batch length: 100 | Each parallel block contains  0.10 Gb of memory
+PCA workflow saved
+Prealigning particles and writting them in disk.
+[mbparse.multicore.checkPool] Dynamo tries to open a parallel pool for 24 workers [02-Jun-2026 11:14:33]
+Starting parallel pool (parpool) using the 'Processes' profile ...
+Connected to parallel pool with 24 workers.
+[mbparse.multicore.checkPool] ... opened pool for 24 workers in 13.61 seconds
+Prealigning in parallel [1:serial precaching]
+Prealigning in parallel [2:parallel processing and saving, this can take a while. Parallelization method: "spmd"]
+Worker  7: 
+  Warning: Directory already exists.
+  > In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('dynamo_write', '/home/jblaser2/Research/dynamo/matlab/src/dynamo_write.m', 136)" style="font-weight:bold">dynamo_write</a> (<a href="matlab: opentoline('/home/jblaser2/Research/dynamo/matlab/src/dynamo_write.m',136,0)">line 136</a>)
+  Warning: Directory already exists.
+  > In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('dynamo_write', '/home/jblaser2/Research/dynamo/matlab/src/dynamo_write.m', 136)" style="font-weight:bold">dynamo_write</a> (<a href="matlab: opentoline('/home/jblaser2/Research/dynamo/matlab/src/dynamo_write.m',136,0)">line 136</a>)
+Worker 15: 
+  Warning: Directory already exists.
+  > In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('dynamo_write', '/home/jblaser2/Research/dynamo/matlab/src/dynamo_write.m', 136)" style="font-weight:bold">dynamo_write</a> (<a href="matlab: opentoline('/home/jblaser2/Research/dynamo/matlab/src/dynamo_write.m',136,0)">line 136</a>)
+Worker 20: 
+  Warning: Directory already exists.
+  > In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('dynamo_write', '/home/jblaser2/Research/dynamo/matlab/src/dynamo_write.m', 136)" style="font-weight:bold">dynamo_write</a> (<a href="matlab: opentoline('/home/jblaser2/Research/dynamo/matlab/src/dynamo_write.m',136,0)">line 136</a>)
+Time prealigning particles: 16.15
+[mbparse.multicore.checkPool] A previous pool of 24 workers is available.
+Launching 3 blocks of the ccmatrix (batch size: 100).
+ Start parallel processing at 02-Jun-2026 11:14:50. Presetting started [sequentially]
+Sequential presetting ended [ 0.00 Gb preallocated]. Parallel processing started [02-Jun-2026 11:14:50]
+.... block 3 [28 x 28] : finished [processing time  0.69 [load: 0.71/process: 0.71/compute: 0.02],  1/3 available] , 
+.... block 2 [100 x 28] : finished [processing time  4.73 [load: 3.12/process: 4.73/compute: 0.01],  2/3 available] , 
+.... block 1 [100 x 100] : finished [processing time  8.22 [load: 2.47/process: 8.23/compute: 0.01],  3/3 available] , 
+Finishing at 02-Jun-2026 11:15:00
+Matrix assembled (3 blocks)
+User time computing 3 blocks in ccmatrix: 10.90 seconds
+Diagonalizing the CC-matrix [128 particles]
+Finished diagonalizing the CC-matrix in  0.05 seconds
+############################################################
+Brace indexing is not supported for variables of this type.
+Reading eigenvector matrix
+Computing 50 eigenvolumes in 128 particles (50200 pixels). Start: 02-Jun-2026 11:15:01
+50 eigenvolumes computed in  3.87 seconds
+50 eigenvolumes processed in  3.88 seconds
+tsne not yet created
+Size eigencomponent matrix: 128 x 50
+tsne  1/10 finished in  0.17 secons
+Invalid result
+tsne  2/10 finished in  0.07 secons
+tsne  3/10 finished in  0.06 secons
+tsne  4/10 finished in  0.06 secons
+tsne  5/10 finished in  0.07 secons
+tsne  6/10 finished in  0.05 secons
+tsne  7/10 finished in  0.05 secons
+tsne  8/10 finished in  0.05 secons
+tsne  9/10 finished in  0.05 secons
+tsne  10/10 finished in  0.05 secons
+TSNE computing finished
+
+==== PCA on MRA-aligned table ====
+PCA(MRA-aligned): kmeans k=2 acc=0.969 ARI=0.878 (5 comps)
+
+==== SPECTRUM (PCA k=2 ARI vs GT) ====
+initial.tbl 0.017  |  MRA cold-start 0.878  |  real.tbl 1.000
+EVAL_MRA_DONE
+[delete:pmodelpool.Manager] Deletion of model pool manager from memory.
+Parallel pool using the 'Processes' profile is shutting down.
