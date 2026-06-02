@@ -2,7 +2,7 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-01** by Eben + Claude (AC3D status update + git config handoff).
+> Last updated: **2026-06-01** by Claude (TomoFlow port+run; emClarity + DISCA earlier same day) + Eben (AC3D/EMAN2/STOPGAP/OPUS-TOMO status); a parallel Dynamo-methodology session is also logged.
 
 ## Now / Next / Parked
 
@@ -12,13 +12,25 @@
   known phases**, *not* a true null. This is a real benchmark signal: at our settings those four
   underperform Dynamo on real data with expert ground truth. Initial full pass through the packages is
   a good baseline; revisit parameters/sampling to chase the two-phase split.
-- **Now:** DISCA done (env `disca`, torch, native sm_120; k=2/3/4 → one-dominant-class, see
-  `disca/research.md` + `disca/results/`). emClarity installed + GPU-verified on the RTX 5080, but
-  tilt-series-only → can't run real T4P, synthetic-track only (`EMCLARITY.md`).
-- **Next:** (a) **continue package coverage** — pick the next 3D-input classifier; (b) chase the
-  two-phase split on the packages that missed it (e.g. DISCA at 64³ vs 32³; mask/lowpass on
-  RELION/PyTom/Protomo) using Dynamo's split as the reference; (c) **ETSimulations** synthetic
-  ground-truth sets (Josh, separate chat) to calibrate each package's sensitivity.
+- **Now:** **TomoFlow done** (env `tomoflow`; required porting `farneback3d`'s CUDA kernels off the
+  removed texture-reference API to run on CUDA 13.2 / sm_120 — see `tomoflow/research.md` §2).
+  Continuous OF landscape is **unimodal** → at k=3 the two large clusters (n=252, 391) are the SAME
+  pilus (CC 0.956) → TomoFlow **also misses the two phases**. **Five packages now miss the split
+  (RELION, PyTom, Protomo, DISCA, TomoFlow) vs Dynamo recovering it.** Earlier same session: DISCA
+  done (`disca/`); emClarity installed + GPU-verified but tilt-series-only → synthetic-track
+  (`EMCLARITY.md`).
+- **Next:** (a) **continue package coverage** — next 3D-input classifier (e.g. MDTOMO, OPUS-TOMO);
+  (b) chase the two-phase split using Dynamo's labels as reference (DISCA at 64³; phase-aware
+  mask/lowpass for the alignment + OF packages); (c) **ETSimulations** synthetic ground-truth sets
+  (Josh, separate chat) to confirm each package *can* separate a known phase difference.
+- **Dynamo methodology side-track (2026-06-01):** explored Dynamo's `dtutorial` synthetic set
+  (`dynamo/dynamo_outputs/ttest128_tutorial/`, 128 particles, 40³, 2 size-variant classes). PCA
+  command-line walkthrough validated headless on CPU: perfect poses (`real.tbl`) → ARI 1.000;
+  unaligned (`initial.tbl`, all-zero poses) → ARI 0.017 (chance) ⇒ **Dynamo PCA is post-alignment
+  only**. Two-stage MRA project `mra_ttest128` set up + validated. **BLOCKED:** in-MATLAB Dynamo
+  execution needs **Parallel Computing Toolbox** (licensed, not installed) — install it, then
+  `run_mra.m` runs as-is. (Also installed Image Processing Toolbox this session + patched a
+  `dynamo_mollify` IPT bug.) See session-log `2026-06-01-dynamo-dtutorial-pca-mra.md`.
 - **Parked (need expert input):** missing-wedge standardization; how to discretize continuous-
   classifier outputs. (Discrete-vs-continuous is **resolved: discrete, two phases**.) → Stefano / Braxton.
 
@@ -34,7 +46,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 | Dynamo | ✅ | MATLAB | ✅ | ✅ | — | — | — | **reference result**: recovers the two distinct pili-phase classes well (Josh + Stefano) → the ground-truth split other packages are measured against; workspace in `dynamo/`, `DYNAMO.md` |
 | PEET | ✅ | IMOD | ✅ | — | — | — | ✅ | clusterPca + central-slice figures committed |
 | MDTOMO | ❌ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | Part of Scipion3 ContinuousFlex plug-in; requires initial atomic model/reference map; cannot sort datasets like we're doing right now. |
-| TomoFlow | ❌ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | Part of Scipion3 ContinuousFlex plug-in; requires initial atomic model/reference map; cannot sort datasets like we're doing right now. |
+| TomoFlow | ✅ | `tomoflow` | ✅ `tomoflow_run.py` | ✅ | ✅ | ✅ | — | also ContinuousFlex, but (unlike MDTOMO/HEMNMA) needs only a **subtomogram-average reference, not an atomic model** — so we DID run it standalone. Required porting farneback3d off CUDA texture-refs for CUDA 13.2/sm_120 (`tomoflow/research.md` §2). Landscape unimodal → **misses the two phases** (k=3 two big classes CC 0.956). `tomoflow/results/` |
 | I3 / ProTomo | ✅ | (native) | ✅ | ✅ | — | — | ✅ | 3.1.0 installed; 2-class run on 234 centered particles (438 edge filtered); CC=0.921; see `protomo/research.md` + session log |
 | EMAN2 | ✅ | `eman2` | ⬜ | ⬜ | ⬜ | ⬜ | — | **owned by Eben**; env + workspace ready; `EMAN2.md` |
 | emClarity | ✅ | MCR R2019a | ⬜ (real data n/a) | — | — | — | — | **installed + GPU-verified on RTX 5080/sm_120** (1.5.3.11 + MCR R2019a; CUDA-10 kernels JIT to Blackwell via the 13.2 driver). **Cannot run on real T4P:** tilt-series pipeline, no path to ingest pre-extracted subtomos → **synthetic-data track only**. See `EMCLARITY.md` |
