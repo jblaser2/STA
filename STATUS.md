@@ -2,7 +2,7 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-02** by Claude (TomoNet evaluation: rejected, not suitable for out-of-box benchmark)
+> Last updated: **2026-06-02** by Eben (OPUS-TOMO workspace added: scripts ready for execution)
 
 ## Now / Next / Parked
 
@@ -12,17 +12,11 @@
   known phases**, *not* a true null. This is a real benchmark signal: at our settings those four
   underperform Dynamo on real data with expert ground truth. Initial full pass through the packages is
   a good baseline; revisit parameters/sampling to chase the two-phase split.
-- **Now:** **TomoFlow done** (env `tomoflow`; required porting `farneback3d`'s CUDA kernels off the
-  removed texture-reference API to run on CUDA 13.2 / sm_120 — see `tomoflow/research.md` §2).
-  Continuous OF landscape is **unimodal** → at k=3 the two large clusters (n=252, 391) are the SAME
-  pilus (CC 0.956) → TomoFlow **also misses the two phases**. **Five packages now miss the split
-  (RELION, PyTom, Protomo, DISCA, TomoFlow) vs Dynamo recovering it.** Earlier same session: DISCA
-  done (`disca/`); emClarity installed + GPU-verified but tilt-series-only → synthetic-track
-  (`EMCLARITY.md`). **TomoNet evaluated (2026-06-02) and rejected:** IsoNet-based denoising only;
-  would require custom autoencoder training, contrary to benchmark scope (out-of-box packages).
-- **Next:** (a) **continue package coverage** — next 3D-input classifier (e.g. MDTOMO, OPUS-TOMO);
-  (b) chase the two-phase split using Dynamo's labels as reference (DISCA at 64³; phase-aware
-  mask/lowpass for the alignment + OF packages); (c) **ETSimulations** synthetic ground-truth sets
+- **Now:** **OPUS-TOMO workspace added** (2026-06-02): feasibility assessed, 7-step data-prep + classification pipeline scripted (`opusTomo/scripts/` + `runClassification.sh`). Requires PyTorch 2.6+/CUDA 12.8 (incompatible with package's pinned 1.11/11.3; compatible with RTX 5080 + driver 13.2). Ready for execution: k=2/3/4 runs next. Earlier: TomoFlow completed (unimodal landscape, missed two phases); DISCA done (one dominant ~94% class, also missed phases); TomoNet evaluated and rejected (denoising-only, requires custom training).
+- **Next:** (a) **Execute OPUS-TOMO k=2/3/4 runs** on T4P dataset (scripts ready in `opusTomo/`);
+  (b) continue package coverage (MDTOMO blocked by atomic-model requirement; EMAN2 owned by Eben, env ready);
+  (c) chase the two-phase split using Dynamo's labels as reference (DISCA at 64³; phase-aware
+  mask/lowpass for alignment + OF packages); (d) **ETSimulations** synthetic ground-truth sets
   (Josh, separate chat) to confirm each package *can* separate a known phase difference.
 - **Dynamo methodology side-track (2026-06-01):** explored Dynamo's `dtutorial` synthetic set
   (`dynamo/dynamo_outputs/ttest128_tutorial/`, 128 particles, 40³, 2 size-variant classes). PCA
@@ -43,7 +37,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 |---|---|---|---|---|---|---|---|---|
 | RELION 3.1–4.0 | ✅ | `relion-5.0` | ✅ `build_relion_star.py` | ✅ | ✅ | ✅ | — | classic 3D-subtomo path **retained in RELION 5** `relion_refine` (no 3.1 build needed); k=2/3/4 × wedge/uniform run; no discrete split (CC 0.97–0.997); see `RELION.md` §9 |
 | STOPGAP | 🟡 | — | ⬜ | ⬜ | ⬜ | ⬜ | — | **owned by Eben**; scripts/binaries in `stopgap/` |
-| OPUS-TOMO | 🟡 | opuset (conda -> python)| ⬜ | ⬜ | ⬜ | ⬜ | — | not started |
+| OPUS-TOMO | 🟡 | opuset (conda -> python)| ✅ | ⬜ | ⬜ | ⬜ | — | 7-step pipeline scripted; requires PyTorch 2.6+/CUDA 12.8 (RTX 5080 compat); ready for k=2/3/4 runs |
 | Dynamo | ✅ | MATLAB | ✅ | ✅ | — | — | — | **reference result**: recovers the two distinct pili-phase classes well (Josh + Stefano) → the ground-truth split other packages are measured against; workspace in `dynamo/`, `DYNAMO.md` |
 | PEET | ✅ | IMOD | ✅ | — | — | — | ✅ | clusterPca + central-slice figures committed |
 | MDTOMO | ❌ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | Part of Scipion3 ContinuousFlex plug-in; requires initial atomic model/reference map; cannot sort datasets like we're doing right now. |
