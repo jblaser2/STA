@@ -1,0 +1,13 @@
+=== 18:30:25  RELION Class3D  K=2  ctf=wedge ===
+    done -> outputs/relion/Class3D/k2_wedge (exit 0)
+=== 18:32:42  RELION Class3D  K=3  ctf=wedge ===
+    done -> outputs/relion/Class3D/k3_wedge (exit 0)
+=== 18:35:14  RELION Class3D  K=4  ctf=wedge ===
+    done -> outputs/relion/Class3D/k4_wedge (exit 0)
+=== 18:38:05  RELION Class3D  K=2  ctf=uniform ===
+    done -> outputs/relion/Class3D/k2_uniform (exit 0)
+=== 18:40:29  RELION Class3D  K=3  ctf=uniform ===
+    done -> outputs/relion/Class3D/k3_uniform (exit 0)
+=== 18:43:05  RELION Class3D  K=4  ctf=uniform ===
+    done -> outputs/relion/Class3D/k4_uniform (exit 0)
+=== ALL RUNS COMPLETE 18:45:58 ===
