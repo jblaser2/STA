@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## runClassification.sh
 # Single SLURM job that runs the full classification pipeline:
-#   1. Subtomogram alignment (9 iterations, 3 angular-search blocks)
+#   1. Subtomogram alignment (6 iterations, 3 angular-search blocks)
 #   2. PCA (rot_vol → calc_covar → calc_eigenval → calc_eigenvec)
 #   3. k-means clustering and class-label assignment
 #
@@ -32,6 +32,10 @@ mkdir -p logs
 
 log() { echo "[$(date '+%H:%M:%S')] $*"; }
 
+# Report the failing command and line on any unexpected error so the cause
+# lands in logs/classify_%j.err instead of the job dying silently.
+trap 'rc=$?; echo "ACHTUNG: runClassification.sh failed at line ${LINENO} (exit ${rc}): ${BASH_COMMAND}" >&2' ERR
+
 # ---- USER CONFIGURATION ----------------------------------------------------
 export STOPGAPHOME=/home/ejl62/summerResearch/STOPGAP/exec
 MATLAB_TOOLBOX=/home/ejl62/summerResearch/STOPGAP/sg_toolbox  # for clustering step
@@ -42,8 +46,11 @@ PCA_ROOT='/home/ejl62/nobackup/autodelete/stopgapClassification/pca_project'
 n_cores=32        # must match #SBATCH --ntasks
 copy_local=1      # /tmp is local LVM (209 GB) on BYU HPC nodes — not NFS
 
-# Final iteration number: 9 iterations → output motl is motl_10.star
-FINAL_ITER=10
+# Final iteration number: must match subtomoParams.sh schedule.
+# 6 iterations (2 per block, the tuned schedule) → output motl is motl_7.star.
+# If you change the iteration count in subtomoParams.sh, update this to
+# (total_iterations + 1).
+FINAL_ITER=7
 # ---------------------------------------------------------------------------
 
 # Source MCR libraries
@@ -53,21 +60,98 @@ watcher="${STOPGAPHOME}/bin/stopgap_watcher.sh"
 parser="${STOPGAPHOME}/bin/stopgap_parser.sh"
 stopgap="${STOPGAPHOME}/bin/stopgap_mpi_slurm.sh"
 
-# submit_cmd is called by the watcher to launch MPI workers as a job step
-submit_cmd="srun ${stopgap} \${rootdir} \${paramfilename} ${n_cores} ${copy_local} slurm"
+# run_watcher_guarded <project_root> <param_file>
+# Runs the watcher with a crash sentinel. A single MPI worker crash writes a
+# crash_<n> marker into the project dir; the watcher only treats this as fatal
+# once EVERY core has crashed (and even then only if recompiled with the
+# updated check_crashes.m), otherwise it polls forever for completion flags
+# that never arrive and the job hangs until wall-time — a silent failure.
+# This sentinel detects ANY crash marker within ~20 s, prints it to the job
+# log, kills the watcher, and exits non-zero so the failure is loud and
+# immediate. The 20 s poll adds negligible overhead.
+run_watcher_guarded() {
+    local root="$1"
+    local paramfile="$2"
+
+    # Clear stale crash markers so we only react to crashes from THIS run.
+    rm -f "${root}"/crash_* 2>/dev/null || true
+
+    ${watcher} "${root}" "${paramfile}" ${n_cores} slurm \
+        "srun ${stopgap} ${root} ${paramfile} ${n_cores} ${copy_local} slurm" &
+    local wpid=$!
+
+    while kill -0 "${wpid}" 2>/dev/null; do
+        sleep 20
+        if compgen -G "${root}/crash_*" > /dev/null; then
+            log "ACHTUNG: worker crash detected — aborting job (crash marker below)"
+            cat "${root}"/crash_* >&2
+            kill -TERM "${wpid}" 2>/dev/null || true
+            sleep 5
+            kill -KILL "${wpid}" 2>/dev/null || true
+            wait "${wpid}" 2>/dev/null || true
+            log "Aborted: a STOPGAP MPI worker crashed. Inspect ${root}/crash_* and the srun output above."
+            exit 1
+        fi
+    done
+
+    # Propagate the watcher exit code; set -e aborts the job if it is non-zero.
+    wait "${wpid}"
+}
+
+# ---- PRE-FLIGHT CHECKS -----------------------------------------------------
+# Fail loudly and early (before consuming wall-time) if a required input is
+# missing — a common cause of opaque mid-run failures.
+preflight() {
+    local missing=0
+    for f in "$@"; do
+        if [ ! -e "${f}" ]; then
+            log "ACHTUNG: required input missing: ${f}"
+            missing=1
+        fi
+    done
+    [ "${missing}" -eq 0 ] || { log "Aborting: missing required inputs (see above)."; exit 1; }
+}
+
+preflight \
+    "${SUBTOMO_ROOT}/params/subtomo_param.star" \
+    "${SUBTOMO_ROOT}/lists/motl_1.star" \
+    "${SUBTOMO_ROOT}/lists/wedgelist.star" \
+    "${SUBTOMO_ROOT}/ref/ref_class1_1.mrc" \
+    "${SUBTOMO_ROOT}/ref/ref_class1_A_1.mrc" \
+    "${SUBTOMO_ROOT}/ref/ref_class1_B_1.mrc" \
+    "${SUBTOMO_ROOT}/masks/ali_mask.mrc" \
+    "${SUBTOMO_ROOT}/masks/ccmask.mrc" \
+    "${SUBTOMO_ROOT}/subtomograms"
 
 # ============================================================================
-log "=== PHASE 1: Subtomogram alignment (9 iterations) ==="
+log "=== PHASE 1: Subtomogram alignment (6 iterations) ==="
 log "Iteration progress: ls ${SUBTOMO_ROOT}/lists/motl_*.star"
 # ============================================================================
-# The watcher reads subtomo_param.star and runs all 9 task blocks in sequence.
+# The watcher reads subtomo_param.star and runs all 6 task blocks in sequence.
 # Each task block: align → average → FSC. Completion is signalled via
 # filesystem flags in subtomo_project/comm/.
 
-${watcher} "${SUBTOMO_ROOT}" "params/subtomo_param.star" ${n_cores} slurm \
-    "srun ${stopgap} ${SUBTOMO_ROOT} params/subtomo_param.star ${n_cores} ${copy_local} slurm"
+run_watcher_guarded "${SUBTOMO_ROOT}" "params/subtomo_param.star"
 
 log "Phase 1 complete. Final motl: motl_${FINAL_ITER}.star"
+
+# Verify the expected final motl actually exists; if not, surface diagnostics
+# rather than letting the PCA copy step fail with an opaque error.
+if [ ! -f "${SUBTOMO_ROOT}/lists/motl_${FINAL_ITER}.star" ]; then
+    log "ACHTUNG: expected ${SUBTOMO_ROOT}/lists/motl_${FINAL_ITER}.star not found after Phase 1!"
+    if compgen -G "${SUBTOMO_ROOT}/crash_*" > /dev/null; then cat "${SUBTOMO_ROOT}"/crash_* >&2; fi
+    exit 1
+fi
+
+# Surface any non-fatal averaging warnings (Fourier dynamic-range, empty class)
+# into the job log so they are not buried in the project ref/ directory.
+if compgen -G "${SUBTOMO_ROOT}/ref/warning_*.txt" > /dev/null; then
+    log "Non-fatal warnings were written during alignment:"
+    for w in "${SUBTOMO_ROOT}"/ref/warning_*.txt; do
+        echo "  --- ${w} ---" >&2
+        sed 's/^/    /' "${w}" >&2
+    done
+fi
 
 # ============================================================================
 log "=== Setting up PCA project ==="
@@ -128,8 +212,7 @@ run_pca_task() {
     local task=$1
     log "PCA task start: ${task}"
     eval "${parser} ${pca_common_args} pca_task ${task}"
-    ${watcher} "${PCA_ROOT}" "params/pca_param.star" ${n_cores} slurm \
-        "srun ${stopgap} ${PCA_ROOT} params/pca_param.star ${n_cores} ${copy_local} slurm"
+    run_watcher_guarded "${PCA_ROOT}" "params/pca_param.star"
     log "PCA task done: ${task}"
 }
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 ## subtomoParams.sh
-# Generates subtomo_param.star for a full 9-iteration alignment schedule.
-# Run this ONCE before job submission — the parser appends three task blocks
-# (iterations 1–3, 4–6, 7–9) to the same param file in sequence.
+# Generates subtomo_param.star for a 6-iteration alignment schedule (3 blocks,
+# 2 iterations each). Run this ONCE before job submission — the parser appends
+# three task blocks to the same param file in sequence.
 #
-# Because all particles are z-axis aligned, cone search is used throughout
-# rather than a full sphere search. In-plane phi is searched over ±180° at
-# each stage to cover all in-plane rotations.
+# Because all particles are z-axis aligned, cone search is used throughout.
+# In-plane phi is searched at full ±180° only in block 1 (to find the unknown
+# in-plane angle); blocks 2–3 refine phi locally (±15° and ±9°).
 
 set -e
 set -o nounset
@@ -33,9 +33,9 @@ score_weight=0.01
 
 # Fixed settings (unchanged across all blocks)
 binning=1
-search_mode='hc'
+search_mode='shc'           # stochastic hill-climb: early-exit search (was 'hc' = exhaustive)
 search_type='cone'
-cone_search_type='complete'
+cone_search_type='coarse'   # DYNAMO-style cone sampling, ~1.5-1.8x fewer angles (was 'complete')
 apply_laplacian=0
 scoring_fcn='flcf'
 symmetry='C1'
@@ -49,8 +49,10 @@ fthresh=800
 hp_rad=1
 hp_sigma=2
 
-# In-plane phi search: ±180° at each stage (full 360° coverage).
-# phi_angincr × phi_angiter = 180 → e.g. 10° × 18 steps
+# In-plane phi search is now set PER BLOCK (see run_block calls below), not
+# globally. A full ±180° search is only needed in block 1 to find the unknown
+# in-plane angle; later blocks refine it locally. These globals are kept as
+# fallback defaults but are overridden by run_block's per-block arguments.
 phi_angincr=10
 phi_angiter=18
 
@@ -72,18 +74,18 @@ tempdir='none'; commdir='none'; rawdir='none'; refdir='none'
 maskdir='none'; listdir='none'; fscdir='none'; subtomodir='none'; metadir='none'
 
 # ---- PARAMETER RANGES (reference) -----------------------------------------
-# BLOCK      startidx  iterations  angincr  angiter  lp_rad  Purpose
-# Block 1       1          3         10°       2      13      Coarse bootstrap
-# Block 2       4          3          5°       3      17      Mid refinement
-# Block 3       7          3          3°       3      22      Fine convergence
+# BLOCK  startidx  iters  angincr  angiter  lp_rad  phi_incr  phi_iter  Purpose
+# Blk 1     1        2     10°       2       13       10        18      Bootstrap + find phi (full ±180°)
+# Blk 2     3        2      5°       3       16        5         3      Refine (±15° in-plane, Fourier-cropped)
+# Blk 3     5        2      3°       3       17        3         3      Fine refine (±9°, Fourier-cropped)
 #
 # angincr × angiter = half-cone angle (degrees from z-axis).
 # lp_rad interpretation for box_size=80, pixel_size=13.33 Å:
-#   lp_rad=13  → ~82 Å resolution
-#   lp_rad=17  → ~63 Å resolution
-#   lp_rad=22  → ~48 Å resolution
-#   lp_rad=40  → ~27 Å resolution (Nyquist for 80-voxel box)
-# Tighten lp_rad as resolution improves and angular search converges.
+#   lp_rad=13  → ~82 Å resolution   (box ~52³ after Fourier crop)
+#   lp_rad=16  → ~67 Å resolution   (box ~62³)
+#   lp_rad=17  → ~63 Å resolution   (box ~64³)
+#   lp_rad=22+ → Fourier crop disabled; full 80³ box (~1.9× more voxels)
+# Keep lp_rad ≤17 so Fourier cropping stays engaged across all blocks.
 # ---------------------------------------------------------------------------
 
 run_block() {
@@ -92,9 +94,11 @@ run_block() {
     local angincr=$3
     local angiter=$4
     local lp_rad=$5
+    local phi_angincr=$6        # per-block in-plane increment (overrides global)
+    local phi_angiter=$7        # per-block in-plane iterations (overrides global)
     local lp_sigma=3
 
-    echo "Appending block: startidx=${startidx}, iterations=${iterations}, angincr=${angincr}, angiter=${angiter}, lp_rad=${lp_rad}"
+    echo "Appending block: startidx=${startidx}, iterations=${iterations}, angincr=${angincr}, angiter=${angiter}, lp_rad=${lp_rad}, phi_angincr=${phi_angincr}, phi_angiter=${phi_angiter}"
 
     eval "${parser} subtomo \
       param_name ${param_name} rootdir ${rootdir} \
@@ -126,11 +130,17 @@ run_block() {
       temperature ${temperature} rot_mode ${rot_mode} fthresh ${fthresh}"
 }
 
-# Append all three blocks in sequence
-run_block 1 3 10 2 13    # iterations 1–3: coarse cone ±20°, lp ~33 Å
-run_block 4 3  5 3 17    # iterations 4–6: medium cone ±15°, lp ~25 Å
-run_block 7 3  3 3 22    # iterations 7–9: fine cone ±9°,   lp ~20 Å
+# Append all three blocks in sequence.
+# 6 iterations total (2 per block). In-plane phi is searched at full ±180° only
+# in block 1 (to find the unknown in-plane angle), then refined locally.
+# lp_rad is kept <=17 so Fourier cropping stays engaged (lp_rad=22 disables it,
+# forcing the full 80^3 box and ~2x slower iterations).
+#
+# startidx iters angincr angiter lp_rad  phi_incr phi_iter   (phi half-range)
+run_block 1 2 10 2 13   10 18    # block 1: cone ±20°, full ±180° in-plane (find phi)
+run_block 3 2  5 3 16    5  3    # block 2: cone ±15°, ±15° in-plane refine
+run_block 5 2  3 3 17    3  3    # block 3: cone ±9°,  ±9°  in-plane refine
 
 echo "Done. subtomo_param.star written to ${rootdir}/${param_name}"
-echo "Final motl after all 9 iterations will be: lists/motl_10.star"
-echo "Final reference will be: ref/ref_class1_10.mrc"
+echo "Final motl after all 6 iterations will be: lists/motl_7.star"
+echo "Final reference will be: ref/ref_class1_7.mrc"

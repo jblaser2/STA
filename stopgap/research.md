@@ -17,6 +17,7 @@
 - [Notable Implementation Details](#notable-implementation-details)
 - [Typical User Workflow](#typical-user-workflow)
 - [Version History Highlights](#version-history-highlights-from-changestxt-and-stopgap_075md)
+- [Performance Optimizations Applied (2026-06-02)](#performance-optimizations-applied-2026-06-02)
 - [Summary](#summary)
 - [Compilation Notes (BYU HPC, R2023b)](#compilation-notes-byu-hpc-r2023b)
 - [Practical Setup Guide for Classification (BYU HPC)](#practical-setup-guide-for-classification-byu-hpc)
@@ -35,8 +36,8 @@ Copy each script to the root of the STOPGAP source directory.
 |------|-------------|
 | `compileStopgap.sh` | Compiles all four STOPGAP binaries from source using MATLAB R2023b `mcc`. Submit as a SLURM job. Only needed if binaries are missing or MCR is updated. |
 | `createStopgapInputs.m` | MATLAB script run once per project from `subtomo_project/`. Reads pre-extracted subvolumes, creates numbered symlinks, and writes the initial motivelist, wedgelist, per-halfset references, and masks. |
-| `subtomoParams.sh` | Calls the STOPGAP parser three times to write `params/subtomo_param.star`: a 9-iteration alignment schedule in three angular-refinement blocks (coarse → medium → fine). |
-| `runClassification.sh` | Main SLURM job. Runs the full pipeline sequentially: 9-iteration subtomogram alignment → PCA covariance decomposition → k-means clustering into 3 classes. |
+| `subtomoParams.sh` | Calls the STOPGAP parser three times to write `params/subtomo_param.star`: a 6-iteration alignment schedule (3 blocks × 2 iterations each) with stochastic hill-climb (`shc`), coarse cone sampling, and per-block phi narrowing (±180° → ±15° → ±9°). |
+| `runClassification.sh` | Main SLURM job. Runs the full pipeline sequentially: 6-iteration subtomogram alignment → PCA covariance decomposition → k-means clustering into 3 classes. Wraps every watcher invocation in a crash sentinel (`run_watcher_guarded`) that aborts within ~20 s if any worker writes a `crash_*` marker, plus pre-flight input checks, an ERR trap, and post-phase output/warning surfacing — so failures land in `logs/` instead of hanging silently (see [§7](#7--silent-failure-guards-robustness)). |
 | `plotPCA.py` | Python script (requires conda env `stopgap` with numpy + matplotlib). Reads `eigenfac.star` and `motl_classified.star`; saves pairwise PC scatter plots (PC1–PC4) and a scree plot to a specified output directory. |
 | `runPostClassification.sh` | Post-classification SLURM job. Phase A: activates conda env `stopgap` and runs `plotPCA.py`. Phase B: seeds per-class references from the final consensus halfset refs, generates `params/multiclass_param.star`, and runs `ali_multiclass` (no angular search) to produce one averaged reference per class. |
 
@@ -48,6 +49,9 @@ Modified versions of files that ship with STOPGAP 0.7.5. Copy them over the orig
 |------|--------------------------|-------------------|
 | `stopgap_config_slurm.sh` | `exec/lib/stopgap_config_slurm.sh` | Fixes `${LD_LIBRARY_PATH}` unbound-variable crash under `set -o nounset` (see [Compilation Notes](#compilation-notes-byu-hpc-r2023b)) |
 | `stopgap_parser.sh` | `exec/bin/stopgap_parser.sh` | Updated to source `stopgap_config_slurm.sh` instead of the nonexistent `stopgap_config.sh` |
+| `src/func/calculate_flcf.m` | `src/func/calculate_flcf.m` | Added optional 5th argument `fmask_in`; when provided, skips `fftn(mask)` (saves one FFT per angle for rotation-invariant masks). Backward-compatible — all TM callers pass only 4 args. |
+| `src/subtomo/func/flcf_subtomo_scoring_function.m` | `src/subtomo/func/flcf_subtomo_scoring_function.m` | `'init'` case now detects spherical masks via a test rotation and precomputes their FFTs into `o.fmask_cache`. `'score'` case skips `sg_rotate_vol` for spherical alignment and CC masks, and passes the cached FFT to `calculate_flcf`. |
+| `src/func/check_crashes.m` | `src/func/check_crashes.m` | Now aborts the watcher on the **first** worker crash (was: only when *all* cores crashed). A single dead core can never complete its packets, so the old behavior left the watcher polling forever until SLURM wall-time killed the job silently. ⚠️ Compiled into `stopgap_watcher` — requires recompile (`compileStopgap.sh`) to take effect; the bash crash sentinel in `runClassification.sh` covers the same failure mode without recompiling. See [§7](#7--silent-failure-guards-robustness). |
 
 ### Compiled binaries → `STOPGAP/exec/lib/`
 
@@ -503,6 +507,8 @@ FLCF(r) = numerator(r) / (N · σ_ref · σ_particle(r))
 
 Where N is the number of voxels under the mask. All three FFT pairs are computed once per reference rotation, making the inner loop over translations very cheap.
 
+**Sphere mask optimization**: `calculate_flcf` accepts an optional 5th argument `fmask_in`. When provided, `fftn(mask)` is skipped and the pre-computed value is used directly. `flcf_subtomo_scoring_function` detects spherical masks at 'init' time (one 90° test rotation; negligible cost), caches `fftn(mask)` in `o.fmask_cache`, and also skips the two `sg_rotate_vol` calls per angle evaluation (rotating a sphere is a mathematical no-op). Combined, this eliminates 2 of the ~3 `sg_rotate_vol` calls and 1 of the ~7 FFTs per angle, roughly halving per-angle cost for spherical masks.
+
 ### Fourier Shell Correlation (FSC)
 
 **Implementation**: `sg_toolbox/sg_calculate_FSC.m`
@@ -730,7 +736,7 @@ All diagnostic `disp()` calls are prefixed with `s.cn` (core name string, e.g., 
 
 ### Crash Recovery
 
-If a parallel job fails, a `crash_{procnum}` file is written in `rootdir/`. The watcher checks for these and can restart failed jobs without re-running successful ones, using the packet completion markers as checkpoints.
+If a parallel job fails, a `crash_{procnum}` file is written in `rootdir/`. The watcher (`check_crashes.m`) checks for these every poll. **As shipped**, STOPGAP 0.7.5 only treats a crash as fatal once *every* core has crashed — a single dead core leaves the watcher polling forever for completion flags that never arrive, so the job hangs until SLURM wall-time kills it with no clear error (the silent-failure mode observed in practice). The edited `check_crashes.m` aborts on the first crash instead (see [§7](#7--silent-failure-guards-robustness)). The `crash_*` markers double as checkpoints — `rootdir/<n>` packet completion markers let a re-run skip already-finished work.
 
 ### Random Seed per Iteration
 
@@ -791,6 +797,62 @@ Rather than shared-memory accumulation (which would require locks), each core wr
 - **0.7.5**: Tiling-based template matching (improved scalability for large tomograms); multi-template support; improved local CTF; exposure weighting in TM
 - **0.7.x**: Introduction of STAR format for all metadata; VMAP module; TPS module; refactored filter system
 - **Earlier versions**: EM-format motivelists (Type 1/2), simpler non-tiled TM, basic FSC without phase randomization
+
+---
+
+## Performance Optimizations Applied (2026-06-02)
+
+The following changes were made to reduce classification runtime for 672 z-axis-aligned particles on 32 cores. The bottleneck is angle-evaluation count (not I/O or parallelism), so all optimizations target the inner angular search loop.
+
+### §1 — Per-block phi narrowing (`subtomoParams.sh`)
+
+Full ±180° in-plane search is only needed in block 1 (to find the unknown φ). Blocks 2–3 now use ±15° (5°×3) and ±9° (3°×3). Reduces phi steps from 37 to 7 in blocks 2–3, giving ~5× fewer evaluations there.
+
+### §2 — Coarse cone sampling (`subtomoParams.sh`)
+
+`cone_search_type='coarse'` uses DYNAMO-style sparse cone sampling instead of the denser `'complete'` grid (~1.5–1.8× fewer orientations per cone).
+
+### §3 — Stochastic hill-climb (`subtomoParams.sh`)
+
+`search_mode='shc'` exits the angle loop as soon as any trial score beats the starting score. For well-converged particles in blocks 2–3, this exits within the first few trials (2–5× fewer evaluations per particle). The `'hc'` (exhaustive) mode always evaluates all angles.
+
+### §4 — Fewer total iterations (`subtomoParams.sh`, `runClassification.sh`)
+
+6 iterations (2 per block) instead of 9 (3 per block). Sufficient for convergence of z-aligned particles. `FINAL_ITER=7` in `runClassification.sh`.
+
+### §5 — Lower `lp_rad` to keep Fourier cropping engaged (`subtomoParams.sh`)
+
+lp_rad = 13 / 16 / 17 across blocks (down from 13 / 17 / 22). At lp_rad ≥ ~22 for an 80-voxel box, STOPGAP disables Fourier cropping and operates on the full 80³ volume (~1.9× more voxels). Keeping lp_rad ≤ 17 maintains cropping throughout.
+
+**Combined §1–§5 reduction**: ~6.5× fewer angle evaluations versus the original exhaustive 9-iteration schedule.
+
+### §6 — Sphere mask optimization (`src/func/calculate_flcf.m`, `src/subtomo/func/flcf_subtomo_scoring_function.m`)
+
+Both `ali_mask` and `ccmask` are `sg_sphere()` objects (confirmed in `createStopgapInputs.m`). Rotating a sphere is a mathematical no-op. At 'init' time, `flcf_subtomo_scoring_function` tests each mask with a 90° rotation; if the relative L2 error is < 1%, it marks the mask as spherical and precomputes `fftn(mask)` into `o.fmask_cache`. In the 'score' inner loop:
+- `sg_rotate_vol(ali_mask, …)` is skipped — the mask is used as-is
+- `calculate_flcf` receives `o.fmask_cache{class_idx}` instead of recomputing `fftn(mask)` each angle
+- `sg_rotate_vol(ccmask, …)` is skipped — `rccmask = o.ccmask` directly
+
+This eliminates 2 of ~3 `sg_rotate_vol` calls and 1 of ~7 FFTs per angle evaluation, roughly halving per-angle cost. Non-spherical mask workflows are unaffected (fallback to original code path).
+
+**Overall speedup estimate**: §1–§5 give ~6.5× reduction in angle count; §6 gives ~2× reduction in per-angle cost → **~13–15× total** versus the original schedule.
+
+### §7 — Silent-failure guards (robustness)
+
+Files: `src/func/check_crashes.m`, `runClassification.sh`.
+
+Not a speed change — this fixes runs that previously failed *silently*. The observed failure: one MPI worker dies (e.g. `crash_1` with exit code 249), but the stock watcher only aborts when **all** cores crash, so it polls forever for completion flags that never arrive and the job hangs until the 2-day wall-time expires, with no useful error in the log.
+
+Two independent fixes, so robustness does not depend on recompiling:
+
+- **`check_crashes.m`** (source / watcher binary): aborts on the *first* crash with a message naming the crashed core(s) and project dir. A single dead core can never finish its packets, so continuing is pointless. Same per-poll cost (no slowdown). ⚠️ Compiled into `stopgap_watcher` — only effective after `compileStopgap.sh` recompile.
+- **`runClassification.sh`** (bash layer, effective immediately, no recompile):
+  - `run_watcher_guarded` runs the watcher in the background and polls for `crash_*` markers every 20 s; on detection it prints the marker, kills the watcher, and `exit 1`s. Negligible overhead.
+  - `preflight` verifies all required seeds/params/masks exist before consuming wall-time.
+  - An `ERR` trap reports the failing line and command to `logs/classify_%j.err`.
+  - After Phase 1 it verifies `motl_${FINAL_ITER}.star` exists and dumps any `ref/warning_*.txt` (Fourier dynamic-range, empty class) into the job log instead of leaving them buried in the project dir.
+
+Net effect: a worker crash now aborts loudly within ~20 s with the cause in `logs/`, instead of a multi-hour silent hang.
 
 ---
 
@@ -1065,19 +1127,21 @@ Run `subtomoParams.sh` from the STOPGAP source root. This calls `stopgap_parser`
 bash /home/<USER_ID>/summerResearch/STOPGAP/subtomoParams.sh
 ```
 
-This produces a 9-iteration alignment schedule in three blocks:
+This produces a 6-iteration alignment schedule in three blocks:
 
-| Block | Iterations | angincr | angiter | Half-cone angle | lp_rad | Effective resolution |
-|-------|-----------|---------|---------|----------------|--------|---------------------|
-| 1 | 1–3 | 10° | 2 | ±20° | 13 | ~82 Å |
-| 2 | 4–6 | 5° | 3 | ±15° | 17 | ~63 Å |
-| 3 | 7–9 | 3° | 3 | ±9° | 22 | ~48 Å |
+| Block | Iterations | angincr | angiter | Half-cone | lp_rad | Effective resolution | phi search |
+|-------|-----------|---------|---------|-----------|--------|---------------------|-----------|
+| 1 | 1–2 | 10° | 2 | ±20° | 13 | ~82 Å | ±180° (full, 10°×18) |
+| 2 | 3–4 | 5° | 3 | ±15° | 16 | ~67 Å | ±15° (5°×3) |
+| 3 | 5–6 | 3° | 3 | ±9° | 17 | ~63 Å | ±9° (3°×3) |
 
-In-plane phi search: ±180° (10° step × 18 steps = full 360° coverage). Cone search is used throughout because all particles are pre-aligned to the z-axis.
+In-plane phi: full ±180° only in block 1 (to find the unknown in-plane angle); blocks 2–3 refine locally. Cone search is used throughout because all particles are pre-aligned to the z-axis. `search_mode='shc'` (stochastic hill-climb) exits the angle loop as soon as a score beats the starting score; `cone_search_type='coarse'` uses sparser DYNAMO-style cone sampling. Combined, these reduce angle evaluations by ~6.5× versus the original exhaustive schedule.
 
-After 9 iterations the final motivelist is `lists/motl_10.star` and the final reference is `ref/ref_class1_10.mrc`.
+`lp_rad` is kept ≤17 so Fourier cropping stays engaged; lp_rad ≥ ~22 on an 80-voxel box disables cropping and forces the full 80³ volume (~1.9× more voxels per evaluation).
 
-**Monitoring resolution**: after each iteration STOPGAP writes FSC curves to `fsc/`. Tighten `lp_rad` in subsequent blocks only when the FSC shows genuine signal at higher resolution. The `lp_rad` values above are conservative starting points; the formula is `resolution ≈ (box_size × pixel_size) / lp_rad`. The maximum useful value is `box_size / 2 = 40` (Nyquist for an 80-voxel box).
+After 6 iterations the final motivelist is `lists/motl_7.star` and the final reference is `ref/ref_class1_7.mrc`.
+
+**Monitoring resolution**: after each iteration STOPGAP writes FSC curves to `fsc/`. Tighten `lp_rad` in subsequent blocks only when the FSC shows genuine signal at higher resolution. The formula is `resolution ≈ (box_size × pixel_size) / lp_rad`. The maximum useful value is `box_size / 2 = 40` (Nyquist for an 80-voxel box). Keep lp_rad ≤17 to maintain Fourier cropping.
 
 ---
 
@@ -1089,21 +1153,21 @@ sbatch /home/<USER_ID>/summerResearch/STOPGAP/runClassification.sh
 
 Monitor with `squeue -u <USER_ID>`; logs go to `logs/classify_<jobid>.log` and `.err`.
 
-**Wall time**: the script is set to `--time=2:00:00`. For 672 particles on 32 cores, subtomo alignment alone takes roughly 2–3 hours — increase this to at least `4:00:00` before submitting.
+**Wall time**: the script is set to `--time=2:00:00`. For 672 particles on 32 cores with the tuned 6-iteration schedule, subtomo alignment should take well under 2 hours; leave at least `2:00:00` as a margin.
 
 `runClassification.sh` runs three phases sequentially within a single SLURM allocation:
 
-#### Phase 1 — Subtomogram alignment (9 iterations)
+#### Phase 1 — Subtomogram alignment (6 iterations)
 
-The watcher reads `params/subtomo_param.star` and executes all 9 task blocks in sequence. Each block: align all particles → average per halfset → compute FSC → write updated motl. Completion is signalled through filesystem flags in `subtomo_project/comm/`.
+The watcher reads `params/subtomo_param.star` and executes all 6 task blocks in sequence. Each block: align all particles → average per halfset → compute FSC → write updated motl. Completion is signalled through filesystem flags in `subtomo_project/comm/`.
 
-Output: `lists/motl_10.star` (refined orientations), `ref/ref_class1_10.mrc` (final reference).
+Output: `lists/motl_7.star` (refined orientations), `ref/ref_class1_7.mrc` (final reference).
 
 #### Phase 2 — PCA
 
 Files are first copied from `subtomo_project` into `pca_project`:
-- `lists/motl_10.star`, `lists/wedgelist.star` → `pca_project/lists/`
-- `ref/ref_class1_10.mrc` → `pca_project/ref/`
+- `lists/motl_7.star`, `lists/wedgelist.star` → `pca_project/lists/`
+- `ref/ref_class1_7.mrc` → `pca_project/ref/`
 - `masks/ali_mask.mrc` → `pca_project/masks/pca_mask.mrc`
 - `subtomograms/` → symlinked (not copied) to avoid duplicating 672 files
 
@@ -1111,7 +1175,7 @@ Four PCA tasks run in sequence, each written to `pca_param.star` and immediately
 
 | Task | What it does |
 |------|-------------|
-| `rot_vol` | Pre-rotates all 672 particles into the reference frame using refined Euler angles from `motl_10.star`; writes `rvol/*.mrc` |
+| `rot_vol` | Pre-rotates all 672 particles into the reference frame using refined Euler angles from `motl_7.star`; writes `rvol/*.mrc` |
 | `calc_covar` | Builds the covariance matrix (`data_type=awpd`, amplitude-weighted phase differences) across all particles under `pca_mask.mrc`; writes `pca/covar.star` |
 | `calc_eigenval` | Decomposes the covariance matrix; writes `pca/eigenval.star` (`n_eigs=10`) |
 | `calc_eigenvec` | Projects all particles onto the eigenvectors; writes `pca/eigenfac.star` (per-particle scores on each component) |
@@ -1123,7 +1187,7 @@ MATLAB is called non-interactively. It reads `pca/eigenfac.star`, runs k-means o
 Key parameters (edit at the top of `runClassification.sh` before submitting):
 - `n_cores=32` (must match `#SBATCH --ntasks`)
 - `N_CLASSES=3`
-- `FINAL_ITER=10`
+- `FINAL_ITER=7` (total iterations + 1; must match the schedule in `subtomoParams.sh`)
 
 ---
 
@@ -1164,7 +1228,7 @@ And writes output references named:
 ref/{ref_name}_{A,B}_{iteration+1}_{class}.mrc    (per-halfset)
 ref/{ref_name}_{iteration+1}_{class}.mrc           (FOM-weighted merged)
 ```
-With `ref_name=ref_multiclass` and `startidx=1`, the script seeds `ref/ref_multiclass_{A,B}_1_{1..N}.mrc` from the final consensus halfset refs (`ref_class1_{A,B}_10.mrc`), and the job writes `ref/ref_multiclass_2_{1..N}.mrc` as the final merged per-class averages.
+With `ref_name=ref_multiclass` and `startidx=1`, the script seeds `ref/ref_multiclass_{A,B}_1_{1..N}.mrc` from the final consensus halfset refs (`ref_class1_{A,B}_7.mrc`), and the job writes `ref/ref_multiclass_2_{1..N}.mrc` as the final merged per-class averages.
 
 **ccmask is required even with `angiter=0`**: it is applied unconditionally in `flcf_subtomo_scoring_function.m` for peak finding regardless of angular search depth. The script copies `ccmask.mrc` from `subtomo_project/masks/` to `pca_project/masks/` before running the watcher.
 
@@ -1200,10 +1264,10 @@ subtomo_project/
   masks/ali_mask.mrc           (alignment mask)
   masks/ccmask.mrc             (CC search mask)
         ↓  subtomoParams.sh
-  params/subtomo_param.star    (9-iteration schedule)
-        ↓  runClassification.sh Phase 1 (subtomo watcher, 9 iterations)
-  lists/motl_10.star           (refined orientations)
-  ref/ref_class1_10.mrc        (final reference)
+  params/subtomo_param.star    (6-iteration schedule: shc + coarse cone + per-block phi)
+        ↓  runClassification.sh Phase 1 (subtomo watcher, 6 iterations)
+  lists/motl_7.star            (refined orientations)
+  ref/ref_class1_7.mrc         (final reference)
         ↓  runClassification.sh Phase 2 (file copy + PCA watcher)
 pca_project/
   rvol/rvol_*.mrc              (particles rotated into reference frame)
@@ -1214,7 +1278,7 @@ pca_project/
   lists/motl_classified.star   (class labels assigned; 3 classes)
         ↓  runPostClassification.sh Phase A (plotPCA.py, conda stopgap)
   plots/pca_pc1_vs_pc2.png     (pairwise PC scatter plots, colored by class)
-  plots/pca_scree.png           (variance explained per component)
+  plots/pca_scree.png          (variance explained per component)
         ↓  runPostClassification.sh Phase B (ali_multiclass, angiter=0)
   ref/ref_multiclass_2_1.mrc   (class 1 average, FOM-weighted merged halfsets)
   ref/ref_multiclass_2_2.mrc   (class 2 average)
