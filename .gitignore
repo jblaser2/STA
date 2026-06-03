@@ -39,3 +39,6 @@
 
 logFile/
 emClarity_checkInstall.txt
+
+# ignore codegraph
+.codegraph
