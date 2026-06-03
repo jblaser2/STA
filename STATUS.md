@@ -2,9 +2,11 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-02** by Eben (STOPGAP orientation: reviewed all scripts, optimizations, and documented gaps; ready to run).
+> Last updated: **2026-06-03** by Josh (PEET WMD PCA with ±60° tilt range; best k-means split 412:260 visually closer to paper; full sweep + class averages generated; root cause of 5:1 mismatch identified).
 
 ## Now / Next / Parked
+
+- **PEET GROUND-TRUTH REPRODUCTION (2026-06-03, in progress):** Goal: reproduce Stefano's PEET 5:1 (509:95) per-particle class labels to know which subtomo is which. Added `tiltRange={[-60,60]}` + `flgWedgeWeight=1` to prm, reran WMD PCA, swept 14 k-means + 8 HAC configurations. Best k-means result: **412:260 (1.58:1) with PCs 1:3** — visually closer to paper per 3dmod inspection. HAC degenerates to 671:1. Root cause of 5:1 mismatch: pre-aligned particles all share the same wedge direction so WMD correction degrades to masking the same Fourier region for all particles; can't replicate Stefano's per-particle tilt geometry. **Next: ask Stefano for his PEET MOTL files (per-particle class labels)**, or accept 412:260 as proxy ground truth. Class averages: `~/Research/peet/results/winner_class_{1,2}_avg.mrc`. Sweep scripts: `run_pca_sweep.sh`, `post_sweep.py` (in results/).
 
 - **BENCHMARK FRAMEWORK (2026-06-02, Claude research complete):** Wrote comprehensive `benchmarkIdeas.md`
   covering: (i) four-lens evaluation framework (external validity vs GT, downstream STA resolution,
@@ -42,7 +44,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 | STOPGAP | 🟡 | — | ⬜ | ⬜ | ⬜ | ⬜ | — | **owned by Eben**; scripts + compiled R2023b binaries in `stopgap/`; 6-iter optimized schedule designed (§1–§6 in research.md, ~13–15× speedup); `check_crashes.m` edited (abort on first crash, in `editedSTOPGAPfiles/`); bash-layer `run_watcher_guarded` described in research.md §7 but **not yet added to `runClassification.sh`**; next: add crash guard → run `createStopgapInputs.m` → `subtomoParams.sh` → `sbatch runClassification.sh` |
 | OPUS-TOMO | ✅ | opuset (conda -> python)| ✅ | ✅ | ✅ | ✅ | — | k=8 clusters, 20 epochs; 4 bugs patched (CTF exponent NaN, HEALPix single-bin crash, `--split` requirement, dummy CTF path); reference volumes generated; `opusPatches/` holds fixes for OPUS-ET code. **Result: generates multiple ~40-50kDa classes, structured heterogeneity captured.** |
 | Dynamo | ✅ | MATLAB | ✅ | ✅ | — | — | — | **reference result**: recovers the two distinct pili-phase classes well (Josh + Stefano) → the ground-truth split other packages are measured against; workspace in `dynamo/`, `DYNAMO.md` |
-| PEET | ✅ | IMOD | ✅ | — | — | — | ✅ | clusterPca + central-slice figures committed |
+| PEET | ✅ | IMOD | ✅ | 🟡 | — | — | ✅ | WMD PCA rerun with ±60° tilt range (2026-06-03). Best k-means k=2: 412:260 (1.58:1, PCs 1:3) — visually closer to paper. Cannot reproduce paper's 5:1 from pre-aligned stack (uniform wedge → WMD degrades). Need Stefano's MOTL for exact ground-truth labels. Sweep + class avg scripts in `~/Research/peet/results/`. |
 | MDTOMO | ❌ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | Part of Scipion3 ContinuousFlex plug-in; requires initial atomic model/reference map; cannot sort datasets like we're doing right now. |
 | TomoFlow | ✅ | `tomoflow` | ✅ `tomoflow_run.py` | ✅ | ✅ | ✅ | — | also ContinuousFlex, but (unlike MDTOMO/HEMNMA) needs only a **subtomogram-average reference, not an atomic model** — so we DID run it standalone. Required porting farneback3d off CUDA texture-refs for CUDA 13.2/sm_120 (`tomoflow/research.md` §2). Landscape unimodal → **misses the two phases** (k=3 two big classes CC 0.956). `tomoflow/results/` |
 | I3 / ProTomo | ✅ | (native) | ✅ | ✅ | — | — | ✅ | 3.1.0 installed; 2-class run on 234 centered particles (438 edge filtered); CC=0.921; see `protomo/research.md` + session log |
@@ -70,6 +72,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 3. ~~Discrete vs. continuous handling for T4P~~ **RESOLVED: discrete, two pili phases (Stefano).**
    Remaining: how to discretize continuous classifiers' outputs for comparison. (Stefano)
 4. What to do with off-class / outlier particles. (Josh)
+6. **Per-particle ground-truth labels for T4P (NEW, 2026-06-03):** Stefano's PEET MOTL files would give exact class assignment per subtomogram. Without them, best available proxy is Dynamo HAC (447:225) confirmed visually by Stefano. Email Stefano for MOTL. (Josh)
 5. **Benchmarking framework choices (NEW, 2026-06-02):** five open Qs in `benchmarkIdeas.md` §11:
    - (1a) README pillar weights 35/25/20/20 OK given downstream-resolution priority, or explore 30/20/20/30?
    - (1b) Is Dynamo's two-phase split sturdy enough for numerical GT, or use qualitatively only?

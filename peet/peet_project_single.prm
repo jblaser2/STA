@@ -31,8 +31,8 @@ reference = 'reference_znorm78.mrc'
 refThreshold  = [672, 672]
 refFlagAllTom = 1
 
-tiltRange = {}
-flgWedgeWeight = 0
+tiltRange = {[-60, 60]}
+flgWedgeWeight = 1
 nWeightGroup = 8
 
 lstThresholds = [672]
