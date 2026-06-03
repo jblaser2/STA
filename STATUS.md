@@ -2,9 +2,11 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-03** by Josh (PEET WMD PCA with ±60° tilt range; best k-means split 412:260 visually closer to paper; full sweep + class averages generated; root cause of 5:1 mismatch identified).
+> Last updated: **2026-06-03** by Josh (motor_easy class A: 246 subtomos extracted, GT-aligned average checkpoint passed; pipeline_quirks.md committed to repo).
 
 ## Now / Next / Parked
+
+- **SYNTHETIC DATA — motor_easy class A DONE, B+C pending (2026-06-03):** Class A: 7 runs × ~35 particles = **246 subtomos extracted** to `production/subtomos/merged_A/`; GT-aligned average computed + opened in 3dmod — checkpoint passed. Class B (6 runs) and Class C (5 runs): simulations, reconstructions, and extraction **not yet started**. After B+C: merge all three into one `labels.csv` → quick PCA k-means at k=3 to validate ground-truth separability. Production layout: `~/Research/synthetic_sta/motor_easy/production/`. Pipeline quirks documented in `STA/etsimulation/pipeline_quirks.md`.
 
 - **PEET GROUND-TRUTH REPRODUCTION (2026-06-03, in progress):** Goal: reproduce Stefano's PEET 5:1 (509:95) per-particle class labels to know which subtomo is which. Added `tiltRange={[-60,60]}` + `flgWedgeWeight=1` to prm, reran WMD PCA, swept 14 k-means + 8 HAC configurations. Best k-means result: **412:260 (1.58:1) with PCs 1:3** — visually closer to paper per 3dmod inspection. HAC degenerates to 671:1. Root cause of 5:1 mismatch: pre-aligned particles all share the same wedge direction so WMD correction degrades to masking the same Fourier region for all particles; can't replicate Stefano's per-particle tilt geometry. **Next: ask Stefano for his PEET MOTL files (per-particle class labels)**, or accept 412:260 as proxy ground truth. Class averages: `~/Research/peet/results/winner_class_{1,2}_avg.mrc`. Sweep scripts: `run_pca_sweep.sh`, `post_sweep.py` (in results/).
 
@@ -61,9 +63,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 - **Real — T4P:** 672 hand-picked, prealigned 80³ subtomograms (`STA/subtomos_mrc/`, gitignored).
   Alignment QC done (`alignment_review/`, `review_alignment.py`). **Expert ground truth (Stefano):
   two distinct pili-phase classes**, recovered by Dynamo — the reference split for the benchmark.
-- **Synthetic — planned:** 3-class & 4-class conformational sets, ~30 Å and ~10 Å class
-  differences, matched SNR, simulated missing wedge, imbalanced sizes. Tooling: **ETSimulations**
-  ✅ installed & validated (`nora_test` run). Production datasets not yet generated.
+- **Synthetic — motor_easy (3-class flagellar motor, ~30 Å differences):** Class A complete (246 subtomos, GT-aligned average validated). Classes B+C pending. `~/Research/synthetic_sta/motor_easy/production/`. Pipeline quirks: `STA/etsimulation/pipeline_quirks.md`.
 
 ## Open Decisions (owner)
 
