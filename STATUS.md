@@ -2,32 +2,34 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-02** by Eben (OPUS-TOMO completed: k=8 clusters, 20 epochs, 4 bugs patched in OPUS-ET) + Claude (Dynamo `dtutorial` cold-start MRA run completed + evaluated).
+> Last updated: **2026-06-02** by Claude (benchmarkIdeas.md: comprehensive survey of 4-lens benchmark design, metrics catalog, output formats, implementation notes, addressing user's 3 concerns re F-beta limitations).
 
 ## Now / Next / Parked
 
+- **BENCHMARK FRAMEWORK (2026-06-02, Claude research complete):** Wrote comprehensive `benchmarkIdeas.md`
+  covering: (i) four-lens evaluation framework (external validity vs GT, downstream STA resolution,
+  stability/robustness, cross-method consensus), (ii) vetted metric catalog with 25+ citations
+  (ARI/AMI/V-measure, gold-standard FSC + AUC-FSC from CryoBench, Hennig clusterboot, Monti consensus,
+  internal validity indices), (iii) explicit answers to Eben's three concerns (F-beta misses
+  downstream goal, doesn't reveal regime-specific wins, not extensible to GT-free data), (iv) real-data
+  track (T4P with Dynamo soft-GT) + synthetic-data track design, (v) output format options
+  (recommended: multi-pillar profile + composite), (vi) implementation notes tied to existing scripts
+  (relion_class_report.py, etc.), (vii) open questions back to team. README §8 weights (35/25/20/20)
+  preserved as constraint; five concerns about the framework raised in §7 (not edited into README).
+  → **Next: team review of benchmarkIdeas.md before execution; resolve the 5 open questions (Qs 1–5 in §11).**
+
 - **GROUND TRUTH (Stefano consult, 2026-06-01):** this T4P dataset has **two distinct, obvious
   pili-phase classes**, and **Dynamo recovers them well** (`dynamo/`). So the matching one-dominant-
-  ~94%-class results from **RELION, PyTom, Protomo, and DISCA are a shared FAILURE to separate the two
-  known phases**, *not* a true null. This is a real benchmark signal: at our settings those four
-  underperform Dynamo on real data with expert ground truth. Initial full pass through the packages is
-  a good baseline; revisit parameters/sampling to chase the two-phase split.
-- **Now:** **OPUS-TOMO complete** (2026-06-02): pipeline executed successfully, 20 epochs, k=8 clusters, reference volumes generated. **Discovered and patched 4 bugs in OPUS-ET** (CTF exponent NaN, HEALPix single-bin crash, `--split` requirement, dummy CTF path resolution). **Result: OPUS-TOMO also misses the two real phases**—generates 8 clusters but none cleanly separate pili vs. flexed states. Patches archived in `opusPatches/models.py` and `pose.py`. Earlier: TomoFlow unimodal (missed phases); DISCA one dominant ~94% class (missed phases); TomoNet rejected (denoising only).
-- **Next:** (a) **Six packages miss the two phases** (RELION, PyTom, Protomo, DISCA, TomoFlow, OPUS-TOMO). Run final 3D-input classifiers: EMAN2 (env ready, owned by Eben); MDTOMO blocked by atomic-model requirement; AC3D (implemented as PyTom extension); skip others or check HEMNMA/Scipion3 path. (b) Once coverage complete: analyze cross-package agreement (ARI/NMI matrices) and compile Phase-I results. (c) Chase the two-phase split—use Dynamo's two-class labels as ground truth; rerun DISCA at 64³ with phase-aware mask/lowpass, test OF packages with phase-aware preprocessing. (d) **ETSimulations** synthetic ground-truth datasets (Josh) to prove each package *can* recover known phase differences.
-- **Dynamo methodology side-track (2026-06-01/02, DONE):** explored Dynamo's `dtutorial` synthetic
-  set (`dynamo/dynamo_outputs/ttest128_tutorial/`, 128 particles, 40³, 2 size-variant classes). PCA
-  command-line walkthrough (headless CPU): perfect poses (`real.tbl`) → ARI 1.000; unaligned
-  (`initial.tbl`, identity poses) → ARI 0.017 (chance) ⇒ **Dynamo PCA is post-alignment only**.
-  Two-stage cold-start MRA project `mra_ttest128` (6 rounds/18 ites, `nref=2`) **ran to completion**
-  (PCT installed 2026-06-02, unblocking it; IPT also installed + `dynamo_mollify` bug patched).
-  Result: the **embedded MRA's own 2-class assignment COLLAPSED** (final ref col 34 = all 1s; col-22
-  "64/64" is just passive carryover of the input GT labels — do not mistake for a recovered split).
-  But cold-start **alignment** partly worked (shift err 4.93→2.06 vox; 63/128 within 20° of truth,
-  bimodal), and **PCA on the MRA-aligned poses → ARI 0.878 / acc 0.969**, near the 1.0 ceiling.
-  ⇒ on this synthetic set Dynamo's classification power = alignment quality + PCA, NOT the MRA
-  class-swapping. Spectrum: `initial` 0.017 | cold-start 0.878 | `real` 1.000. See session-log
-  `2026-06-01-dynamo-dtutorial-pca-mra.md`.
-- **Parked (need expert input):** missing-wedge standardization; how to discretize continuous-
+  ~94%-class results from **RELION, PyTom, Protomo, DISCA, TomoFlow, OPUS-TOMO are a shared FAILURE** to separate the two
+  known phases, *not* a true null. Benchmark signal: at our settings those six underperform Dynamo on real data with expert ground truth.
+
+- **Package completion status (2026-06-02):** 9 of 15 packages run on real T4P (RELION, Dynamo, PyTom,
+  Protomo, DISCA, TomoFlow, EMAN2, OPUS-TOMO, PEET partial). EMAN2 k=2 complete but k=3/4 not yet run
+  (table shows ⬜ discrepancy — needs fixing). STOPGAP owned by Eben, not started. MDTOMO/HEMNMA
+  require atomic models (❌ skipped). AC3D folded into PyTom. TomoNet formally rejected (out-of-box scope
+  violated). emClarity can't run real tilt-series data (synthetic only).
+
+- **Parked (need expert input):** missing-wedge standardization; whether to discretize continuous-
   classifier outputs. (Discrete-vs-continuous is **resolved: discrete, two phases**.) → Stefano / Braxton.
 
 ## Package Matrix (15 packages, 3D-input classifiers)
@@ -68,6 +70,13 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 3. ~~Discrete vs. continuous handling for T4P~~ **RESOLVED: discrete, two pili phases (Stefano).**
    Remaining: how to discretize continuous classifiers' outputs for comparison. (Stefano)
 4. What to do with off-class / outlier particles. (Josh)
+5. **Benchmarking framework choices (NEW, 2026-06-02):** five open Qs in `benchmarkIdeas.md` §11:
+   - (1a) README pillar weights 35/25/20/20 OK given downstream-resolution priority, or explore 30/20/20/30?
+   - (1b) Is Dynamo's two-phase split sturdy enough for numerical GT, or use qualitatively only?
+   - (1c) Synthetic sweep budget for regime map — is Josh's track scoped for 3–5 dimensions?
+   - (1d) Half-set FSC strategy: pose-locked feasible across packages, true gold-standard is not. OK with that?
+   - (1e) Worth commit to "consensus minus soft-GT" analysis to surface cross-package consensus structures?
+   (See `benchmarkIdeas.md` §11 for context.)
 
 ## People
 
