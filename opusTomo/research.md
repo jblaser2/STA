@@ -1,7 +1,7 @@
 # OPUS-ET Pili Subtomogram Classification — Research Notes
 
 _Last updated: 2026-06-02_  
-_Status: Pipeline completed successfully (20 epochs, K=8 clusters)_
+_Status: Pipeline completed successfully (20 epochs, K=2 clusters — two distinct pili conformational states)_
 
 ---
 
@@ -258,23 +258,43 @@ Produces `pre0.star` – `pre7.star` in `opus_project/split_star/`.
 
 ---
 
-## Actual Results (K=8, Epoch 19)
+### Step 8: 2D Class Average Projections (`opus_project/08_class_averages.py`)
+
+For each class, loads all raw subtomograms assigned to that class, accumulates a float64 mean volume, then generates three 2D views: XY projection (top-down cross-section), XZ projection (side view), and the central Z slice.
+
+```bash
+python opus_project/08_class_averages.py              # auto-detect epoch, K=2
+python opus_project/08_class_averages.py --epoch 19 --k 2  # explicit
+```
+
+Output saved alongside the 3D volumes for the same run:
+`opus_project/output/analyze.{EPOCH}/kmeans{K}/class_averages.png`
+
+Saving inside `analyze.{EPOCH}/kmeans{K}/` means the directory path encodes both epoch and K. Re-running with different parameters writes to a different directory automatically.
+
+**Implementation details:**
+- MRC axis order is `(Z, Y, X)`: XY projection = `np.sum(avg, axis=0)`, XZ = `np.sum(avg, axis=1)`, central Z slice = `avg[D//2, :, :]`
+- Per-panel normalisation: z-score, clip to ±3σ, rescale to [0, 1]
+- STAR parsing: `_rlnImageName` column contains bare filenames; prepend `~/src/particles/` to get full paths
+
+---
+
+## Actual Results (K=2, Epoch 19)
+
+K=2 was chosen after inspecting the UMAP from an initial K=8 run, which showed the 8 clusters were over-segmenting two well-separated populations. The UMAP confirms two clean, bimodal blobs with no bridging continuum; PCA shows essentially 1D variation (PC2 ≈ 0 for all particles), consistent with a binary classification problem.
 
 | Class | Particles | Fraction |
 |---|---|---|
-| 0 | 44 | 6.5% |
-| 1 | 85 | 12.6% |
-| 2 | 67 | 10.0% |
-| 3 | 120 | 17.9% |
-| 4 | 126 | 18.8% |
-| 5 | **6** | **0.9%** |
-| 6 | 146 | 21.7% |
-| 7 | 78 | 11.6% |
+| 0 | 430 | 64% |
+| 1 | 242 | 36% |
 
-Class 5 (6 particles) is very small and may represent outliers.
+3D density maps: `opus_project/output/analyze.19/kmeans2/reference{0,1}.mrc`  
+Split STAR files: `opus_project/split_star/pre{0,1}.star`  
+2D class averages: `opus_project/output/analyze.19/kmeans2/class_averages.png`
 
-3D density maps: `opus_project/output/analyze.19/kmeans8/reference{0..7}.mrc`
-Split STAR files: `opus_project/split_star/pre{0..7}.star`
+**2D projection averages** (XY, XZ, central Z slice) show similar gross morphology in both classes — the pilus density appears as a horizontal band with the characteristic missing-wedge cross-pattern in the central Z slice. The structural difference between the two classes is subtle at this averaging level and is better assessed directly in the 3D density maps.
+
+**K selection rationale**: Start with K=8, inspect the UMAP. If you see clearly separated blobs (not a continuum), use K = number of blobs. Re-run analysis only (no retrain needed) with `--skip-train --k N`.
 
 ---
 
@@ -395,6 +415,7 @@ image_fft = image_fft * c[i:i+1].abs().pow(max(self.ctf_beta + ctf_beta_rand, 0.
     ├── 05_analyze.sh             # dsdsh analyze -> PCA/UMAP/kmeans
     ├── 06_eval_vol.sh            # dsdsh eval_vol -> reference*.mrc
     ├── 07_split_star.sh          # dsd parse_pose_star --labels -> pre*.star
+    ├── 08_class_averages.py      # 2D projection class averages (XY, XZ, central Z)
     ├── logs/                     # pipeline run logs
     ├── particles.star            # RELION 3.0 STAR file (672 particles)
     ├── pose_euler.pkl            # rotation matrices (all identity)
@@ -407,12 +428,13 @@ image_fft = image_fft * c[i:i+1].abs().pow(max(self.ctf_beta + ctf_beta_rand, 0.
     │   └── analyze.19/
     │       ├── z_pca.png         # PCA plot
     │       ├── umap.png          # UMAP plot
-    │       └── kmeans8/
+    │       └── kmeans2/          # final run (K=2)
     │           ├── labels.pkl    # cluster assignments (672,)
     │           ├── centers.txt   # latent codes at centers
-    │           └── reference*.mrc  # one 3D map per class
+    │           ├── reference*.mrc  # one 3D map per class
+    │           └── class_averages.png  # 2×3 grid: XY/XZ projections + central Z slice
     └── split_star/
-        └── pre{0..7}.star        # per-class particle lists
+        └── pre{0,1}.star         # per-class particle lists
 
 ~/src/particles/
     ├── aligned_tom*.mrc          # 672 subtomogram MRC files
@@ -423,7 +445,8 @@ image_fft = image_fft * c[i:i+1].abs().pow(max(self.ctf_beta + ctf_beta_rand, 0.
 
 ## Iterating on Results
 
-- **Try different K**: re-run with `bash runClassification.sh --skip-train --k 5` (or 12). Deletes nothing — creates new `kmeans5/` subdirectory.
+- **Try different K**: re-run with `bash runClassification.sh --skip-train --k 4`. Creates new `kmeans4/` subdirectory; does not delete existing results.
+- **K selection guide**: run K=8 first, inspect `umap.png`. Count distinct blobs; use that as K. Continuous smear → no discrete heterogeneity (or insufficient training).
 - **Interactive filtering**: `jupyter notebook opusTomo/cryodrgn/templates/cryoDRGN_filtering_template.ipynb` — polygon-lasso UMAP to manually curate subpopulations.
-- **More epochs**: re-run training without `--skip-train`; existing `split.pkl` is reused, epochs resume from checkpoint.
+- **More epochs**: re-run training without `--skip-train`; existing `split.pkl` is reused, epochs continue from checkpoint.
 - **Higher resolution**: take particles from one class's `pre*.star` and re-run STA refinement in RELION or EMAN2 on just that subpopulation.
