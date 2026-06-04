@@ -244,7 +244,59 @@ for anything physics-related.
 
 ---
 
-## 11. Production Run Layout (Multi-Class, Shared Coords)
+## 11. `sim_metadata.json` Is Written After `scale_mrc` — Killed Runs Leave a 1-Byte File
+
+**Symptom:** After using the scale_mrc kill workaround (quirk #2), `sim_metadata.json` exists
+but is only 1 byte (`[`). Extraction fails with `json.decoder.JSONDecodeError: Expecting value`.
+
+**Root cause:** ETSimulations writes `sim_metadata.json` via a `metadata_process` (a separate
+`multiprocessing.Process`) that listens on a queue. The worker only puts the metadata into the
+queue **after** `scale_mrc()` returns (line 245 of `ets_generate_data.py`, immediately after
+line 240 `scale_mrc(...)`). Killing the parent after the MRC appears also kills the
+`metadata_process` mid-write — it writes `[` and then dies.
+
+**Fix A — Reconstruct from `temp_0/BasicParticle_coord.txt`** (fast, no re-simulation needed):
+
+`temp_0/BasicParticle_coord.txt` is preserved when the process is killed (cleanup only runs at
+the end of a successful process). It contains the complete particle data in 6-column format:
+
+```
+N 6
+x_nm  y_nm  z_nm  euler_z1_deg  euler_x_deg  euler_z2_deg
+```
+
+Columns 1–3 match `sim_metadata["positions"]` (nm, integer-rounded).
+Columns 4–6 match `sim_metadata["orientations"]` (ZXZ degrees, integer-rounded).
+
+Use `reconstruct_metadata.py` (in the motor_easy root):
+
+```bash
+python reconstruct_metadata.py production/class_B/run_01
+# Writes production/class_B/run_01/output/sim_metadata.json from temp_0/
+```
+
+This is what `run_classB.sh` and `run_classC.sh` do automatically after each kill.
+
+**Fix B — Wait for metadata before killing** (avoids reconstruction, but slower):
+
+Change the polling condition to also wait for `sim_metadata.json` to grow past 1 KB:
+
+```bash
+META="production/class_B/run_01/output/sim_metadata.json"
+until [ -f "$MRC" ] && [ $(stat -c%s "$MRC") -gt 100000000 ] && \
+      [ -f "$META" ] && [ $(stat -c%s "$META") -gt 1000 ]; do sleep 10; done
+kill ...
+```
+
+This waits through `scale_mrc` (20 min per run) but preserves full float-precision orientations.
+
+**Precision note:** The reconstructed metadata uses integer-degree orientations (1° resolution)
+vs. the float orientations in `orient_pool.txt`. For GT-aligned averaging the difference is
+negligible; the averaged motor structure is visually indistinguishable.
+
+---
+
+## 12. Production Run Layout (Multi-Class, Shared Coords)
 
 To generate a ground-truth-labeled 3-class dataset:
 - Use the **same coord files** for all classes (same particle positions and orientations)
