@@ -41,7 +41,7 @@ Because the complex is imaged *in situ* inside an intact cell, the population of
 Many packages using different classification algorithms have been developed for STA. However, **no systematic benchmarking has been done** across these packages on the same dataset with standardized preprocessing. This project creates such a benchmark using four datasets:
 
 - **Real dataset 1:** 672 prealigned T4P subtomograms from *Vibrio* cells with expert-validated structural classes
-- **Real dataset 2:** Type IV Secretion System (T4SS) — planned; target organism and source TBD
+- **Real dataset 2:** Type IV Secretion System (T4SS) — planned; details TBD
 - **Synthetic dataset 1:** `motor_easy` — 3-class flagellar motor assembly intermediates (634 particles, exact per-particle ground-truth labels known)
 - **Synthetic dataset 2:** Planned — likely harder, with smaller structural differences (~10 Å) between classes
 
