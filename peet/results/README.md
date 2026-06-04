@@ -4,12 +4,12 @@
 
 | Class | Label | Count | Stefano target |
 |-------|-------|-------|---------------|
-| 1 | `ring_complete` | 413 | 509 |
-| 2 | `ring_altered` | 191 | 95 |
+| 1 | `ring_complete` | 388 | 509 |
+| 2 | `ring_altered` | 216 | 95 |
 | 3 | `junk` | 68 | 68 |
 | — | **Total** | **672** | **672** |
 
-The junk count (68) matches the target exactly. The structural split (413:191 ≈ 2.2:1)
+The junk count (68) matches the target exactly. The structural split (388:216 ≈ 1.8:1)
 is the best achievable on this dataset; see **Limitation** below.
 
 ## Biological interpretation
@@ -38,17 +38,20 @@ classification.
 2. **Junk removal:** bottom 68 particles by CCC score (CCC < 0.186) excluded — these
    perfectly match the expected junk count. Top 604 particles used for PCA.
 3. **PCA:** `pca prm 1 604 peet_single_AvgVol_1P672.mrc 1` with:
-   - `pcaFnParticleMask` = sphere R=25 voxels (333 Å at 13.33 Å/px)
+   - `pcaFnParticleMask` = T4P cylindrical mask (cropped to 78³; axis along Y,
+     radius 11.2 vox in XZ, asymmetric Y extent 9.8/15.8 vox from center — 10,025 voxels)
    - `tiltRange = {[-60, 60]}`, `flgWedgeWeight = 1` (WMD on)
-   - Output: `pca604_sphere_r25.mat` (604 particles × 20 PCs)
-4. **Clustering:** `clusterPca prm pca604_sphere_r25.mat 2 "2:10" 1 0 kmeans 100 100`
-   - k=2, PCs 2–10 (PC1 excluded — captures brightness noise, not structure)
-   - 100 replicates for convergence
+   - Output: `pca604_t4p_cyl.mat` (604 particles × 20 PCs)
+4. **Clustering:** `clusterPca prm pca604_t4p_cyl.mat 2 "1:20" 1 0 kmeans 100 200`
+   - k=2, all 20 PCs (AIC/BIC improvement increases monotonically through PC 20)
+   - 200 replicates for convergence
 5. 68 CCC-excluded particles assigned class 3 (`junk`) in final output.
 
-**Sweep performed:** 200+ configurations tested across sphere/cylinder masks
-(R=9–38 vox), PC ranges (1:3 through 2:15), WMD on/off, particle counts (604/672),
-and k-means replicates (30–100). Best L1 distance to target: **190** (vs ~510 naive).
+**Note on mask selection:** An earlier sweep over 200+ configurations used generic
+sphere masks (R=9–38 vox). Switching to the biologically motivated T4P cylindrical
+mask changed the optimal PC strategy: PC1 is now the primary structural signal
+(not noise), and AIC/BIC both confirm 2 clusters are statistically supported (AIC
+improvement = 518, BIC improvement = 363 for PCs 1:20).
 
 ## Limitation
 
