@@ -279,7 +279,7 @@ Large files (`.mrc`, `.star`, `.hdf`, `.h5`) are gitignored. Only scripts, docs,
 | Person | Role |
 |---|---|
 | **Josh Blaser** | Recent Graduate, primary researcher |
-| **Eben** | Recent Graduate, primary researcher |
-| **Stefano** | Postdoc, CryoET domain expert, manuscript review |
+| **Eben Lonsdale** | Recent Graduate, primary researcher |
+| **Stefano Maggi** | Postdoc, CryoET domain expert, manuscript review |
 | **Braxton Owens** | PhD student, guidance |
 | **Gus Hart** | Professor, primary advisor |
