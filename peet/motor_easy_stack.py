@@ -112,11 +112,20 @@ def main():
     # szVol 92: 2 px margin from 96³ box to avoid edge artifacts
     ref_path = os.path.join(OUT_DIR, "motor_easy_initial_ref.mrc")
     prm_path = os.path.join(PEET_DIR, "motor_easy.prm")
+    # Solvent mask for PCA: r=32 px, center Y-10 (motor position in 96³ box).
+    # Same mask used by RELION — restricts PCA variance to the motor region.
+    solvent_mask = os.path.expanduser(
+        "~/Research/STA/outputs/relion_motor_easy/solvent_mask.mrc")
+
     prm = f"""# PEET parameter file — motor_easy synthetic data
 # {n} GT-aligned subtomograms (96^3, 13.33 A/px) stacked along Z
 # Particles at ({half}, {half}, {half}+i*{BOX}) for i=0..{n-1}
 # Identity MOTL — all euler angles = 0 (particles already GT-aligned)
 # tiltRange [-60,60] + flgWedgeWeight=1 — native WMD in Fourier space
+# pcaFnParticleMask: soft-edge sphere r=32 px, center Y-10 (motor position)
+#   matches RELION solvent mask; ensures PCA captures structural signal.
+# szVol=96 (full box): no alignment search so 2px edge margin not needed.
+# outsideMaskRadius=44: full-box sphere for averaging reference computation.
 
 fnVolume = {{'{stacked_mrc}'}}
 fnModParticle = {{'{model_path}'}}
@@ -124,11 +133,13 @@ fnModParticle = {{'{model_path}'}}
 initMOTL = {{'{motl_path}'}}
 
 fnOutput = 'motor_easy'
-szVol = [92 92 92]
+szVol = [96 96 96]
 
 maskType = 'sphere'
 insideMaskRadius = 0
-outsideMaskRadius = 11
+outsideMaskRadius = 44
+
+pcaFnParticleMask = '{solvent_mask}'
 
 yaxisType = 0
 sampleSphere = 'none'

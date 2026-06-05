@@ -2,7 +2,7 @@
 """
 kmeans_motor_easy.py — k-means classification on PEET PCA scores for motor_easy.
 
-Reads pca634_motor_easy.mat (from PEET pca command), applies sklearn k-means on
+Reads pca694_motor_easy.mat (from PEET pca command), applies sklearn k-means on
 the top N principal components, and writes predictions.csv for score_synthetic.py.
 
 Usage:
@@ -16,7 +16,7 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
 RESULTS = "/home/jblaser2/Research/peet/motor_easy/results"
-MAT     = os.path.join(RESULTS, "pca634_motor_easy.mat")
+MAT     = os.path.join(RESULTS, "pca694_motor_easy.mat")
 LABELS  = "/home/jblaser2/Research/synthetic_sta/motor_easy/production/subtomos/merged_all_aln/labels.csv"
 STA_DIR = "/home/jblaser2/Research/STA"
 OUT_DIR = "outputs/peet_motor_easy"
@@ -35,7 +35,7 @@ SEED   = 42
 
 def load_pc_scores(mat_path):
     with h5py.File(mat_path, 'r') as f:
-        coeffs = np.array(f['coeffs'])  # (634, 20)
+        coeffs = np.array(f['coeffs'])  # (694, 20)
     print(f"Loaded coeffs: {coeffs.shape} from {mat_path}")
     return coeffs
 
