@@ -76,24 +76,26 @@ grep -c "<Particle" $SCRIPTS/particle_list.xml
 
 ## Step 2: Generate the Cylindrical Mask
 
+The **v2 mask** (tuned to the T4P lower periplasmic ring, matching PEET v2) is the
+current canonical mask and is already on disk. To regenerate it:
+
 ```bash
 cd $SCRIPTS
-python generate_cylindrical_mask.py
+python generate_cylindrical_mask.py --radius 13 --height_pos 0 --height_neg 25 --box 80
 ```
 
-This creates `cylindrical_mask.em` and `cylindrical_mask.mrc` in the current
-directory using the defaults:
+| Parameter | Value | Physical size | Notes |
+|---|---|---|---|
+| Box | 80 voxels | — | |
+| Radius (XZ) | 13 voxels | 173 Å | Captures lower periplasmic ring |
+| Height +Y | 0 voxels | 0 Å | Flat at center — no upward extent |
+| Height -Y | 25 voxels | 333 Å | Below-center only (ring region) |
 
-| Parameter | Value | Physical size |
-|---|---|---|
-| Box | 80 voxels | — |
-| Height (Y) | 17.6 voxels | 234.6 Å = 23.5 nm |
-| Radius (XZ) | 7.2 voxels | 95.9 Å = 9.6 nm |
+This geometry matches PEET v2 (which gave the best AIC/BIC on T4P). The mask was
+generated from `T4P_mask/generate_cylindrical_mask.py` and copied to `PyTom/`.
+`T4P_mask/cylindrical_mask_v2.mrc` holds the same mask for RELION use.
 
-To use different values:
-```bash
-python generate_cylindrical_mask.py --height 17.6 --radius 7.2 --box 80
-```
+Previous default params (r=7.2, symmetric ±8.8 vox) failed to separate T4P phases.
 
 ---
 
@@ -114,8 +116,16 @@ mpirun -np 16 python $PYTOM/pytom/classification/auto_focus_classify.py \
     -c  $SCRIPTS/cylindrical_mask.em \
     -b  1 \
     -i  15 \
+    -a  \
     -o  $OUTDIR
 ```
+
+> **Note — `-a` is required on this machine:** The compiled FRM extension
+> (`_swig_frm`) is absent from `pytom_env`, so running without `-a` causes an
+> MPI_ABORT on all workers at the alignment step. Our particles are pre-aligned
+> (zero rotations/shifts in the particle list), so `-a` is scientifically correct
+> here: difference-map scoring uses the stored orientations rather than
+> re-running FRM.
 
 ### Key Parameters
 
@@ -131,7 +141,7 @@ mpirun -np 16 python $PYTOM/pytom/classification/auto_focus_classify.py \
 | `-o` | Output directory | `./autofocus_output/` |
 | `-n` | Noise fraction (0–1) | 0.1 (flag 10% lowest-scoring as noise) |
 | `-d` | Dispersion: remove classes smaller than max/d | 5 |
-| `-a` | Skip FRM alignment (use stored orientations only) | omit = run alignment |
+| `-a` | Skip FRM alignment (use stored orientations only) | **required** — see note above |
 
 ### Frequency (`-f`) Guide
 

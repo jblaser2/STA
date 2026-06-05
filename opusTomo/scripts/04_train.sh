@@ -17,7 +17,7 @@ STAR="$SCRIPT_DIR/particles.star"
 POSES="$SCRIPT_DIR/pose_euler.pkl"
 MASK="$SCRIPT_DIR/mask.mrc"
 OUTDIR="$SCRIPT_DIR/output"
-DATADIR="$HOME/src/particles"
+DATADIR="$HOME/Research/STA/subtomos_mrc"
 
 for f in "$STAR" "$POSES" "$MASK"; do
     [[ -f "$f" ]] || { echo "ERROR: $f not found — run prerequisite scripts first."; exit 1; }
