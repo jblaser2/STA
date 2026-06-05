@@ -42,7 +42,7 @@ Many packages using different classification algorithms have been developed for 
 
 - **Real dataset 1:** 672 prealigned T4P subtomograms from *Vibrio* cells with expert-validated structural classes
 - **Real dataset 2:** Type IV Secretion System (T4SS) — planned; details TBD
-- **Synthetic dataset 1:** `motor_easy` — 3-class flagellar motor assembly intermediates (634 particles, exact per-particle ground-truth labels known)
+- **Synthetic dataset 1:** `motor_easy` — 3-class flagellar motor assembly intermediates (694 particles, exact per-particle ground-truth labels known)
 - **Synthetic dataset 2:** Planned — likely harder, with smaller structural differences (~10 Å) between classes
 
 All packages are run with identical preprocessing on both real and synthetic data. Scores on synthetic data anchor the real-data results via ARI and related external-validity metrics.
@@ -89,12 +89,12 @@ We also recognize that limiting evaluation to 3D-input classifiers foregoes a la
 
 ### Synthetic Data — Flagellar Motor Assembly Intermediates (`motor_easy`)
 
-**634 subtomograms** simulated with ETSimulations at 13.33 Å/px, 80³ box, SNR matched to the real T4P data. Three ground-truth classes model progressive flagellar motor assembly:
+**694 subtomograms** simulated with ETSimulations at 13.33 Å/px, 80³ box, SNR matched to the real T4P data. Three ground-truth classes model progressive flagellar motor assembly:
 
 | Class | Description | N particles |
 |---|---|---|
 | **A** — `ring_complete` | Full motor: C-ring + MS-ring present | 246 |
-| **B** — `noCring` | Motor core + MS-ring; C-ring absent | 211 |
+| **B** — `noCring` | Motor core + MS-ring; C-ring absent | 271 |
 | **C** — `core_only` | Motor core only; both rings absent | 177 |
 
 Class differences are ~30 Å — large enough to be detectable but realistic for assembly intermediates. The A–C boundary is the most distinct; A–B and B–C are progressively harder to separate. A smaller-difference dataset is planned as a harder benchmark track.
