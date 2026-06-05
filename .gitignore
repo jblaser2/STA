@@ -50,6 +50,10 @@ emClarity_checkInstall.txt
 *.bak2.m
 *.m.bak
 
+# HPC job output logs
+*.log
+*.err
+
 # STOPGAP compiled MATLAB MCR binaries (platform-specific ELF executables; recompile on target)
 STOPGAP/exec/lib*/sg_toolbox
 STOPGAP/exec/lib*/stopgap

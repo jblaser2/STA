@@ -2,7 +2,7 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-04** by Claude (class B expanded to 271 particles; mask sized; ETSim pipeline bugs fixed).
+> Last updated: **2026-06-05** by Claude (STOPGAP source + scripts committed to repo; .gitignore updated).
 
 ## Now / Next / Parked
 
@@ -53,7 +53,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 | Package | Installed | Env | Data-prep | k=2 | k=3 | k=4 | Pushed | Notes / blockers |
 |---|---|---|---|---|---|---|---|---|
 | RELION 3.1–4.0 | ✅ | `relion-5.0` | ✅ `build_relion_star.py` | ✅ | ✅ | ✅ | — | classic 3D-subtomo path **retained in RELION 5** `relion_refine` (no 3.1 build needed); k=2/3/4 × wedge/uniform run; no discrete split (CC 0.97–0.997); see `RELION.md` §9 |
-| STOPGAP | 🟡 | — | ⬜ | ⬜ | ⬜ | ⬜ | — | **owned by Eben**; scripts + compiled R2023b binaries in `stopgap/`; 6-iter optimized schedule designed (§1–§6 in research.md, ~13–15× speedup); `check_crashes.m` edited (abort on first crash, in `editedSTOPGAPfiles/`); bash-layer `run_watcher_guarded` described in research.md §7 but **not yet added to `runClassification.sh`**; next: add crash guard → run `createStopgapInputs.m` → `subtomoParams.sh` → `sbatch runClassification.sh` |
+| STOPGAP | 🟡 | — | ⬜ | ⬜ | ⬜ | ⬜ | — | **owned by Eben**; full source + pipeline scripts committed to repo at `STOPGAP/` (commit 42122b0): `scripts/`, `src/`, `sg_toolbox/`, slurm jobs (`run_pipeline.slurm`, `resume_pca.slurm`); edited files (incl. `check_crashes.m`) live directly in source tree (not separate editedSTOPGAPfiles/); compiled R2023b MCR binaries excluded from git (gitignored); 6-iter optimized schedule designed (§1–§6 in research.md, ~13–15× speedup); `run_watcher_guarded` described in research.md §7 but **not yet added to `run_pipeline.slurm`**; next: add crash guard → run `build_inputs.m` → `sbatch run_pipeline.slurm` |
 | OPUS-TOMO | ✅ | opuset (conda -> python)| ✅ | ✅ | ✅ | ✅ | — | k=8 clusters, 20 epochs; 4 bugs patched (CTF exponent NaN, HEALPix single-bin crash, `--split` requirement, dummy CTF path); reference volumes generated; `opusPatches/` holds fixes for OPUS-ET code. **Result: generates multiple ~40-50kDa classes, structured heterogeneity captured.** |
 | Dynamo | ✅ | MATLAB | ✅ | ✅ | — | — | — | **reference result**: recovers the two distinct pili-phase classes well (Josh + Stefano) → the ground-truth split other packages are measured against; workspace in `dynamo/`, `DYNAMO.md` |
 | PEET | ✅ | IMOD | ✅ | ✅ | — | — | ✅ | Two runs complete (2026-06-04). **v1** (cyl r=11.2): 388/216/68. **v2** (cyl r=13, below-center): 374/230/68, AIC=659. Labels: ring_complete/ring_altered/junk. CSVs + figures in `peet/results/`. Cylindrical mask → include PC1 (structural signal). Still need Stefano's MOTL for exact GT. |
