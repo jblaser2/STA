@@ -95,17 +95,17 @@ We also recognize that limiting evaluation to 3D-input classifiers foregoes a la
 |---|---|---|
 | **A** — `ring_complete` | Full motor: C-ring + MS-ring present | 246 |
 | **B** — `noCring` | Motor core + MS-ring; C-ring absent | 271 |
-| **C** — `core_only` | Motor core only; both rings absent | 177 |
+| **C** — `Cring_only` | C-ring only (isolated cytoplasmic switch complex); MS-ring, P/L-rings, rod/hook absent | 177 |
 
 Class differences are ~30 Å — large enough to be detectable but realistic for assembly intermediates. The A–C boundary is the most distinct; A–B and B–C are progressively harder to separate. A smaller-difference dataset is planned as a harder benchmark track.
 
 **Input density maps** — the three ground-truth structural variants used to simulate the data:
 
 <p align="center">
-  <img src="etsimulation/figures/motor_easy_class_maps.png" width="780" alt="Orthoslice views of the three class density maps: Class A (ring_complete), Class B (noCring), Class C (core_only)"/>
+  <img src="etsimulation/figures/motor_easy_class_maps.png" width="780" alt="Orthoslice views of the three class density maps: Class A (ring_complete), Class B (noCring), Class C (Cring_only)"/>
 </p>
 
-<p align="center"><em>Input density maps for the three synthetic classes (rows: A, B, C; columns: YZ side, XY top-down, XZ section, 3D render). The progressive loss of the C-ring (A→B) and MS-ring (B→C) is clearly visible in the clean maps. These structural differences become far less obvious after noise and missing-wedge artifacts are introduced.</em></p>
+<p align="center"><em>Input density maps for the three synthetic classes (rows: A, B, C; columns: YZ side, XY top-down, XZ section, 3D render). Class A is the full motor; Class B has the C-ring removed (cut below the membrane neck); Class C retains only the C-ring (isolated cytoplasmic switch complex — everything above the membrane neck removed). These structural differences become far less obvious after noise and missing-wedge artifacts are introduced.</em></p>
 
 **Simulated reconstruction** — what the data actually looks like after tilt-series simulation and WBP reconstruction:
 
@@ -120,17 +120,21 @@ Class differences are ~30 Å — large enough to be detectable but realistic for
 <table align="center">
   <tr>
     <td align="center">
-      <img src="etsimulation/figures/motor_easy_classA_avg.png" width="420" alt="Class A GT-aligned average: full motor with C-ring and MS-ring"/>
+      <img src="etsimulation/figures/motor_easy_classA_avg.png" width="280" alt="Class A GT-aligned average: full motor with C-ring and MS-ring"/>
       <br><em>Class A GT-aligned average (n=246)<br>Full motor: C-ring + MS-ring present</em>
     </td>
     <td align="center">
-      <img src="etsimulation/figures/motor_easy_classC_avg.png" width="420" alt="Class C GT-aligned average: motor core only, both rings absent"/>
-      <br><em>Class C GT-aligned average (n=177)<br>Motor core only; both rings absent</em>
+      <img src="etsimulation/figures/motor_easy_classB_avg.png" width="280" alt="Class B GT-aligned average: motor core with MS-ring, C-ring absent"/>
+      <br><em>Class B GT-aligned average (n=271)<br>Motor core + MS-ring; C-ring absent</em>
+    </td>
+    <td align="center">
+      <img src="etsimulation/figures/motor_easy_classC_avg.png" width="280" alt="Class C GT-aligned average: C-ring only, MS-ring and rod/hook absent"/>
+      <br><em>Class C GT-aligned average (n=177)<br>C-ring only; MS-ring, rod/hook absent</em>
     </td>
   </tr>
 </table>
 
-**GT separability (validated):** Template-matching on GT-aligned subtomos gives ARI = 0.289 (~68–73% per-class accuracy on individual noisy particles), confirming the classes are structurally distinct but not trivially separable. Class average CCs: A–B = 0.72, A–C = 0.66, B–C = 0.83. Per-particle ground-truth labels: `production/labels.csv`.
+**GT separability (validated):** Template-matching on GT-aligned subtomos gives ARI = 0.289 (~68–73% per-class accuracy on individual noisy particles), confirming the classes are structurally distinct but not trivially separable. Class average CCs: A–B = 0.72, A–C = 0.66, B–C = 0.83 *(computed on old C_core definition — revalidation with new C_noRodHook pending)*. Per-particle ground-truth labels: `production/labels.csv`.
 
 ---
 

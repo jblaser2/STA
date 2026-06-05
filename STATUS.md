@@ -2,9 +2,11 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-05** by Claude/Eben (694-particle RELION ARI=0.380 iter1; PEET motor_easy rerun ARI≈0 WMD; EMAN2 wedgefill patch; T4P: PyTom 440/232, RELION all 6 configs 672/0, OPUS-TOMO 447/225 threshold mask).
+> Last updated: **2026-06-05** by Claude (motor_easy class C redesigned → C_noRodHook = C-ring only; CUT2_C=46.5; L2 min-pair 0.387; new maps generated, simulations not yet re-run; prior session: 694-particle RELION ARI=0.380, PEET ARI≈0 WMD).
 
 ## Now / Next / Parked
+
+- **MOTOR_EASY CLASS C REDESIGNED — RE-SIMULATION NEEDED (2026-06-05):** Root cause of RELION/PEET B/C confusion: nested A⊃B⊃C structure (old C_core = B minus rod/hook, L2=0.340). **New design:** A=full motor, B=no C-ring, **C=C-ring only** (CUT2_C=46.5 base px). New L2: A-B=0.431, A-C=0.387, B-C=0.696. New maps in `~/Research/synthetic_sta/motor_easy/maps/`. **ACTION NEEDED: re-simulate class C particles** using `class_C_noRodHook.mrc`, rebuild `merged_all_aln/`, then rerun RELION/PEET/Dynamo. See `.session-log/2026-06-05-motor-easy-class-redesign.md`.
 
 - **T4P RE-RUNS COMPLETE — PYTOM SUCCESS, RELION EXHAUSTED, OPUS-TOMO DONE (2026-06-05):** **PyTom:** v2 cylindrical mask (r=13, h_pos=0, h_neg=25) + `-a` flag: k=2 → 440/232, k=3 → 422/150/100. **RELION:** all 6 configs collapse to 672/0 at iter 1–2 — (1) cylindrical mask; (2) ini_high=30+diam=500+firstiter_cc; (3) random init; (4) PEET-seeded → ARI=−0.03; (5) PEET-seeded + orientation search (no --skip_align) → 672/0. Algorithm-level SNR failure, no parameter fix possible. Canonical: ARI≈0. **OPUS-TOMO:** env (opuset) rebuilt from scratch; cloned opusTOMO → ~/opusSrc/opusTOMO (patched); particle paths fixed to `subtomos_mrc/`. Re-run with threshold mask (31.2% voxels): K=2 → **447/225** (epoch 19, 2.5 min training). Y-axis cylinder (2.7% voxels, matching PyTom) tried: K=2 collapses (668/4), too restrictive for VAE template reconstruction. Results: `results/opus_tomo_k2.csv`; extraction script: `scripts/eval/extract_opus_tomo_classes.py`. **Next: compute OPUS-TOMO ARI vs PEET soft GT; Dynamo motor_easy; EMAN2 k=3/k=4.**
 
@@ -72,7 +74,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 - **Real — T4P:** 672 hand-picked, prealigned 80³ subtomograms (`STA/subtomos_mrc/`, gitignored).
   Alignment QC done (`alignment_review/`, `review_alignment.py`). **Expert ground truth (Stefano):
   two distinct pili-phase classes**, recovered by Dynamo — the reference split for the benchmark.
-- **Synthetic — motor_easy (3-class flagellar motor, ~30 Å differences):** All 3 classes complete, **694 GT-aligned subtomos** (A=246, B=271, C=177). `merged_all_aln/` **rebuilt (2026-06-05)**. GT separability validated (template CC ARI=0.289). RELION v3 (GT-seeded+firstiter_cc) on 694 particles: ARI=0.380 iter 1 → 0.099 iter 2. PEET WMD-PCA ARI≈0 (uniform-wedge limitation). Scoring infra: `scripts/eval/`. Mask for classification: r=32 px, center=(48,38), 96³ box. `~/Research/synthetic_sta/motor_easy/production/`.
+- **Synthetic — motor_easy (3-class flagellar motor, ~30 Å differences):** **CLASS C REDESIGNED (2026-06-05)** — C_noRodHook = C-ring only (CUT2_C=46.5 base px). Classes: A=full motor, B=no C-ring, C=C-ring only. Old C_core maps archived; new maps at `~/Research/synthetic_sta/motor_easy/maps/`. **Current `merged_all_aln/` still uses OLD class C definition** (694 particles: A=246, B=271, C=177 old). **Must re-simulate C_noRodHook particles before next package runs.** Prior RELION/PEET scores (archived): RELION ARI=0.380 iter1, PEET ARI≈0 (old class C). Mask for classification: r=32 px, center=(48,38), 96³ box. Scoring infra: `scripts/eval/`. `~/Research/synthetic_sta/motor_easy/production/`.
 
 ## Open Decisions (owner)
 
