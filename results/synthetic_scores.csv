@@ -7,3 +7,6 @@ peet,motor_easy,2,k2_pc1_10,634,-0.000043,0.019406,0.021297,0.367508,outputs/pee
 peet,motor_easy,3,k3_pc1_3,634,-0.000551,0.002339,0.005514,0.361199,outputs/peet_motor_easy/predictions_k3_pc1_3.csv,
 peet,motor_easy,3,k3_pc1_5,634,-0.002765,0.007442,0.010618,0.356467,outputs/peet_motor_easy/predictions_k3_pc1_5.csv,
 peet,motor_easy,3,k3_pc1_10,634,0.000896,0.014670,0.017750,0.380126,outputs/peet_motor_easy/predictions_k3_pc1_10.csv,
+relion,motor_easy,3,k3_wedge_v3_GTseeded,634,0.254623,0.228929,0.231193,0.673502,outputs/relion_motor_easy/Class3D/k3_wedge_v3/predictions.csv,GT-seeded+firstiter_cc: best RELION result; blind result is k3_wedge ARI=0.005
+relion,motor_easy,3,k3_wedge_v3_694_iter1,694,0.379643,0.324007,0.325830,0.743516,outputs/relion_motor_easy/Class3D/k3_wedge_v3_694/predictions_iter1.csv,694-particle rebuild; GT-seeded+firstiter_cc
+relion,motor_easy,3,k3_wedge_v3_694_iter2,694,0.099192,0.096564,0.099072,0.548991,outputs/relion_motor_easy/Class3D/k3_wedge_v3_694/predictions_iter2.csv,694-particle rebuild; GT-seeded+firstiter_cc
