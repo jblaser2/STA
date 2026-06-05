@@ -42,3 +42,16 @@ emClarity_checkInstall.txt
 
 # ignore codegraph
 .codegraph
+
+# MATLAB autosave and backup files
+*.m~
+*.asv
+*.bak.m
+*.bak2.m
+*.m.bak
+
+# STOPGAP compiled MATLAB MCR binaries (platform-specific ELF executables; recompile on target)
+STOPGAP/exec/lib*/sg_toolbox
+STOPGAP/exec/lib*/stopgap
+STOPGAP/exec/lib*/stopgap_parser
+STOPGAP/exec/lib*/stopgap_watcher

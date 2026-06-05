@@ -1,0 +1,2 @@
+Path	Symbol	Reason
+sg_toolbox/sg_toolbox/sg_mrcread.m	half	undeployable
