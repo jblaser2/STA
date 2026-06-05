@@ -1,5 +1,12 @@
 #!/bin/bash
-# EMAN2 subtomogram PCA classification pipeline
+# EMAN2 subtomogram PCA classification pipeline -- NO ALIGNMENT variant.
+#
+# The subvolumes in this dataset are already aligned at Euler angles (0,0,0).
+# We therefore DO NOT run any subtomogram orientation search (e2spt_refine.py /
+# e2spt_align.py). Instead, particles are averaged in their given orientation
+# (identity xform) with missing-wedge-aware averaging, and PCA classification
+# applies those same identity transforms.
+#
 # Usage: ./run_pipeline.sh
 set -euo pipefail
 
@@ -9,27 +16,22 @@ PROJECT_DIR="/home/ejl62/src/eman2_project"
 # ---- Parameters (edit these before running) ----
 NCLASS=2              # number of K-Means clusters
 NBASIS=12             # PCA basis vectors (loosened from 8 to capture subtler variance)
-MAXRES=60             # low-pass before PCA in Å (loosened from 30; matches actual signal range)
+MAXRES=60             # low-pass before PCA in Å (matches actual signal range)
 SYM=c1                # symmetry
-THREADS=24            # CPU threads for all refinement steps
+THREADS=24            # CPU threads for averaging/post-processing
 CLEAN=1               # 1 = --clean removes PCA outliers before K-Means
-PKEEP=0.8             # fraction of best-scoring particles to average (0.7–0.8 typical)
-
-SEED_N=50             # particles used for seed refinement (Step 3a)
-SEED_NITER=5          # iterations for seed refinement
-NITER=10              # full-dataset refinement iterations (Step 3b)
-GOLDSTANDARD=30       # Å — phase-randomisation cutoff for full refinement
-
-NITER_PERCLASS=5      # per-class refinement iterations (Step 6)
-GOLDSTANDARD_PERCLASS=20  # Å — gold-standard cutoff for per-class refinement
+RESTARGET=30          # Å — target resolution passed to e2refine_postprocess
+# NOTE: there is no --pkeep here. pkeep culled particles by *alignment score*,
+# which no longer exists once we stop aligning. All particles are kept.
 # -------------------------------------------------
 
 # Derived paths — do not edit these
-SEED_LST="subset${SEED_N}.lst"
-SEED_PATH="spt_seed"
-SEED_REF="${SEED_PATH}/threed_$(printf "%02d" "${SEED_NITER}").hdf"
-REFINE_PATH="spt_02"
-FINAL_PARMS="${REFINE_PATH}/particle_parms_$(printf "%02d" "${NITER}").json"
+CONS_PATH="spt_noalign"          # consensus (no-align) average + mask live here
+CONS_ITER=1                      # single pass — no iterations without alignment
+CONS_ITER2=$(printf "%02d" "$CONS_ITER")
+CONS_PARMS="${CONS_PATH}/particle_parms_${CONS_ITER2}.json"
+CONS_MAP="${CONS_PATH}/threed_${CONS_ITER2}.hdf"
+CONS_MASK="${CONS_PATH}/mask_tight.hdf"
 
 log() { echo "[$(date '+%H:%M:%S')] $*"; }
 
@@ -41,6 +43,53 @@ export PATH="$CONDA_BASE/envs/eman2/bin:$PATH"
 cd "$PROJECT_DIR"
 log "Working in $PROJECT_DIR"
 log "EMAN2 Python: $(which python)"
+
+# ---- noalign_average: build threed + even/odd + mask for a set of particles ----
+# Averages particles at their given (identity) orientation -- NO alignment search.
+# Args: $1 = path (spt dir), $2 = iter (int), $3 = lst file (only needed when the
+#       particle_parms json does not already exist in the path).
+noalign_average() {
+    local path="$1" itr="$2" lst="${3:-}"
+    local itr2; itr2=$(printf "%02d" "$itr")
+    local parms="${path}/particle_parms_${itr2}.json"
+    local even="${path}/threed_${itr2}_even.hdf"
+    local odd="${path}/threed_${itr2}_odd.hdf"
+    local comb="${path}/threed_${itr2}.hdf"
+
+    mkdir -p "$path"
+
+    # 1. Identity orientations (only if not already provided, e.g. by pcasplit).
+    if [ ! -f "$parms" ]; then
+        [ -n "$lst" ] || { echo "ERROR: noalign_average needs an lst to build $parms"; exit 1; }
+        log "  Writing identity particle_parms → $parms"
+        python make_identity_parms.py "$lst" "$parms"
+    fi
+
+    # 2. Missing-wedge-aware average of even/odd halves (no orientation search).
+    log "  Averaging (mean.tomo, identity orientation) → $comb"
+    { e2spt_average.py \
+        --path "$path" \
+        --iter "$itr" \
+        --sym "$SYM" \
+        --keep 1.0 \
+        --threads "$THREADS" \
+        --skippostp \
+        --verbose 1; } 255>&-
+
+    # 3. Post-process: gold-standard masked FSC, mask.hdf + mask_tight.hdf, filter.
+    log "  Post-processing (FSC, masks, Wiener) for $path iter $itr2"
+    { e2refine_postprocess.py \
+        --even "$even" \
+        --odd "$odd" \
+        --output "$comb" \
+        --iter "$itr" \
+        --tomo \
+        --mass -1 \
+        --threads "$THREADS" \
+        --restarget "$RESTARGET" \
+        --sym "$SYM" \
+        --align; } 255>&-
+}
 
 # ---- Step 1: Patch np.int → np.int64 in e2spt_pcasplit.py ----
 log "Step 1: Checking/patching e2spt_pcasplit.py..."
@@ -54,84 +103,35 @@ else
     python make_project.py
 fi
 
-for f in particles.hdf ptcls.lst initial_ref.hdf; do
+for f in particles.hdf ptcls.lst; do
     [ -f "$f" ] || { echo "ERROR: $f not found after ingestion"; exit 1; }
 done
 
-# ---- Step 3a: Seed reference from a particle subset ----
-# Refine SEED_N particles for SEED_NITER iterations to produce a structurally
-# meaningful starting reference. A direct arithmetic mean of all particles is a
-# featureless blob; even a short refinement on a small subset produces a much
-# better seed because particles are averaged in a common orientation frame.
-if [ -f "$SEED_REF" ]; then
-    log "Step 3a: Seed reference exists ($SEED_REF) — skipping."
+# ---- Step 3: Consensus average WITHOUT alignment ----
+# Particles are already at Euler (0,0,0); we just co-add them (missing-wedge
+# aware) to build the reference map + tight mask that PCA classification needs.
+# No seed refinement and no full refinement — there is nothing to align.
+if [ -f "$CONS_MAP" ] && [ -f "$CONS_MASK" ] && [ -f "$CONS_PARMS" ]; then
+    log "Step 3: Consensus average exists ($CONS_MAP) — skipping."
 else
-    if [ ! -f "$SEED_LST" ]; then
-        log "Step 3a: Building ${SEED_N}-particle subset (${SEED_LST})..."
-        python3 -c "
-from EMAN2 import LSXFile
-n = $SEED_N
-src = LSXFile('ptcls.lst', True)
-dst = LSXFile('$SEED_LST', False)
-for i in range(n):
-    entry = src.read(i)
-    dst.write(-1, entry[0], entry[1])
-src.close(); dst.close()
-print('Created $SEED_LST ({} particles)'.format(n))
-"
-    fi
-
-    log "Step 3a: Running ${SEED_NITER}-iteration seed refinement on ${SEED_N} particles..."
-    log "         Log → seed_refine.log"
-    { e2spt_refine.py "$SEED_LST" \
-        --ref initial_ref.hdf \
-        --path "$SEED_PATH" \
-        --niter "$SEED_NITER" \
-        --sym "$SYM" \
-        --threads "$THREADS" \
-        --pkeep "$PKEEP" \
-        --verbose 1 \
-        2>&1 | tee seed_refine.log; } 255>&-
-    log "Seed refinement done. Reference: $SEED_REF"
+    log "Step 3: Building consensus average (no alignment) in $CONS_PATH/..."
+    noalign_average "$CONS_PATH" "$CONS_ITER" ptcls.lst
 fi
 
-[ -f "$SEED_REF" ] || { echo "ERROR: Seed reference missing: $SEED_REF"; exit 1; }
+for f in "$CONS_MAP" "$CONS_MASK" "$CONS_PARMS"; do
+    [ -f "$f" ] || { echo "ERROR: consensus build failed — $f missing"; exit 1; }
+done
 
-# ---- Step 3b: Full-dataset refinement ----
-# 10 iterations with gold-standard FSC. Uses the seed reference from Step 3a
-# as the starting point rather than the featureless arithmetic mean.
-if [ -f "$FINAL_PARMS" ]; then
-    log "Step 3b: $FINAL_PARMS exists — skipping full refinement."
-else
-    log "Step 3b: Running ${NITER}-iteration full refinement..."
-    log "         Seed:         $SEED_REF"
-    log "         Gold-standard: ${GOLDSTANDARD} Å"
-    log "         pkeep:         ${PKEEP}"
-    log "         Threads:       ${THREADS}"
-    log "         This may take several hours. Log → refine.log"
-    { e2spt_refine.py ptcls.lst \
-        --ref "$SEED_REF" \
-        --path "$REFINE_PATH" \
-        --niter "$NITER" \
-        --sym "$SYM" \
-        --threads "$THREADS" \
-        --pkeep "$PKEEP" \
-        --goldstandard "$GOLDSTANDARD" \
-        --verbose 1 \
-        2>&1 | tee refine.log; } 255>&-
-    log "Full refinement done."
-fi
-
-[ -f "$FINAL_PARMS" ] || { echo "ERROR: Full refinement failed — $FINAL_PARMS missing"; exit 1; }
-
-if [ ! -f "$REFINE_PATH/mask_tight.hdf" ]; then
-    log "WARNING: $REFINE_PATH/mask_tight.hdf not found — pcasplit will run without a mask."
-    log "         Check refine.log for post-processing errors."
-fi
-
-# Print FSC summary from full refinement
-FULL_RES=$(grep "Resolution.*FSC" refine.log 2>/dev/null | tail -1 || true)
-[ -n "$FULL_RES" ] && log "Full refinement resolution: $FULL_RES"
+CONS_RES=$(python3 -c "
+import numpy as np
+try:
+    fsc=np.loadtxt('${CONS_PATH}/fsc_masked_${CONS_ITER2}.txt')
+    fi=fsc[:,1]<0.143
+    print('{:.1f} A (FSC=0.143)'.format(1./fsc[fi,0][0]) if np.any(fi) else 'n/a')
+except Exception as e:
+    print('n/a')
+")
+log "Consensus resolution: $CONS_RES"
 
 # ---- Step 4: PCA classification (interactive loop) ----
 SPTCLS=""
@@ -141,13 +141,15 @@ while true; do
     [ "$CLEAN" -eq 1 ] && CLEAN_FLAG="--clean"
 
     log "Step 4: PCA classification (nclass=$NCLASS, nbasis=$NBASIS, maxres=$MAXRES Å, clean=$CLEAN)..."
+    log "        Applying identity transforms from $CONS_PARMS (no re-alignment)."
     { e2spt_pcasplit.py \
-        --path "$REFINE_PATH" \
-        --iter "$NITER" \
+        --path "$CONS_PATH" \
+        --iter "$CONS_ITER" \
         --nclass "$NCLASS" \
         --nbasis "$NBASIS" \
         --maxres "$MAXRES" \
         --sym "$SYM" \
+        --mask "$CONS_MASK" \
         --nowedgefill \
         --verbose 1 \
         $CLEAN_FLAG \
@@ -182,7 +184,7 @@ while true; do
 
     echo ""
     echo "Options:"
-    echo "  [Enter]   Accept — proceed to per-class refinement"
+    echo "  [Enter]   Accept — proceed to per-class averaging"
     echo "  n <N>     Change --nclass (e.g. 'n 3')"
     echo "  b <N>     Change --nbasis (e.g. 'b 10')"
     echo "  r <N>     Change --maxres in Å (e.g. 'r 80')"
@@ -209,58 +211,66 @@ while true; do
     esac
 done
 
-# ---- Step 6: Per-class refinement ----
-log "Step 6: Per-class refinement (${NITER_PERCLASS} iters each, goldstandard=${GOLDSTANDARD_PERCLASS} Å)..."
+# ---- Step 6: Per-class average WITHOUT alignment ----
+# pcasplit already wrote per-class particle_parms_NN.json (carrying the same
+# identity transforms) and ptcls_clsNN.lst into $SPTCLS. We just re-average each
+# class with even/odd halves + post-processing to get a gold-standard FSC and a
+# per-class mask. Still no orientation search.
+log "Step 6: Per-class averaging (no alignment, restarget=${RESTARGET} Å)..."
 echo ""
 
 for CLS_LST in "$SPTCLS"/ptcls_cls*.lst; do
     CLS_NUM=$(basename "$CLS_LST" | sed 's/ptcls_cls\([0-9]*\)\.lst/\1/')
-    CLS_REF="$SPTCLS/threed_${CLS_NUM}.hdf"
-    CLS_PATH="spt_cls${CLS_NUM}"
-    FINAL_CLS="${CLS_PATH}/threed_$(printf "%02d" "${NITER_PERCLASS}").hdf"
+    CLS_ITR=$((10#$CLS_NUM))
+    CLS_ITR2=$(printf "%02d" "$CLS_ITR")
+    FINAL_CLS="$SPTCLS/threed_${CLS_ITR2}_even.hdf"   # even half = sign that post-proc ran
     N_PTCLS=$(wc -l < "$CLS_LST")
 
-    if [ -f "$FINAL_CLS" ]; then
-        log "  Class $CLS_NUM: $FINAL_CLS already exists — skipping."
+    if [ -f "$FINAL_CLS" ] && [ -f "$SPTCLS/fsc_masked_${CLS_ITR2}.txt" ]; then
+        log "  Class $CLS_NUM: already averaged — skipping."
         continue
     fi
 
-    log "  Class $CLS_NUM: Refining $N_PTCLS particles → $CLS_PATH/ ..."
-    log "           Log → refine_cls${CLS_NUM}.log"
-    { e2spt_refine.py "$CLS_LST" \
-        --ref "$CLS_REF" \
-        --path "$CLS_PATH" \
-        --niter "$NITER_PERCLASS" \
-        --sym "$SYM" \
-        --threads "$THREADS" \
-        --pkeep "$PKEEP" \
-        --goldstandard "$GOLDSTANDARD_PERCLASS" \
-        --verbose 1 \
-        2>&1 | tee "refine_cls${CLS_NUM}.log"; } 255>&-
+    log "  Class $CLS_NUM: Averaging $N_PTCLS particles (identity orientation)..."
+    # particle_parms_${CLS_ITR2}.json already exists in $SPTCLS (written by pcasplit),
+    # so noalign_average reuses it rather than rebuilding identity parms.
+    noalign_average "$SPTCLS" "$CLS_ITR"
+
+    # e2refine_postprocess writes mask.hdf / mask_tight.hdf with fixed names, so
+    # preserve this class's masks before the next class overwrites them.
+    [ -f "$SPTCLS/mask.hdf" ]       && cp -f "$SPTCLS/mask.hdf"       "$SPTCLS/mask_cls${CLS_ITR2}.hdf"
+    [ -f "$SPTCLS/mask_tight.hdf" ] && cp -f "$SPTCLS/mask_tight.hdf" "$SPTCLS/mask_tight_cls${CLS_ITR2}.hdf"
     log "  Class $CLS_NUM done."
 done
 
 # ---- Final summary ----
 echo ""
-log "=== Pipeline complete ==="
+log "=== Pipeline complete (NO subtomogram alignment performed) ==="
 echo ""
-echo "Full refinement:  $REFINE_PATH/  ($NITER iterations, goldstandard=${GOLDSTANDARD} Å)"
-echo "  $FULL_RES"
+echo "Consensus average:  $CONS_PATH/  (identity orientation, no alignment)"
+echo "  Resolution: $CONS_RES"
 echo ""
-echo "Classification:   $SPTCLS/"
+echo "Classification:     $SPTCLS/"
 echo ""
 echo "Per-class results:"
 for CLS_LST in "$SPTCLS"/ptcls_cls*.lst; do
     CLS_NUM=$(basename "$CLS_LST" | sed 's/ptcls_cls\([0-9]*\)\.lst/\1/')
-    CLS_PATH="spt_cls${CLS_NUM}"
-    FINAL_CLS="${CLS_PATH}/threed_$(printf "%02d" "${NITER_PERCLASS}").hdf"
+    CLS_ITR2=$(printf "%02d" "$((10#$CLS_NUM))")
     N_PTCLS=$(wc -l < "$CLS_LST")
-    CLS_RES=$(grep "Resolution.*FSC" "refine_cls${CLS_NUM}.log" 2>/dev/null | tail -1 || true)
+    CLS_RES=$(python3 -c "
+import numpy as np
+try:
+    fsc=np.loadtxt('$SPTCLS/fsc_masked_${CLS_ITR2}.txt')
+    fi=fsc[:,1]<0.143
+    print('{:.1f} A (FSC=0.143)'.format(1./fsc[fi,0][0]) if np.any(fi) else 'n/a')
+except Exception:
+    print('(see $SPTCLS/fsc_masked_${CLS_ITR2}.txt)')
+")
     echo ""
     echo "  Class $CLS_NUM: $N_PTCLS particles"
-    echo "    Map:        $FINAL_CLS"
-    echo "    Resolution: ${CLS_RES:-(see refine_cls${CLS_NUM}.log)}"
-    echo "    FSC file:   ${CLS_PATH}/fsc_masked_$(printf "%02d" "${NITER_PERCLASS}").txt"
+    echo "    Map:        $SPTCLS/threed_${CLS_ITR2}.hdf"
+    echo "    Resolution: $CLS_RES"
+    echo "    FSC file:   $SPTCLS/fsc_masked_${CLS_ITR2}.txt"
 done
 echo ""
 echo "Visualization:"
@@ -268,12 +278,10 @@ echo "  PCA scatter:    $SPTCLS/pca_scatter.png"
 echo "  Class slices:   $SPTCLS/class_averages.png"
 for CLS_LST in "$SPTCLS"/ptcls_cls*.lst; do
     CLS_NUM=$(basename "$CLS_LST" | sed 's/ptcls_cls\([0-9]*\)\.lst/\1/')
-    CLS_PATH="spt_cls${CLS_NUM}"
-    FINAL_CLS="${CLS_PATH}/threed_$(printf "%02d" "${NITER_PERCLASS}").hdf"
-    [ -f "$FINAL_CLS" ] && echo "  Class $CLS_NUM 3D: e2display.py $FINAL_CLS"
+    CLS_ITR2=$(printf "%02d" "$((10#$CLS_NUM))")
+    [ -f "$SPTCLS/threed_${CLS_ITR2}.hdf" ] && echo "  Class $CLS_NUM 3D: e2display.py $SPTCLS/threed_${CLS_ITR2}.hdf"
 done
 echo ""
 echo "Next steps:"
-echo "  - Check FSC curves in each spt_cls*/fsc_masked_*.txt"
+echo "  - Check FSC curves in $SPTCLS/fsc_masked_*.txt"
 echo "  - If classes still look similar, re-run PCA with 'r 80' or 'b 16'"
-echo "  - If pili show periodic density, investigate helical symmetry (see plan.md)"

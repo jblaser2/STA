@@ -1,9 +1,10 @@
 # EMAN2 Codebase Research Report
-_Last updated: 2026-05-27_
+_Last updated: 2026-06-05_
 
 ## Contents
 
 - [Overview](#overview)
+- [Pipeline Refactor — Alignment-Free Classification (2026-06-05)](#pipeline-refactor--alignment-free-classification-2026-06-05)
 - [Repository Structure](#repository-structure)
 - [Tomography Workflow](#tomography-workflow)
 - [Data Formats and File Conventions](#data-formats-and-file-conventions)
@@ -23,6 +24,74 @@ _Last updated: 2026-05-27_
 ## Overview
 
 EMAN2 is a scientific image processing suite developed primarily at Baylor College of Medicine for cryo-electron microscopy (cryo-EM) and cryo-electron tomography (cryo-ET). It provides an end-to-end pipeline: from raw tilt series to reconstructed tomograms, particle picking, subtomogram extraction, iterative alignment/averaging, and classification. The codebase is structured as a collection of Python scripts in `programs/` backed by a C++ core library (`libEM/`) exposed through Python bindings (`libpyEM/`).
+
+> **Important (2026-06-05):** The project pipeline (`eman2_project/run_pipeline.sh`) has been refactored to **remove all subtomogram alignment**. The dataset's subvolumes are already aligned at Euler angles (0,0,0), so the alignment search was overriding correct orientations. See the next section. Where older sections below describe seed/full/per-class **refinement** (`e2spt_refine.py` → `e2spt_align.py`), `spt_seed/`, `spt_02/`, `spt_cls01/02/`, or "always pass `--nowedgefill`", treat them as **historical** — the [Pipeline Refactor](#pipeline-refactor--alignment-free-classification-2026-06-05) section is authoritative for the current pipeline. The EMAN2 program-level documentation (algorithms, file formats, code locations) remains accurate.
+
+---
+
+## Pipeline Refactor — Alignment-Free Classification (2026-06-05)
+
+### Why
+
+The pili subvolumes in this dataset are **already aligned at Euler angles (0,0,0)** — the alignment transform to apply is identity. The previous pipeline ran `e2spt_refine.py` (seed, full, and per-class), which calls `e2spt_align.py` every iteration doing a full from-scratch global orientation search (`rotate_translate_3d_tree`, `refine=false` → `fromscratch=True`). That search **overrode the supplied orientations**. Proof: particle 0, which should be at (0,0,0), was stored in the old `spt_02/particle_parms_10.json` as `az=95.7°, alt=31.6°, phi=−90°, shift (−5,6,−14)`. The refactor stops re-finding orientations the data already has.
+
+`e2spt_pcasplit.py` itself never aligns — it reads each particle's `xform.align3d` from `particle_parms_NN.json` (line 145) and applies it (line 147). So removing alignment is a matter of (a) not running the refinement search and (b) feeding pcasplit **identity** transforms.
+
+### What changed
+
+| Old (alignment-based) | New (alignment-free) |
+|---|---|
+| Step 3a: seed refine 50 ptcls (`e2spt_refine`) | **deleted** — only existed to bootstrap the search |
+| Step 3b: full refine `spt_02/` (10 iters of global search) | **`noalign_average`** → identity `particle_parms` + `e2spt_average` (mean.tomo, even/odd) + `e2refine_postprocess` (mask_tight + gold-standard FSC) in `spt_noalign/` |
+| Step 4: pcasplit on `spt_02` iter 10 | pcasplit on `spt_noalign` iter 1, explicit `--mask spt_noalign/mask_tight.hdf`, applies **identity** transforms |
+| Step 6: per-class refine (`spt_cls01/02`, more `e2spt_align`) | per-class `noalign_average`, reusing the identity parms pcasplit writes into `sptcls_XX/` |
+
+No `e2spt_refine.py` / `e2spt_align.py` calls remain anywhere in the pipeline. The only rotation left is `e2refine_postprocess.py --align`, which is the standard odd↔even half-map registration for gold-standard FSC (it reported a benign handedness/z-flip between halves) — **not** subtomogram alignment.
+
+**The `noalign_average` bash function** (in `run_pipeline.sh`) reproduces one refinement iteration *minus the align step*:
+1. Write identity `particle_parms_NN.json` (via `make_identity_parms.py`) unless one already exists (pcasplit writes per-class parms itself).
+2. `e2spt_average.py --path DIR --iter N --sym c1 --keep 1.0 --skippostp` — missing-wedge-aware `mean.tomo` average of even/odd halves at identity orientation.
+3. `e2refine_postprocess.py --even … --odd … --output threed_NN.hdf --iter N --tomo --mass -1 --restarget 30 --sym c1 --align` — masked FSC, `mask.hdf`, `mask_tight.hdf`, Wiener filter.
+
+**`--pkeep` was removed.** It culled particles by *alignment score*, which no longer exists once we stop aligning. All particles are kept (`--keep 1.0`; with equal scores the threshold keeps 100%). Quality-based culling would require adding a correlation-to-reference score (not yet implemented).
+
+**Per-class mask preservation:** `e2refine_postprocess.py` always writes `mask.hdf`/`mask_tight.hdf` with fixed names, so per-class runs sharing `sptcls_XX/` clobber each other's standalone masks. The maps are masked correctly at creation; Step 6 additionally copies each class's masks to `mask_cls0N.hdf` / `mask_tight_cls0N.hdf` to preserve them.
+
+### Mask used during classification
+
+pcasplit's `--mask` now points explicitly at `spt_noalign/mask_tight.hdf` (previously it defaulted implicitly to the same file in `spt_02/`). It is **not** a sphere or fixed-radius shape: an auto-generated soft (0→1) mask following the density envelope — 80³ box at 13.33 Å/pix, ~10% of the box, bounding box ≈ 72×28×67 vox, offset ~+25 vox in Y (an elongated, off-center slab tracing the structure). pcasplit additionally applies its own per-particle wedge handling and a `--maxres 60 Å` low-pass before PCA.
+
+### Empirical results (end-to-end run, `sptcls_02/`)
+
+- **Classification is robust to removing alignment.** No-align split = **405 / 273**; old aligned split = **396 / 282**. Same ~60/40 partition, ~100% of particles in the same class. The two populations are real, not an artifact of the alignment search. (Label numbering swaps run-to-run because `KMeans` uses random init with no fixed seed.)
+- **Resolution drops, as expected** — the honest cost of trusting the supplied orientations vs. re-searching them:
+
+  | Map (FSC 0.143) | No-align | Old aligned |
+  |---|---|---|
+  | Consensus, masked | 82 Å | 51 Å |
+  | Consensus, masked-tight | 71 Å | 51 Å |
+  | Per-class 01 | 82 Å | 51 Å |
+  | Per-class 02 | 82 Å | 59 Å |
+
+  (Both no-align classes land on exactly 82 Å because the FSC crossings fall on the same coarse Fourier shell at this box/apix — not a bug.)
+- **The two class averages are very similar by eye** at ~82 Å (same cross/"T"-anchor density). PC1 dominates the separation (tight cluster at PC1 ≈ −260 vs. spread bulk at +100…+260); the real-space difference is subtle. Inspect `sptcls_XX/pca_basis.hdf` component 0 or compute a difference map to see what distinguishes the classes.
+
+### `--nowedgefill` finding and the wedgefill patch
+
+`--nowedgefill` was a **no-op in this EMAN2 build**: the only reference outside the argparse definition is the `mask.wedgefill` block at lines 217–221 of `e2spt_pcasplit.py`, which is **commented out**. The active numpy path (lines 140–174) always handles the wedge the same way (zero low-amplitude Fourier voxels via `div<1`, track in `wgs` for weighting); there is no fill-from-reference path.
+
+`patch_scripts.py` now applies a **second patch** that re-activates the author's intended behaviour in the active path: before masking each particle, fill its missing wedge from the consensus reference's FFT (`mask.wedgefill`, `fillsource = threed_NN.hdf`, `thresh_sigma=0.0`), gated on `--nowedgefill`. Verified the patch is real: `mask.wedgefill` modifies ~44% of each particle's Fourier components.
+
+**But wedge-fill changes nothing here.** With it active, the classification is **100% identical** (same 405/273, same particles) and the PC2/PC3 scatter banding is unchanged. So the banding is **not** a missing-wedge artifact, and the split is robust to alignment, the wedge flag, *and* actual reference-based wedge-fill. The pipeline therefore **keeps `--nowedgefill`** (wedge-fill off) — the faster, equivalent choice. To enable wedge-fill, delete the `--nowedgefill` line in Step 4; the capability is baked into `patch_scripts.py` and runs on every pipeline invocation.
+
+### New / changed project files
+
+- **`make_identity_parms.py`** (new) — writes `particle_parms_NN.json` with `xform.align3d = identity`, `score = 0`, `coverage = 1.0` for every particle in an input `.lst`. Keys are `"('<lst>', i)"` tuples, exactly the format pcasplit/`e2spt_average` parse.
+- **`patch_scripts.py`** — now applies two idempotent patches: (1) `np.int → np.int64`; (2) the wedgefill enablement above. Backs up the original to `.bak`; each patch checks a marker (`#WEDGEFILL_PATCH`) before applying.
+- **`run_pipeline.sh`** — rewritten as the 4-phase alignment-free pipeline (patch → ingest → consensus average → PCA → per-class average). Parameters: `NCLASS=2, NBASIS=12, MAXRES=60, SYM=c1, THREADS=24, CLEAN=1, RESTARGET=30`. No `SEED_*`, `NITER`, `GOLDSTANDARD`, or `PKEEP` parameters anymore.
+- **New directories:** `spt_noalign/` (consensus average + mask, iter 01) replaces `spt_seed/` + `spt_02/`. Per-class results stay inside `sptcls_XX/` (no more `spt_cls01/02/`).
+- **Backup:** `/home/ejl62/miniforge3/envs/eman2/bin/e2spt_pcasplit.py.bak` is the unpatched original (restore with `cp <script>.bak <script>`).
+- The old `spt_seed/`, `spt_02/`, `spt_cls01/02/`, `sptcls_00/`, `sptcls_01/` dirs may still exist on disk from prior runs; the current pipeline does not use them.
 
 ---
 
@@ -689,7 +758,9 @@ The particles are **pili** subtomograms — bacterial appendages imaged by cryo-
 
 ### Pipeline Logic
 
-The pipeline has five phases:
+> **Superseded (2026-06-05):** This five-phase description is the **historical alignment-based** pipeline. The current pipeline is alignment-free (4 phases: patch → ingest → consensus average → PCA → per-class average) — see [Pipeline Refactor](#pipeline-refactor--alignment-free-classification-2026-06-05). Phases 2, 3, and 5 below (seed/full/per-class **refinement**) no longer exist; the "Why align before classifying?" rationale is reversed (we now deliberately do **not** align, because the particles are already at Euler (0,0,0)). Phase 1 (ingestion) and the PCA classification mechanics remain accurate.
+
+The pipeline (historical) had five phases:
 
 1. **Data ingestion** — 672 individual MRC files are stacked into a single EMAN2 HDF file, a particle list (LST) is built, and a simple arithmetic mean is computed as `initial_ref.hdf`. No structural analysis happens here. Skip-checked — safe to re-run.
 
@@ -712,19 +783,22 @@ The particles were rotated post-extraction so that the pili axis aligns with Z. 
 Two consequences for every pipeline run:
 
 - **In refinement — do not pass `--maxtilt`**. That flag zeros Fourier voxels assuming the wedge is at Y-axis, which would corrupt the wrong voxels. Instead, the `mean.tomo` averager uses per-shell statistical weighting (`wedgesigma=3.0`) to suppress low-SNR voxels without assuming a particular wedge geometry.
-- **In classification — always pass `--nowedgefill`**. Without it, `e2spt_pcasplit.py` uses an amplitude-based heuristic to detect and zero wedge voxels — also assuming Y-axis orientation — which would zero signal in the wrong direction.
+- **In classification — pass `--nowedgefill`** (the pipeline does). **Correction (2026-06-05):** in the installed EMAN2 build the `--nowedgefill` flag is a *no-op* — the reference-fill code is commented out and the active path always does the same amplitude-based wedge handling regardless. `patch_scripts.py` now re-enables a reference-based `mask.wedgefill` gated on this flag, but enabling it leaves the classification 100% identical. See [Pipeline Refactor](#pipeline-refactor--alignment-free-classification-2026-06-05). The pipeline keeps `--nowedgefill` as the faster, equivalent choice.
 
 ### Scripts
 
 | File | Purpose |
 |------|---------|
-| `run_pipeline.sh` | Master pipeline (5 phases — see Pipeline Logic above). Key parameters at the top: `NCLASS`, `NBASIS` (default 12), `MAXRES` (default 60 Å), `THREADS`, `CLEAN` (default on), `NITER` (default 10), `SEED_N` (default 50), `SEED_NITER` (default 5), `NITER_PERCLASS` (default 5), `GOLDSTANDARD` (default 30 Å), `PKEEP` (default 0.8). Each step is skip-checked against its expected output — safe to re-run after interruption. |
+| `run_pipeline.sh` | Master pipeline. **Refactored 2026-06-05 to be alignment-free** (4 phases: patch → ingest → consensus average → PCA → per-class average — see [Pipeline Refactor](#pipeline-refactor--alignment-free-classification-2026-06-05)). Key parameters: `NCLASS=2`, `NBASIS=12`, `MAXRES=60` Å, `THREADS`, `CLEAN` (on), `RESTARGET=30` Å. The `SEED_*`, `NITER`, `GOLDSTANDARD`, and `PKEEP` parameters were **removed** (no alignment → no iterations, no alignment-score culling). Each step is skip-checked against its expected output. The PCA step is interactive; run non-interactively (stdin closed) it auto-accepts the default split. |
 | `make_project.py` | Reads all `aligned_tom*.mrc` files, stacks into `particles.hdf` with pixel size set to 13.328 Å, writes `ptcls.lst`, and computes a simple arithmetic mean as `initial_ref.hdf`. Takes ~1–2 min. If `particles.hdf` already exists it is deleted and rebuilt. |
-| `patch_scripts.py` | Locates `e2spt_pcasplit.py` on PATH and replaces `r = r.astype(np.int)` with `r = r.astype(np.int64)` (NumPy 2.4.6 removed `np.int`). Backs up the original to `.bak` on first run. Idempotent — exits without changes if the patch is already applied. |
+| `patch_scripts.py` | Applies two idempotent patches to the installed `e2spt_pcasplit.py`: (1) `r = r.astype(np.int)` → `np.int64` (NumPy 2.4.6 removed `np.int`); (2) re-enables a reference-based `mask.wedgefill` in the active code path, gated on `--nowedgefill` (marker `#WEDGEFILL_PATCH`). Backs up the original to `.bak` on first run. See [Pipeline Refactor](#pipeline-refactor--alignment-free-classification-2026-06-05). |
+| `make_identity_parms.py` | Writes a `particle_parms_NN.json` with identity `xform.align3d` (no rotation/shift) and `score=0` for every particle in an input `.lst`. Used by the alignment-free pipeline so `e2spt_average.py` / `e2spt_pcasplit.py` co-add and classify particles in their given (0,0,0) orientation without any alignment search. |
 | `plot_pca.py` | Reads `pca_ptcls.txt` from the specified path (or auto-detects the latest `sptcls_XX/`). Plots pairwise scatter of the first three PCA components, saves `pca_scatter.png`. Uses non-interactive matplotlib backend (no display required). |
 | `plot_class_averages.py` | Loads each `threed_NN.hdf` class average from the specified `sptcls_XX/` directory (excludes `_even`/`_odd` half-datasets), extracts the central XY, XZ, YZ slices **and** the corresponding maximum intensity projections (MIPs), and saves a 6-column contrast-stretched PNG grid as `class_averages.png`. No display required. |
 
 ### Directory Layout
+
+> **Updated 2026-06-05:** The current alignment-free pipeline uses `spt_noalign/` (consensus average, iter 01) in place of `spt_seed/` + `spt_02/`, adds `make_identity_parms.py`, and keeps per-class results inside `sptcls_XX/` rather than `spt_cls01/02/`. The layout below shows the historical alignment-based directories (which may still exist on disk from prior runs but are no longer produced or used). Current key paths: `spt_noalign/{threed_01.hdf, mask_tight.hdf, particle_parms_01.json}`; `sptcls_XX/{ptcls_clsNN.lst, threed_NN.hdf, fsc_masked_NN.txt, mask_tight_clsNN.hdf, pca_scatter.png, class_averages.png}`.
 
 ```
 /home/ejl62/src/eman2_project/
@@ -843,7 +917,7 @@ Each re-run of PCA creates a new auto-numbered `sptcls_XX/` directory; previous 
 | `--nbasis` | 12 | PCA components retained before clustering. 12 captures subtler variance than the old default of 8. Try 16 if structure is still indistinct. |
 | `--maxres` | 60 Å | Low-pass filter applied before PCA. Set to match the actual signal range, not Nyquist. The first pipeline run confirmed useful signal only at ~130 Å or worse; 60 Å is appropriate after a properly converged 10-iteration refinement. Tighten to 40–50 Å if FSC shows signal there. |
 | `--sym` | c1 | No symmetry imposed — pili may have helical symmetry but classify without it first. |
-| `--nowedgefill` | always on | **Required for this dataset** — wedge is not at EMAN2's expected Y-axis orientation. |
+| `--nowedgefill` | on (pipeline) | **No-op in this build** (reference-fill code is commented out). `patch_scripts.py` re-enables a reference `mask.wedgefill` gated on this flag, but enabling it leaves classification 100% identical. Kept on as the faster equivalent. See [Pipeline Refactor](#pipeline-refactor--alignment-free-classification-2026-06-05). |
 | `--clean` | on | Remove statistical outliers (>2σ from PCA centroid) before fitting K-Means. On by default — suppresses junk particles from distorting the cluster fit. |
 
 **Interpreting the scatter plot:**
@@ -895,9 +969,15 @@ Scores are negative (lower = better alignment). If the 5th percentile is much wo
 
 ### Current Pipeline State
 
-- `spt_01/` — legacy: 1-iteration run from arithmetic mean; FSC ~133 Å; kept for reference
-- `sptcls_00/` — legacy: PCA run against `spt_01/` with `--maxres 30`, `--nbasis 8`; class split was noise-driven
-- New pipeline (`spt_seed/`, `spt_02/`, `sptcls_01+/`) — in progress or pending first run
+**As of 2026-06-05 (alignment-free pipeline, full end-to-end run completed):**
+- `spt_noalign/` — consensus average (identity orientation, no alignment); `threed_01.hdf`, `mask_tight.hdf`, identity `particle_parms_01.json`; masked FSC 0.143 ≈ 82 Å (71 Å masked-tight).
+- `sptcls_02/` — **canonical current result**: 405/273 split, per-class maps (`threed_01.hdf` = 273 ptcls, `threed_02.hdf` = 405 ptcls, both ~82 Å), preserved per-class masks, `pca_scatter.png`, `class_averages.png`.
+- `pipeline_run.log` — console log of the end-to-end run.
+
+**Legacy / historical (alignment-based, may still exist on disk):**
+- `spt_01/` — 1-iteration run from arithmetic mean; FSC ~133 Å.
+- `sptcls_00/` — PCA against `spt_01/` (`--maxres 30`, `--nbasis 8`); noise-driven split.
+- `spt_seed/`, `spt_02/`, `spt_cls01/02/`, `sptcls_01/` — the old seed/full/per-class **refinement** outputs (alignment search). Superseded by the alignment-free run; not produced by the current pipeline.
 
 ---
 
