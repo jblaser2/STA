@@ -19,6 +19,12 @@
 *.bin
 *.dat
 
+# Python pickles (model weights, checkpoints — can be hundreds of MB)
+*.pkl
+
+# MATLAB binary data files (can be large)
+*.mat
+
 # Ignore compressed archives (often large)
 
 *.zip
@@ -55,7 +61,7 @@ emClarity_checkInstall.txt
 *.err
 
 # STOPGAP compiled MATLAB MCR binaries (platform-specific ELF executables; recompile on target)
-STOPGAP/exec/lib*/sg_toolbox
-STOPGAP/exec/lib*/stopgap
-STOPGAP/exec/lib*/stopgap_parser
-STOPGAP/exec/lib*/stopgap_watcher
+packages/STOPGAP/exec/lib*/sg_toolbox
+packages/STOPGAP/exec/lib*/stopgap
+packages/STOPGAP/exec/lib*/stopgap_parser
+packages/STOPGAP/exec/lib*/stopgap_watcher

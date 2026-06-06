@@ -10,3 +10,18 @@ peet,motor_easy,2,k2_pc1_10_694,694,-0.003938,0.005440,0.007252,0.400576,outputs
 peet,motor_easy,3,k3_pc1_3_694,694,0.003492,0.023935,0.026785,0.389049,outputs/peet_motor_easy/predictions_k3_pc1_3.csv,694-particle rebuild; correct mask r=32px Y-10
 peet,motor_easy,3,k3_pc1_5_694,694,0.023855,0.102612,0.105384,0.400576,outputs/peet_motor_easy/predictions_k3_pc1_5.csv,694-particle rebuild; correct mask r=32px Y-10
 peet,motor_easy,3,k3_pc1_10_694,694,0.026292,0.111066,0.113740,0.423631,outputs/peet_motor_easy/predictions_k3_pc1_10.csv,694-particle rebuild; correct mask r=32px Y-10
+peet,motor_easy,2,k2_pc1_3_cnew,694,-0.001451,0.080134,0.081846,0.394813,outputs/peet_motor_easy/predictions_k2_pc1_3.csv,
+peet,motor_easy,2,k2_pc1_5_cnew,694,0.115647,0.163956,0.165452,0.512968,outputs/peet_motor_easy/predictions_k2_pc1_5.csv,
+peet,motor_easy,2,k2_pc1_10_cnew,694,0.111275,0.159794,0.161307,0.505764,outputs/peet_motor_easy/predictions_k2_pc1_10.csv,
+peet,motor_easy,3,k3_pc1_3_cnew,694,0.049987,0.145230,0.147763,0.427954,outputs/peet_motor_easy/predictions_k3_pc1_3.csv,
+peet,motor_easy,3,k3_pc1_5_cnew,694,0.025251,0.123344,0.126034,0.400576,outputs/peet_motor_easy/predictions_k3_pc1_5.csv,
+peet,motor_easy,3,k3_pc1_10_cnew,694,0.027048,0.126876,0.129560,0.407781,outputs/peet_motor_easy/predictions_k3_pc1_10.csv,
+relion,motor_easy,3,k3_wedge_v4_iter001,694,0.475264,0.438005,0.439502,0.795389,/tmp/relion_v4_iter001.csv,
+relion,motor_easy,3,k3_wedge_v4_iter002,694,0.254842,0.223281,0.225354,0.664265,/tmp/relion_v4_iter002.csv,
+relion,motor_easy,3,k3_wedge_v4_iter003,694,0.162703,0.150339,0.152626,0.561960,/tmp/relion_v4_iter003.csv,
+relion,motor_easy,3,k3_wedge_v4_iter004,694,0.161249,0.148180,0.150490,0.544669,/tmp/relion_v4_iter004.csv,
+relion,motor_easy,3,k3_wedge_v4_iter005,694,0.166328,0.151255,0.153574,0.534582,/tmp/relion_v4_iter005.csv,
+relion,motor_easy,3,k3_wedge_v4_iter1_cnew,694,0.475264,0.438005,0.439502,0.795389,/tmp/relion_v4_iter001.csv,
+peet,motor_easy,2,k2_pc1_5_cnew,694,0.115647,0.163956,0.165452,0.512968,outputs/peet_motor_easy/predictions_k2_pc1_5.csv,
+dynamo,motor_easy,2,hac_k2_cnew,694,0.005294,0.091450,0.093105,0.403458,/home/jblaser2/Research/STA/dynamo/dynamo_outputs/motor_easy_hac/predictions_k2.csv,
+dynamo,motor_easy,3,hac_k3_cnew,694,-0.008888,0.082435,0.085519,0.358790,/home/jblaser2/Research/STA/dynamo/dynamo_outputs/motor_easy_hac/predictions_k3.csv,

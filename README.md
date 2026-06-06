@@ -8,15 +8,46 @@
 
 ## Table of Contents
 
-1. [Background](#background)
-2. [Project Goal](#project-goal)
-3. [What Makes This Benchmark Unique](#what-makes-this-benchmark-unique)
-4. [Datasets](#datasets)
-5. [Packages Evaluated](#packages-evaluated)
-6. [Evaluation Framework](#evaluation-framework)
-7. [Preliminary Findings](#preliminary-findings)
-8. [Open Questions](#open-questions)
-9. [Team](#team)
+1. [Repository Structure](#repository-structure)
+2. [Background](#background)
+3. [Project Goal](#project-goal)
+4. [What Makes This Benchmark Unique](#what-makes-this-benchmark-unique)
+5. [Datasets](#datasets)
+6. [Packages Evaluated](#packages-evaluated)
+7. [Evaluation Framework](#evaluation-framework)
+8. [Preliminary Findings](#preliminary-findings)
+9. [Open Questions](#open-questions)
+10. [Team](#team)
+
+---
+
+## Repository Structure
+
+```
+packages/       All 10 actively-tested classification packages.
+                packages/README.md has the master progress table (all packages × all datasets).
+                Each packages/<pkg>/README.md tracks that package's status, results, and next steps.
+
+data/           T4P dataset files and QC artifacts: cylindrical masks, alignment review,
+                masked averages. Large .mrc files are gitignored; only scripts and small
+                outputs are committed. T4P subtomograms live at data/T4P_subtomos/ (local only).
+
+synthetic/      Synthetic data pipeline documentation (motor_easy dataset).
+                Actual simulation data lives locally at ~/Research/synthetic_sta/.
+
+scripts/        Data-prep converters (scripts/data_prep/) and scoring tools (scripts/eval/).
+                Shared utilities for building package-specific input files and computing ARI/AMI.
+
+outputs/        Large binary classification run outputs, organized by package (gitignored).
+
+results/        Aggregated scoring CSVs and per-package result figures (committed).
+
+docs/           Background documents: installation guide, benchmark design framework,
+                RELION algorithm notes, excluded packages list.
+
+.session-log/   Dated session handoff logs (one file per work session).
+STATUS.md       Single source of truth for project state — read before starting, update after.
+```
 
 ---
 

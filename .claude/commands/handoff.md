@@ -11,6 +11,11 @@ Work from what actually happened in THIS conversation — do not invent progress
    - Update any package-matrix cells whose state changed this session (✅/🟡/⬜, notes, blockers).
    - Add/adjust "Open Decisions" if new ones surfaced.
 
+1a. **Sync package READMEs** (required if any package result changed in step 1):
+   - Update `packages/README.md` — the progress matrix row(s) for changed package(s).
+   - Update `packages/<pkg>/README.md` — the results table and next steps section.
+   - This keeps the package-level docs in sync with STATUS.md (see CLAUDE.md §"Package README Protocol").
+
 2. **Write a session-log entry** at `STA/.session-log/YYYY-MM-DD-<short-topic>.md` (today's date)
    with sections: Goal / What happened / Files changed / Where I stopped / Next step.
    If a file for today+topic already exists, append to it rather than overwriting.

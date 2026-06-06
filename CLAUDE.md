@@ -20,26 +20,44 @@ Scientific context: membrane-embedded complexes (T4P, flagellar motor), sparse p
   imbalanced class sizes
 
 ## Packages Under Evaluation (3D input only)
-RELION 3.1–4.0, STOPGAP, OPUS-TOMO, Dynamo, PEET, MDTOMO, TomoFlow, I3/ProTomo, EMAN2,
-emClarity, PyTom, DISCA, HEMNMA-3D, AC3D, TomoNet
+10 active: RELION, STOPGAP, OPUS-TOMO, Dynamo, PEET, TomoFlow, I3/ProTomo, EMAN2, PyTom, DISCA.
+Not tested (with reasons): see `docs/excluded-packages.md`.
 
 ## Directory Structure
 ```
 STA/
-├── subtomos_mrc/        # 672 individual .mrc subtomograms (gitignored)
-├── outputs/             # Per-package classification outputs
-│   └── relion/
+├── packages/            # All 10 actively-tested classification packages
+│   ├── README.md        # Master progress table (all packages × all datasets)
+│   ├── dynamo/          # Dynamo workspace + README.md
+│   ├── peet/            # PEET project files + README.md
+│   ├── relion/          # RELION scripts + README.md
+│   ├── PyTom/           # PyTom scripts + README.md
+│   ├── eman2/           # EMAN2 workspace + README.md
+│   ├── opusTomo/        # OPUS-TOMO scripts + README.md
+│   ├── STOPGAP/         # STOPGAP source + pipeline + README.md
+│   ├── disca/           # DISCA scripts + README.md
+│   ├── tomoflow/        # TomoFlow scripts + README.md
+│   └── protomo/         # ProTomo scripts + README.md
+├── data/                # Dataset files and QC artifacts
+│   ├── T4P_subtomos/    # 672 T4P subtomograms (local only, gitignored)
+│   ├── T4P_mask/        # Cylindrical classification mask
+│   ├── alignment_review/# T4P particle alignment QC
+│   ├── masked_average/  # Masked averaging experiments
+│   └── few_sta_test/    # Resolution-scaling validation (archived)
+├── synthetic/           # Synthetic data pipeline docs
+│   └── etsimulation/    # ETSimulations pipeline docs and scripts
 ├── scripts/
 │   ├── data_prep/       # Input conversion scripts per package
-│   └── markdown_instructions/  # Per-package usage guides (RELION, DYNAMO, STOPGAP, etc.)
-├── dynamo/              # Dynamo workspace
-├── peet/                # PEET project files and guides
-├── stopgap/             # STOPGAP scripts and compiled binaries
-├── PyTom/               # PyTom scripts
-├── eman2/               # EMAN2 workspace
-├── etsimulation/        # Synthetic data generation research/scripts
+│   └── eval/            # Scoring tools (ARI/AMI/V-measure, FSC)
+├── outputs/             # Large binary run outputs (gitignored), organized by package
+├── results/             # Aggregated scoring CSVs + figures (committed)
+├── docs/                # Background documents and installation guides
+│   ├── excluded-packages.md    # Packages evaluated but not tested
+│   ├── Package_installation.md # Installation guide per package (RHEL 10)
+│   ├── benchmarkIdeas.md       # Evaluation framework design
+│   └── Relion-algorithm-use.md # RELION algorithm notes
 ├── README.md            # Full project overview and evaluation plan
-└── Package_installation.md  # Installation guide per package (RHEL 10)
+└── STATUS.md            # Single source of truth for project state
 ```
 
 ## Key Workflow Conventions
@@ -48,6 +66,18 @@ STA/
 - Run classifications at k=2, 3, and 4 for every package
 - Large files (`.mrc`, `.star`, `.hdf`, `.h5`, archives) are gitignored — only scripts and docs commit
 - Package-specific conda envs: `eman2`, `etsim`, `pytom_env`, `relion-5.0` (on Josh's machine)
+
+## Package README Protocol
+
+**After any STATUS.md update that touches a package result, also update:**
+1. `packages/README.md` — update that package's row in the progress matrix
+2. `packages/<pkg>/README.md` — update the results table and next steps section
+
+This applies to: run completions, new ARI scores, config changes, status changes (⬜ → ✅),
+or any result that would change what appears in STATUS.md's package matrix row.
+
+The `/handoff` skill (`.claude/commands/handoff.md`) includes this as an explicit checklist
+step — do not skip it when running `/handoff`.
 
 ## Evaluation Framework (summary)
 | Metric group | Weight |
