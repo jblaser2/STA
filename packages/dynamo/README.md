@@ -18,11 +18,17 @@ Dynamo is the **reference result** — its two-class split is the structural gro
 packages are measured against. Class 1 (ring-complete, n=447): 62.7 Å at FSC=0.5.
 Class 2 (ring-altered, n=225): 96.9 Å at FSC=0.5.
 
-### Synthetic — motor_easy (694 particles, 3 classes)
+### Synthetic — motor_easy (694 particles, 3 classes, C_noRodHook definition)
 
-| k | ARI | Status |
-|---|-----|--------|
-| 3 | 🟡 pending | PCT confirmed installed; unblocked as of 2026-06-04 |
+| Approach | k | ARI | Notes |
+|----------|---|-----|-------|
+| HAC (CC Ward) | 2 | 0.005 | Cophenetic=0.094; no CC structure at this SNR |
+| HAC (CC Ward) | 3 | −0.009 | All 177 class C particles in large cluster |
+| **dpkpca** | **3** | **0.200** | nc=17 sweep; class B 96–99% pure; A/C mix |
+| dpkpca | 2 | 0.143 | nc=32 |
+
+Canonical motor_easy result: **k=3 ARI=0.200** (dpkpca).  
+Scripts: `dynamo_scripts/dynamo_motor_easy_hac.m`, `dynamo_motor_easy_pca.m`, `setup_motor_easy_pca.py`.
 
 ---
 
@@ -37,7 +43,7 @@ Class 2 (ring-altered, n=225): 96.9 Å at FSC=0.5.
 
 ## Next Steps
 
-- Run Dynamo MRA on motor_easy (rebuild `merged_all_aln/` first after class C re-simulation).
+- motor_easy complete. Next package: PyTom motor_easy (scripts staged at `packages/PyTom/`).
 
 ---
 

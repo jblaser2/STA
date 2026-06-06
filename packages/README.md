@@ -30,15 +30,15 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — not a
 
 ### Synthetic Dataset — motor_easy (694 particles, 3 classes, 30 Å differences)
 
-> **Note:** Class C redesigned 2026-06-05 (C_noRodHook = C-ring only). Re-simulation of
-> class C particles needed before next package runs. Current scores use old class C definition.
+> Class C redesigned 2026-06-05 (C_noRodHook = C-ring only). Re-simulation + `merged_all_aln/`
+> rebuild complete (A=246, B=271, C=177=694). All scores below use new C_noRodHook definition.
 
 | Package | k=3 ARI | k=3 Split | Notes |
 |---------|---------|-----------|-------|
-| [RELION](relion/) | 0.380 (iter 1) | — | GT-seeded; collapses to ARI=0.099 at iter 2 |
-| [PEET](peet/) | 0.026 | — | WMD-PCA limitation on uniform-wedge pre-aligned stacks |
-| [Dynamo](dynamo/) | 🟡 pending | — | PCT confirmed installed; unblocked |
-| All others | ⬜ | — | Pending re-simulation of class C |
+| [RELION](relion/) | **0.475** (iter 1) | — | GT-seeded firstiter_cc; collapses to ~0.16 by iter 2 |
+| [PEET](peet/) | 0.050 | — | Best k=3; k=2 best ARI=0.116 (pc1_5); WMD-PCA limitation |
+| [Dynamo](dynamo/) | **0.200** (k=3) | — | dpkpca nc=17 sweep; class B 96-99% pure; HAC ARI≈0 |
+| All others | ⬜ | — | PyTom motor_easy scripts staged, not yet run |
 
 ---
 
