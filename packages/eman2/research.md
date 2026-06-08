@@ -1,5 +1,5 @@
 # EMAN2 Codebase Research Report
-_Last updated: 2026-06-05_
+_Last updated: 2026-06-08_
 
 ## Contents
 
@@ -59,7 +59,7 @@ No `e2spt_refine.py` / `e2spt_align.py` calls remain anywhere in the pipeline. T
 
 ### Mask used during classification
 
-pcasplit's `--mask` now points explicitly at `spt_noalign/mask_tight.hdf` (previously it defaulted implicitly to the same file in `spt_02/`). It is **not** a sphere or fixed-radius shape: an auto-generated soft (0→1) mask following the density envelope — 80³ box at 13.33 Å/pix, ~10% of the box, bounding box ≈ 72×28×67 vox, offset ~+25 vox in Y (an elongated, off-center slab tracing the structure). pcasplit additionally applies its own per-particle wedge handling and a `--maxres 60 Å` low-pass before PCA.
+pcasplit's `--mask` now points explicitly at `spt_noalign/mask_tight.hdf` (previously it defaulted implicitly to the same file in `spt_02/`). It is **not** a sphere or fixed-radius shape: an auto-generated soft (0→1) mask following the density envelope — 80³ box at 13.33 Å/pix, ~10% of the box at the 0.5 threshold (52,112 voxels). Interior (≥0.5) bounding box ≈ 69×29×67 vox (dz×dy×dx), centroid offset ≈ +23 vox in Y — an elongated, off-center slab tracing the structure. pcasplit additionally applies its own per-particle wedge handling and a `--maxres 60 Å` low-pass before PCA.
 
 ### Empirical results (end-to-end run, `sptcls_02/`)
 
@@ -754,7 +754,7 @@ The particles are **pili** subtomograms — bacterial appendages imaged by cryo-
 
 **RHEL PATH:** On RHEL, `conda activate` does not always prepend the environment's `bin/` ahead of `/usr/bin`, so `python` may resolve to the system Python. The manual step-by-step below includes `export PATH=".../envs/eman2/bin:$PATH"` — always include this when running steps outside the pipeline script.
 
-**Disk:** Budget approximately: `particles.hdf` (~1.4 GB for 672 × 80³ float32) + `spt_seed/` (~30 MB, 50-particle subset) + `spt_02/` (~150–200 MB for 10 iterations) + each `sptcls_XX/` (~20 MB) + each `spt_cls*/` (~30 MB per class). ~2 GB total beyond the particle stack. `/home` has 874 GB and is 8% used — not a concern.
+**Disk:** Budget approximately: `particles.hdf` (~1.4 GB for 672 × 80³ float32) + `spt_noalign/` (~20 MB, consensus average 1 iter) + each `sptcls_XX/` (~30–40 MB, includes per-class maps + masks). ~2 GB total beyond the particle stack. `/home` has 874 GB and is 8% used — not a concern. Legacy alignment dirs `spt_seed/`, `spt_02/`, `spt_cls01/02/` may still exist on disk from prior runs but are no longer produced.
 
 ### Pipeline Logic
 
@@ -827,16 +827,24 @@ Two consequences for every pipeline run:
 ├── sptcls_XX/                 # pcasplit output (auto-numbered, zero-based)
 │   ├── ptcls_cls01.lst        # class 1 particle list (one-based)
 │   ├── ptcls_cls02.lst        # class 2 particle list
+│   ├── particle_parms_01.json # identity xform for class 1 (written by pcasplit)
+│   ├── particle_parms_02.json # identity xform for class 2
 │   ├── pca_ptcls.txt          # particle IDs + PCA coordinates
 │   ├── pca_scatter.png        # scatter plot (written by plot_pca.py)
 │   ├── class_averages.png     # slice + MIP grid (written by plot_class_averages.py)
 │   ├── pca_basis.hdf          # PCA eigenvector volumes
-│   ├── threed_01.hdf          # class 1 average (one-based)
-│   └── threed_02.hdf          # class 2 average
-├── spt_cls01/                 # Step 6: per-class refinement, class 1 (5 iters)
-│   ├── threed_05.hdf          # final class 1 map
-│   └── fsc_masked_05.txt      # gold-standard FSC for class 1
-└── spt_cls02/                 # Step 6: per-class refinement, class 2 (5 iters)
+│   ├── threed_01.hdf          # class 1 average — Step 6 output (one-based)
+│   ├── threed_01_even.hdf     # class 1 even half
+│   ├── threed_01_odd.hdf      # class 1 odd half
+│   ├── threed_02.hdf          # class 2 average — Step 6 output
+│   ├── fsc_masked_01.txt      # gold-standard FSC, class 1
+│   ├── fsc_masked_02.txt      # gold-standard FSC, class 2
+│   ├── mask_cls01.hdf         # per-class mask (copied after Step 6)
+│   ├── mask_tight_cls01.hdf
+│   ├── mask_cls02.hdf
+│   └── mask_tight_cls02.hdf
+# NOTE: spt_cls01/ and spt_cls02/ are NOT produced by the current pipeline.
+#       They exist on disk from the old alignment-based runs only.
 ```
 
 ### How to Run
@@ -850,7 +858,7 @@ cd /home/ejl62/src/eman2_project
 
 `run_pipeline.sh` activates the conda environment itself — no manual `conda activate` needed.
 
-**Manual step-by-step** (if the pipeline script fails or you need to run steps individually):
+**Manual step-by-step** (historical — alignment-based pipeline; superseded by the alignment-free refactor; kept for reference only):
 
 ```bash
 cd /home/ejl62/src/eman2_project
@@ -997,12 +1005,7 @@ Each run of the PCA classification step (`e2spt_pcasplit.py`) produces a new aut
 
 **Notes on numbering:** `e2spt_pcasplit.py` uses one-based numbering for class files inside each `sptcls_XX/` directory, but zero-based numbering for the directory itself (`sptcls_00`, `sptcls_01`, …). The `threed_NN.hdf` files use a two-digit zero-padded suffix matching the class index (e.g. `threed_01.hdf` = class 1).
 
-**Downstream use:** The `ptcls_clsNN.lst` files are the intended input for per-class refinement. The pipeline script (Step 6) runs this automatically; the equivalent manual command is:
-```bash
-e2spt_refine.py sptcls_XX/ptcls_cls01.lst \
-  --ref sptcls_XX/threed_01.hdf \
-  --path spt_cls01 --niter 5 --sym c1 --threads 24 --pkeep 0.8 --goldstandard 20
-```
+**Downstream use:** The `ptcls_clsNN.lst` files drive per-class averaging in Step 6. The pipeline runs `noalign_average` once per class; results stay inside `sptcls_XX/`. See [Per-Class Averaging (No Alignment)](#1-per-class-averaging-no-alignment) for the manual equivalent.
 
 ---
 
@@ -1012,21 +1015,35 @@ After accepting a classification result in `sptcls_XX/`, the following steps are
 
 ---
 
-### 1. Per-Class Iterative Refinement
+### 1. Per-Class Averaging (No Alignment)
 
-**This step is now automated** — `run_pipeline.sh` Step 6 runs it automatically after you accept the PCA classification. The pipeline runs 5 iterations with `--goldstandard 20` for each class. Output: `spt_cls01/threed_05.hdf` (final map), `spt_cls01/fsc_masked_05.txt` (gold-standard FSC).
+**This step is now automated** — `run_pipeline.sh` Step 6 runs it automatically after you accept the PCA classification. It calls `noalign_average` once per class, which runs `e2spt_average.py` + `e2refine_postprocess.py` at identity orientation. Output stays inside `sptcls_XX/`: `threed_01.hdf`/`threed_02.hdf` (the per-class maps), `fsc_masked_01.txt`/`fsc_masked_02.txt`, and per-class masks (`mask_cls01.hdf`, `mask_tight_cls01.hdf`, …). No `spt_cls01/02/` directories are created.
 
 Manual equivalent (if running outside the pipeline):
 ```bash
-CLS=01
-e2spt_refine.py sptcls_XX/ptcls_cls${CLS}.lst \
-  --ref sptcls_XX/threed_${CLS}.hdf \
-  --path spt_cls${CLS} \
-  --niter 5 --sym c1 --threads 24 --pkeep 0.8 --goldstandard 20 --verbose 1 \
-  2>&1 | tee refine_cls${CLS}.log
+SPTCLS=sptcls_02   # replace with the actual sptcls_XX directory
+CLS_ITR=1; CLS_ITR2=01   # repeat for each class
+
+# particle_parms_01.json already written by pcasplit — do not overwrite
+
+e2spt_average.py \
+    --path "$SPTCLS" --iter "$CLS_ITR" \
+    --sym c1 --keep 1.0 --threads 24 --skippostp --verbose 1
+
+e2refine_postprocess.py \
+    --even "$SPTCLS/threed_${CLS_ITR2}_even.hdf" \
+    --odd  "$SPTCLS/threed_${CLS_ITR2}_odd.hdf" \
+    --output "$SPTCLS/threed_${CLS_ITR2}.hdf" \
+    --iter "$CLS_ITR" --tomo --mass -1 \
+    --threads 24 --restarget 30 --sym c1 --align
+
+# e2refine_postprocess overwrites mask.hdf / mask_tight.hdf with fixed names;
+# copy immediately to preserve this class's masks before the next class runs.
+cp "$SPTCLS/mask.hdf"       "$SPTCLS/mask_cls${CLS_ITR2}.hdf"
+cp "$SPTCLS/mask_tight.hdf" "$SPTCLS/mask_tight_cls${CLS_ITR2}.hdf"
 ```
 
-Gold-standard FSC requires at least ~100 particles per class (50 per half). With this dataset (~300–400 per class), it is meaningful. The pipeline uses `--goldstandard 20` (tighter than the 30 Å used for global refinement) because the per-class reference is already well-formed.
+Gold-standard FSC requires at least ~100 particles per class (50 per half). With this dataset (~300–400 per class), it is meaningful.
 
 ### 1.5 Helical Symmetry Investigation
 

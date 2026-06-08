@@ -1,0 +1,3218 @@
+{
+"('ptcls.lst', 100)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 101)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 102)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 106)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 107)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 108)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 109)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 110)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 111)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 112)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 113)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 114)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 115)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 116)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 117)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 118)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 119)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 120)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 121)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 122)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 123)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 124)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 125)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 126)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 127)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 128)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 132)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 133)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 134)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 135)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 136)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 137)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 138)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 139)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 140)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 141)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 142)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 143)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 144)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 147)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 148)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 149)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 150)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 151)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 152)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 153)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 154)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 155)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 156)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 157)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 158)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 159)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 160)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 161)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 165)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 166)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 167)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 168)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 169)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 170)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 171)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 172)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 173)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 174)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 175)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 176)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 177)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 178)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 179)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 180)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 181)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 182)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 203)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 204)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 205)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 206)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 207)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 208)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 209)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 210)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 211)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 212)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 213)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 214)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 215)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 216)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 217)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 218)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 219)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 220)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 221)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 222)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 223)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 224)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 225)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 226)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 227)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 228)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 229)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 230)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 231)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 232)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 233)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 234)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 235)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 236)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 237)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 238)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 239)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 240)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 241)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 249)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 250)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 251)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 252)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 253)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 254)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 255)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 256)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 257)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 258)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 259)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 260)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 261)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 262)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 263)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 264)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 265)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 266)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 267)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 268)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 269)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 270)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 271)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 272)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 273)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 274)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 275)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 276)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 277)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 278)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 279)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 280)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 281)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 282)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 283)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 284)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 285)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 287)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 288)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 289)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 290)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 291)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 292)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 293)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 294)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 295)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 296)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 297)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 298)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 299)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 300)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 301)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 302)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 303)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 304)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 305)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 306)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 307)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 308)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 309)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 310)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 311)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 312)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 313)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 314)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 315)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 316)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 317)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 318)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 319)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 320)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 321)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 322)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 323)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 324)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 325)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 326)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 327)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 328)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 332)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 333)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 334)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 335)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 336)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 337)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 338)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 339)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 340)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 341)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 342)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 343)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 344)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 345)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 346)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 347)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 348)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 349)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 350)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 351)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 352)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 353)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 354)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 355)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 356)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 357)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 358)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 359)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 360)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 361)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 362)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 363)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 365)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 366)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 367)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 368)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 369)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 370)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 371)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 372)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 373)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 374)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 375)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 376)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 377)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 378)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 379)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 380)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 381)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 382)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 383)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 384)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 385)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 386)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 387)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 388)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 389)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 390)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 395)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 396)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 397)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 398)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 399)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 400)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 401)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 402)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 403)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 404)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 405)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 406)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 407)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 408)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 409)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 410)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 411)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 412)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 413)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 414)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 415)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 416)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 417)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 418)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 419)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 420)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 425)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 426)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 427)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 428)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 429)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 430)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 431)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 432)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 433)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 434)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 435)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 436)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 437)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 438)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 439)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 440)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 441)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 442)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 443)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 444)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 445)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 446)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 450)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 451)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 452)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 453)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 454)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 455)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 456)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 457)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 458)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 459)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 460)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 461)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 462)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 463)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 464)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 465)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 466)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 467)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 468)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 469)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 470)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 471)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 472)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 473)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 474)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 475)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 476)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 477)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 478)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 479)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 480)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 482)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 483)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 484)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 485)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 486)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 487)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 488)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 489)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 490)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 491)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 492)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 493)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 494)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 495)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 496)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 497)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 498)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 499)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 500)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 501)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 502)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 503)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 504)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 506)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 507)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 508)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 55)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 552)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 553)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 554)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 557)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 558)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 559)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 560)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 570)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 571)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 572)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 573)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 574)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 575)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 623)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 624)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 625)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 636)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 637)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 638)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 639)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 652)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 71)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 72)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 73)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 74)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 75)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 76)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 77)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 78)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 79)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 80)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 81)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 82)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 83)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 84)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 87)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 88)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 89)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 90)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 91)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 92)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 93)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 94)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 95)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 96)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 97)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 98)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+},
+"('ptcls.lst', 99)": {
+"coverage": 1.0,
+"score": 0.0,
+"xform.align3d": {
+"__class__": "Transform",
+"matrix": "[1,0,0,0,0,1,0,0,0,0,1,0]"
+}
+}
+}

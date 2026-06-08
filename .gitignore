@@ -65,3 +65,6 @@ packages/STOPGAP/exec/lib*/sg_toolbox
 packages/STOPGAP/exec/lib*/stopgap
 packages/STOPGAP/exec/lib*/stopgap_parser
 packages/STOPGAP/exec/lib*/stopgap_watcher
+
+# eman2 settings files
+.eman2settings.json

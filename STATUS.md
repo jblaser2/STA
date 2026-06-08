@@ -2,7 +2,7 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-08** by Claude (OPUS-TOMO motor_easy k=3 ARI=0.021 complete; PyTom motor_easy k=3 ARI=0.134 backfilled from prior session; STATUS + package READMEs synced).
+> Last updated: **2026-06-08** by Eben (EMAN2 T4P no-align pipeline rerun complete; results + research.md committed).
 
 ## Now / Next / Parked
 
@@ -46,9 +46,8 @@
 
 - **GROUND TRUTH (Stefano consult, 2026-06-01; updated 2026-06-05):** this T4P dataset has **two distinct, obvious pili-phase classes**, and **Dynamo recovers them well** (`dynamo/`). **PEET also separates** (v2 cyl mask, 374/230/68). **PyTom NOW SEPARATES** (v2 cyl mask + auto_focus + -a flag: 440/232). **RELION, Protomo, DISCA, TomoFlow still fail** (one dominant class; RELION exhausted all 6 configs, algorithm-level SNR failure). **OPUS-TOMO: partial result** — K=2 gives 447/225 split (threshold mask) but ARI vs GT not yet computed; Y-axis cylindrical mask (matching PyTom v2) collapses K=2 (VAE needs broader mask). Benchmark signal: correct-mask versions of Dynamo/PEET/PyTom vs algorithm-level failures of the others.
 
-- **Package completion status (2026-06-02):** 9 of 15 packages run on real T4P (RELION, Dynamo, PyTom,
-  Protomo, DISCA, TomoFlow, EMAN2, OPUS-TOMO, PEET partial). EMAN2 k=2 complete but k=3/4 not yet run
-  (table shows ⬜ discrepancy — needs fixing). STOPGAP owned by Eben, not started. MDTOMO/HEMNMA
+- **Package completion status (2026-06-02, updated 2026-06-08):** 9 of 15 packages run on real T4P (RELION, Dynamo, PyTom,
+  Protomo, DISCA, TomoFlow, EMAN2, OPUS-TOMO, PEET partial). EMAN2 k=2 rerun complete with no-align pipeline (table now ✅). k=3/k=4 not yet run. STOPGAP owned by Eben, not started. MDTOMO/HEMNMA
   require atomic models (❌ skipped). AC3D folded into PyTom. TomoNet formally rejected (out-of-box scope
   violated). emClarity can't run real tilt-series data (synthetic only).
 
@@ -69,7 +68,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 | MDTOMO | ❌ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | Part of Scipion3 ContinuousFlex plug-in; requires initial atomic model/reference map; cannot sort datasets like we're doing right now. |
 | TomoFlow | ✅ | `tomoflow` | ✅ `tomoflow_run.py` | ✅ | ✅ | ✅ | — | also ContinuousFlex, but (unlike MDTOMO/HEMNMA) needs only a **subtomogram-average reference, not an atomic model** — so we DID run it standalone. Required porting farneback3d off CUDA texture-refs for CUDA 13.2/sm_120 (`tomoflow/research.md` §2). Landscape unimodal → **misses the two phases** (k=3 two big classes CC 0.956). `tomoflow/results/` |
 | I3 / ProTomo | ✅ | (native) | ✅ | ✅ | — | — | ✅ | 3.1.0 installed; 2-class run on 234 centered particles (438 edge filtered); CC=0.921; see `protomo/research.md` + session log |
-| EMAN2 | ✅ | `eman2` | ✅ | ⬜ | ⬜ | ⬜ | ✅ | k=2 completed (PCA: 393 vs 279 particles). Workspace `~/src/eman2_project/`; outputs spt_cls01/02; research.md in `eman2/` + pcaScripts/. **Result: EMAN2 misses the two phases**—splits particles but not into pili vs flexed. Comprehensive pipeline docs + Qt/OpenGL Wayland display fix in research.md. **2026-06-05 (Eben): code improvements committed+pushed** — `patch_scripts.py` Patch 2 re-activates reference-based `mask.wedgefill` in `e2spt_pcasplit.py` active path (the `--nowedgefill` flag was a no-op since fill lived only in a commented-out real-space block); `run_pipeline.sh` now a NO-ALIGNMENT variant (particles pre-aligned at (0,0,0) → identity transforms, skip orientation search). Not yet rerun with these changes. |
+| EMAN2 | ✅ | `eman2` | ✅ | ✅ | ⬜ | ⬜ | ✅ | **No-align rerun complete (2026-06-08, Eben).** Split: **405 / 273** (cls02/cls01). Consensus FSC: masked=82 Å, masked-tight=71 Å; per-class both 82 Å. **Result: still misses the two phases** — ~60/40 partition does not map to ring_complete/ring_altered; class averages nearly identical by eye at 82 Å. Pipeline: identity `particle_parms` via `make_identity_parms.py` → `e2spt_average` → `e2refine_postprocess` → `e2spt_pcasplit` (mask=`spt_noalign/mask_tight.hdf`, maxres=60 Å). Wedgefill patch (Patch 2) active. Outputs: `packages/eman2/results/`; workspace `~/src/eman2_project/`; docs: `packages/eman2/research.md`. k=3/k=4 not yet run. |
 | emClarity | ✅ | MCR R2019a | ⬜ (real data n/a) | — | — | — | — | **installed + GPU-verified on RTX 5080/sm_120** (1.5.3.11 + MCR R2019a; CUDA-10 kernels JIT to Blackwell via the 13.2 driver). **Cannot run on real T4P:** tilt-series pipeline, no path to ingest pre-extracted subtomos → **synthetic-data track only**. See `EMCLARITY.md` |
 | PyTom | ✅ | `pytom_env` | ✅ | ✅ | ✅ | ⬜ | — | **T4P FIXED (2026-06-05):** v2 cylindrical mask (r=13, h_pos=0, h_neg=25) + `-a` flag (FRM module absent — see memory). k=2: **440/232** (converged iter 5, class 1≈PEET ring_altered). k=3: **422/150/100** (iter 11). Results: `results/pytom_v2mask_k{2,3}.csv`; figures: `PyTom/figures_v2mask_k{2,3}/`. Previous failure was wrong mask. k=4 not yet run. **motor_easy (prior session):** k=2 ARI=0.090, k=3 ARI=**0.134** (v2mask). Scripts: `packages/PyTom/setup_motor_easy_pytom.py`, `run_motor_easy_pytom.sh`. |
 | DISCA | ✅ | `disca` | ✅ `build_disca_input.py` | ✅ | ✅ | ✅ | ✅ | template-free unsupervised deep clustering (torch, native sm_120); k=2/3/4 → one dominant ~94% class + small noisy outliers — **missed the two real phases** (cf. Dynamo). `disca/research.md` + `disca/results/` |
