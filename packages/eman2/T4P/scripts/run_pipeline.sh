@@ -10,17 +10,18 @@
 # Usage: ./run_pipeline.sh
 set -euo pipefail
 
-CONDA_BASE="/home/ejl62/miniforge3"
-PROJECT_DIR="/home/ejl62/src/eman2_project"
+CONDA_BASE="/home/jblaser2/miniforge3"
+PROJECT_DIR="/home/jblaser2/Research/eman2_project"
 
 # ---- Parameters (edit these before running) ----
-NCLASS=2              # number of K-Means clusters
+NCLASS=3              # number of K-Means clusters (canonical T4P: 2 signal + 1 junk)
 NBASIS=12             # PCA basis vectors (loosened from 8 to capture subtler variance)
 MAXRES=60             # low-pass before PCA in Å (matches actual signal range)
 SYM=c1                # symmetry
 THREADS=24            # CPU threads for averaging/post-processing
 CLEAN=1               # 1 = --clean removes PCA outliers before K-Means
 RESTARGET=30          # Å — target resolution passed to e2refine_postprocess
+NONINTERACTIVE=1      # 1 = skip interactive loop, accept first classification result
 # NOTE: there is no --pkeep here. pkeep culled particles by *alignment score*,
 # which no longer exists once we stop aligning. All particles are kept.
 # -------------------------------------------------
@@ -175,12 +176,19 @@ while true; do
     wc -l "$SPTCLS"/ptcls_cls*.lst
     echo "========================================================"
 
-    for viewer in eog xdg-open display; do
-        if command -v "$viewer" &>/dev/null 2>&1; then
-            "$viewer" "$SPTCLS/pca_scatter.png" &
-            break
-        fi
-    done
+    if [ "${NONINTERACTIVE:-0}" -ne 1 ]; then
+        for viewer in eog xdg-open display; do
+            if command -v "$viewer" &>/dev/null 2>&1; then
+                "$viewer" "$SPTCLS/pca_scatter.png" &
+                break
+            fi
+        done
+    fi
+
+    if [ "${NONINTERACTIVE:-0}" -eq 1 ]; then
+        log "NONINTERACTIVE=1 — accepting classification result."
+        break
+    fi
 
     echo ""
     echo "Options:"
