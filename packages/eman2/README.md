@@ -2,7 +2,7 @@
 
 **Algorithm:** PCA split on subtomogram stack with reference-based wedge-fill  
 **Environment:** `eman2` conda env  
-**Status:** 🟡 T4P k=2 run complete (misses two phases) — wedge-fill patch applied, not yet re-run
+**Status:** 🟡 T4P k=2 no-align rerun complete (405/273; misses two phases) — canonical k=3+junk run still needed
 
 ---
 
@@ -10,13 +10,13 @@
 
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
-| **T4P** | 🟡 | k=3 / k=2 | — | — | 393 / 279 (+junk pending) | Does not recover two phases; wedge-fill patch applied 2026-06-05, re-run needed |
+| **T4P** | 🟡 | k=2 / k=2 | none | — (no GT) | 405 / 273 | No-align rerun (identity parms) complete; misses two phases; canonical k=3+junk run still needed |
 | **FM_easy** | ⬜ | — | — | — | — | Not yet run |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 
-> T4P to-do: re-run with k=3 (2+junk, cyl v2 mask) using the wedge-fill patch.
-> Previous 393/279 result used k=2 and pre-patch pipeline — not the canonical run.
+> T4P to-do: re-run with k=3 (2+junk, cyl v2 mask) for canonical result.
+> Current 405/273 result used k=2, identity parms (no-align), no mask — not the canonical run.
 
 ---
 

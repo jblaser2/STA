@@ -32,7 +32,7 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 | [PyTom](PyTom/) | 🟡 | 440/232 (junk pending) | cyl v2 | **Yes** | <img src="figures/T4P/pytom_k2_class_avgs.png" width="150"> | `-a` flag + v2 mask both required; re-run needed with k=3+junk |
 | [OPUS-TOMO](opusTomo/) | 🟡 | 447/225 (junk pending) | threshold (31.2%) | **Partial** | _(pending)_ | Threshold mask required for VAE; junk pending; ARI vs GT pending |
 | [RELION](relion/) | ✅ (exhausted) | 672/0 | cyl v2 | **No** | — | Algorithm-level SNR failure; all configs collapse |
-| [EMAN2](eman2/) | 🟡 | 393/279 (old run) | — | **No** | _(pending)_ | Wedge-fill patch applied; canonical k=3 run needed |
+| [EMAN2](eman2/) | 🟡 | 405/273 (k=2 no-align) | none | **No** | <img src="eman2/results/class_averages.png" width="150"> | No-align rerun complete (identity parms); misses two phases; canonical k=3+junk still needed |
 | [DISCA](disca/) | 🟡 | ~630/42 (old run) | none | **No** | <img src="disca/T4P/results/disca_k2_classes.png" width="150"> | ~94% dominant class; k=3 canonical run needed |
 | [TomoFlow](tomoflow/) | 🟡 | — (old run) | none | **No** | <img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="150"> | Unimodal; k=3 canonical run needed |
 | [ProTomo](protomo/) | ✅ | 234/0 (438 filtered) | none | **No** | <img src="protomo/T4P/results/class_averages_slices.png" width="150"> | Centering filter = junk removal; CC=0.921 trivial |
