@@ -15,18 +15,14 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — not a
 
 ### T4P Real Dataset (672 prealigned 80³ subtomograms, 13.33 Å/px)
 
-**Reference (PEET v2, Stefano-validated — ring\_complete / ring\_altered / junk):**
+**Reference (Stefano — ring\_complete / ring\_altered / junk, 509/95/68):**
 
-<img src="peet/peet_class_averages_k2_wmd.png" width="420">
-
-**Cross-package particle agreement** (Dynamo · PEET · PyTom · OPUS-TOMO; row-normalized, ARI per pair):
-
-<img src="figures/T4P/cross_pkg_correlation.png" width="620">
+<img src="figures/T4P/reference_class_avgs.png" width="420">
 
 | Package | k=2 | k=3 | k=4 | Converged? | Class Avgs (best k) | Notes |
 |---------|-----|-----|-----|------------|---------------------|-------|
 | [Dynamo](dynamo/) | ✅ 447/225 | — | — | **Yes** (reference result) | <img src="dynamo/dynamo_final_results/class_comparison.png" width="150"> | HAC; recovers both known pili phases |
-| [PEET](peet/) | ✅ 374/230/68 | — | — | **Yes** | <img src="peet/peet_class_averages_k2_wmd.png" width="150"> | Cylindrical mask v2 (r=13, below-center); junk class = bottom 68 by CCC |
+| [PEET](peet/) | ✅ 374/230/68 | — | — | **Yes** | <img src="figures/T4P/peet_v2_class_avgs.png" width="150"> | Cylindrical mask v2 (r=13, below-center); junk class = bottom 68 by CCC |
 | [PyTom](PyTom/) | ✅ 440/232 | ✅ 422/150/100 | ⬜ | **Yes** | <img src="figures/T4P/pytom_k2_class_avgs.png" width="150"> | v2 cyl mask + `-a` flag; prev failure was wrong mask |
 | [OPUS-TOMO](opusTomo/) | ✅ 447/225 | ✅ | ✅ | **Partial** | _(pending — run `gen_class_avg_panels.py`)_ | Threshold mask (31.2%): K=2 splits; cyl mask collapses (VAE too restrictive) |
 | [RELION](relion/) | ✅ | ✅ | ✅ | **No** | — | Algorithm-level SNR failure; all 6 variants collapse to 672/0 |
