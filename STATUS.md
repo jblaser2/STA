@@ -2,7 +2,7 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-08** by Claude (packages/README.md figures gallery: cross-package T4P correlation, per-package class-avg thumbnails, motor_easy confusion matrix columns; 3 new eval scripts).
+> Last updated: **2026-06-08** by Claude (OPUS-TOMO motor_easy k=3 ARI=0.021 complete; PyTom motor_easy k=3 ARI=0.134 backfilled from prior session; STATUS + package READMEs synced).
 
 ## Now / Next / Parked
 
