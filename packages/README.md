@@ -38,6 +38,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — not a
 | [RELION](relion/) | **0.475** (iter 1) | — | GT-seeded firstiter_cc; collapses to ~0.16 by iter 2 |
 | [PEET](peet/) | 0.050 | — | Best k=3; k=2 best ARI=0.116 (pc1_5); WMD-PCA limitation |
 | [Dynamo](dynamo/) | **0.200** (k=3) | — | dpkpca nc=17 sweep; class B 96-99% pure; HAC ARI≈0 |
+| [OPUS-TOMO](opusTomo/) | 0.021 | 479/130/85 | Threshold mask (28.3%); C perfectly isolated but A/B unseparated; VAE collapses |
 | All others | ⬜ | — | PyTom motor_easy scripts staged, not yet run |
 
 ---

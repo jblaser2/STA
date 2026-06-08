@@ -2,7 +2,7 @@
 
 **Algorithm:** Variational autoencoder (VAE) continuous latent-space clustering  
 **Environment:** `opuset` conda env (rebuilt from scratch 2026-06-05, cu128 PyTorch)  
-**Status:** ✅ T4P k=2/3/4 complete (threshold mask) · ARI vs PEET GT not yet computed
+**Status:** ✅ T4P k=2/3/4 complete (threshold mask) · ✅ motor_easy k=3 complete (ARI=0.021) · ARI vs PEET GT not yet computed
 
 ---
 
@@ -22,9 +22,29 @@ learning meaningful latent structure.
 
 ARI vs PEET soft GT not yet computed.
 
-### Synthetic — motor_easy
+### Synthetic — motor_easy (694 GT-aligned particles, 96³, 13.33 Å/px)
 
-Not yet run (pending class C re-simulation).
+| Mask | K | ARI | Split | Notes |
+|------|---|-----|-------|-------|
+| Threshold (28.3% voxels) | 3 | **0.021** | 479 / 130 / 85 | Class C (177) fully in dominant cluster; A/B unseparated |
+
+**Confusion matrix (GT rows × Pred cols):**
+```
+A (246):   42   46  158
+B (271):   43   84  144
+C (177):    0    0  177
+```
+
+Class C is 100% captured in cluster 2 — the VAE detects the most distinct structural difference
+(C-ring only vs. full motor). However cluster 2 also absorbs 64% of A and 53% of B, so ARI is
+near-random (0.021). The A vs. B distinction (~40 Å difference in C-ring presence) is not
+resolved. Scores: AMI=0.124, V=0.127, Acc=0.437.
+
+Threshold mask: computed from motor_easy consensus average (mean + 1σ + 2-iter dilation), 28.3%
+of 96³ voxels — comparable to T4P's 31.2%, well above the VAE collapse threshold.
+
+Scripts: `packages/opusTomo/scripts/setup_motor_easy_opus.py`, `run_motor_easy_opus.sh`.
+Output: `packages/opusTomo/scripts/opus_project_motor_easy/`. Labels: `outputs/opus_tomo_motor_easy_k3.csv`.
 
 ---
 
