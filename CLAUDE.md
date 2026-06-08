@@ -79,6 +79,23 @@ or any result that would change what appears in STATUS.md's package matrix row.
 The `/handoff` skill (`.claude/commands/handoff.md`) includes this as an explicit checklist
 step — do not skip it when running `/handoff`.
 
+**Figure gallery protocol (added 2026-06-08):** `packages/README.md` has a visual figures
+gallery embedded in each dataset's progress table — class-average thumbnails and (for
+motor_easy) confusion matrix thumbnails per package row. When a new classification run
+completes or an existing result improves:
+
+- **Class-average panel:** generate a new PNG using `scripts/eval/gen_class_avg_panels.py`
+  with the package's class-average MRC files, save to `packages/figures/<dataset>/`,
+  and update the "Class Avgs" cell in the table.
+- **Confusion matrix (motor_easy only):** if a better confusion matrix PNG is generated,
+  update the "Best Confusion" cell to point to it.
+- **Cross-package correlation (T4P):** re-run `scripts/eval/gen_cross_pkg_correlation.py`
+  if a new package's T4P assignment CSV is added to `results/` — this regenerates
+  `packages/figures/T4P/cross_pkg_correlation.png`.
+
+Cells currently showing `_(pending)_` need local MRC class-average files; fill them with
+`gen_class_avg_panels.py` as each package's class averages become available.
+
 ## Evaluation Framework (summary)
 | Metric group | Weight |
 |---|---|
