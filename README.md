@@ -105,13 +105,13 @@ We also recognize that limiting evaluation to 3D-input classifiers foregoes a la
 **Expert-validated structural classes:** The T4P pilus system in *Vibrio* exists in two distinct conformational states corresponding to different configurations of the lower periplasmic ring, as described in the published structural study of this system (Bharat lab, bioRxiv 2025 — see [preprint](https://www.biorxiv.org/content/10.1101/2025.10.14.680967v1.full), Figure 2). Expert inspection of class averages from this dataset confirms the presence of both conformational states. This serves as the qualitative reference standard against which package outputs are evaluated; while the class split ratio and exact particle assignments vary between packages and with the published result, packages whose averaged structures are consistent with both known states are considered to have "converged." Fully quantitative per-particle ground-truth labels are not yet available for this dataset.
 
 <p align="center">
-  <img src="dynamo/dynamo_final_results/class_comparison.png" width="780" alt="Dynamo HAC T4P two-class result: central XY slices of Class 1 (ring-complete, n=447) and Class 2 (ring-altered, n=225) with per-class FSC resolution estimates"/>
+  <img src="packages/dynamo/dynamo_final_results/class_comparison.png" width="780" alt="Dynamo HAC T4P two-class result: central XY slices of Class 1 (ring-complete, n=447) and Class 2 (ring-altered, n=225) with per-class FSC resolution estimates"/>
 </p>
 
 <p align="center"><em>Dynamo HAC classification of T4P (reference result). Two class averages consistent with the known lower periplasmic ring conformational states are recovered. Class 1: 62.7 Å (FSC=0.5); Class 2: 96.9 Å (FSC=0.5). The split ratio differs from the published study, and further quantitative validation is needed to confirm robustness.</em></p>
 
 <p align="center">
-  <img src="dynamo/dynamo_final_results/embedding_umap.png" width="540" alt="UMAP embedding of T4P particles colored by Dynamo HAC class assignment"/>
+  <img src="packages/dynamo/dynamo_final_results/embedding_umap.png" width="540" alt="UMAP embedding of T4P particles colored by Dynamo HAC class assignment"/>
 </p>
 
 <p align="center"><em>UMAP of Dynamo's cross-correlation embedding (672 particles). The two classes show partial separation in embedding space, but the overlap is substantial — the UMAP is consistent with two structural populations but is not conclusive on its own.</em></p>
@@ -133,7 +133,7 @@ Class differences are ~30 Å — large enough to be detectable but realistic for
 **Input density maps** — the three ground-truth structural variants used to simulate the data:
 
 <p align="center">
-  <img src="etsimulation/figures/motor_easy_class_maps.png" width="780" alt="Orthoslice views of the three class density maps: Class A (ring_complete), Class B (noCring), Class C (Cring_only)"/>
+  <img src="synthetic/etsimulation/figures/motor_easy_class_maps.png" width="780" alt="Orthoslice views of the three class density maps: Class A (ring_complete), Class B (noCring), Class C (Cring_only)"/>
 </p>
 
 <p align="center"><em>Input density maps for the three synthetic classes (rows: A, B, C; columns: YZ side, XY top-down, XZ section, 3D render). Class A is the full motor; Class B has the C-ring removed (cut below the membrane neck); Class C retains only the C-ring (isolated cytoplasmic switch complex — everything above the membrane neck removed). These structural differences become far less obvious after noise and missing-wedge artifacts are introduced.</em></p>
@@ -141,7 +141,7 @@ Class differences are ~30 Å — large enough to be detectable but realistic for
 **Simulated reconstruction** — what the data actually looks like after tilt-series simulation and WBP reconstruction:
 
 <p align="center">
-  <img src="etsimulation/figures/motor_easy_sim_tomo.png" width="720" alt="Simulated motor_easy tomogram: noiseless reconstruction (left) and noisy WBP reconstruction (right) with particle positions annotated"/>
+  <img src="synthetic/etsimulation/figures/motor_easy_sim_tomo.png" width="720" alt="Simulated motor_easy tomogram: noiseless reconstruction (left) and noisy WBP reconstruction (right) with particle positions annotated"/>
 </p>
 
 <p align="center"><em>Simulated tomogram: noiseless reconstruction (left) alongside the realistic noisy WBP reconstruction (right) with particle positions marked. Noise, CTF, and missing-wedge artifacts from the ±60° tilt-series simulation are clearly visible. All three classes appear visually indistinguishable in individual raw particles — structural differences only emerge after alignment and averaging.</em></p>
@@ -151,15 +151,15 @@ Class differences are ~30 Å — large enough to be detectable but realistic for
 <table align="center">
   <tr>
     <td align="center">
-      <img src="etsimulation/figures/motor_easy_classA_avg.png" width="280" alt="Class A GT-aligned average: full motor with C-ring and MS-ring"/>
+      <img src="synthetic/etsimulation/figures/motor_easy_classA_avg.png" width="280" alt="Class A GT-aligned average: full motor with C-ring and MS-ring"/>
       <br><em>Class A GT-aligned average (n=246)<br>Full motor: C-ring + MS-ring present</em>
     </td>
     <td align="center">
-      <img src="etsimulation/figures/motor_easy_classB_avg.png" width="280" alt="Class B GT-aligned average: motor core with MS-ring, C-ring absent"/>
+      <img src="synthetic/etsimulation/figures/motor_easy_classB_avg.png" width="280" alt="Class B GT-aligned average: motor core with MS-ring, C-ring absent"/>
       <br><em>Class B GT-aligned average (n=271)<br>Motor core + MS-ring; C-ring absent</em>
     </td>
     <td align="center">
-      <img src="etsimulation/figures/motor_easy_classC_avg.png" width="280" alt="Class C GT-aligned average: C-ring only, MS-ring and rod/hook absent"/>
+      <img src="synthetic/etsimulation/figures/motor_easy_classC_avg.png" width="280" alt="Class C GT-aligned average: C-ring only, MS-ring and rod/hook absent"/>
       <br><em>Class C GT-aligned average (n=177)<br>C-ring only; MS-ring, rod/hook absent</em>
     </td>
   </tr>
@@ -201,7 +201,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skipped
 **PEET class averages and difference map (mask v2):**
 
 <p align="center">
-  <img src="peet/results/class_averages_v2_masked_xy_diff.png" width="740" alt="PEET T4P classification with mask v2: Class 1 (ring_complete, n=374), Class 2 (ring_altered, n=230), and color-coded XY difference map"/>
+  <img src="packages/peet/results/class_averages_v2_masked_xy_diff.png" width="740" alt="PEET T4P classification with mask v2: Class 1 (ring_complete, n=374), Class 2 (ring_altered, n=230), and color-coded XY difference map"/>
 </p>
 
 <p align="center"><em>PEET T4P classification (mask v2, cylindrical). Class 1 (ring_complete, n=374) vs. Class 2 (ring_altered, n=230). Full XY slice shown; red = more density in Class 1, blue = more density in Class 2. Structural differences concentrate in the ring region, consistent with the known lower periplasmic ring conformational states.</em></p>
@@ -255,11 +255,11 @@ Aggregate by rank-based Borda count (scales are incommensurable):
 <table align="center">
   <tr>
     <td align="center">
-      <img src="tomoflow/results/tomoflow_k2_classes.png" width="340" alt="TomoFlow k=2 class averages: both classes show the same T4P structure"/>
+      <img src="packages/tomoflow/results/tomoflow_k2_classes.png" width="340" alt="TomoFlow k=2 class averages: both classes show the same T4P structure"/>
       <br><em>TomoFlow k=2: both classes show the same pilus structure — the two conformational states are not separated</em>
     </td>
     <td align="center">
-      <img src="PyTom/figures_k2/class_0_central_slice.png" width="340" alt="PyTom k=2 Class 0: dominant class shows T4P structure"/>
+      <img src="packages/PyTom/figures_k2/class_0_central_slice.png" width="340" alt="PyTom k=2 Class 0: dominant class shows T4P structure"/>
       <br><em>PyTom k=2 dominant class: structurally identical to the minor class — classification collapsed to one effective class</em>
     </td>
   </tr>
