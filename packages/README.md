@@ -53,7 +53,8 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — not a
 | [PEET](peet/) | 0.050 | — | _(pending)_ | <img src="../outputs/peet_motor_easy/confusion_peet_k2_k2_pc1_5_cnew.png" width="200"> | Best k=3; k=2 best ARI=0.116 (pc1_5) shown; WMD-PCA limitation |
 | [Dynamo](dynamo/) | **0.200** (k=3) | — | _(pending)_ | <img src="dynamo/dynamo_outputs/motor_easy_pca/confusion_dynamo_k3_k3_pca_nc_best_cnew.png" width="200"> | dpkpca nc=17 sweep; class B 96-99% pure; HAC ARI≈0 |
 | [OPUS-TOMO](opusTomo/) | 0.021 | 479/130/85 | _(pending)_ | <img src="../outputs/confusion_opus-tomo_k3_threshold_mask.png" width="200"> | Threshold mask (28.3%); C perfectly isolated but A/B unseparated; VAE collapses |
-| All others | ⬜ | — | ⬜ | ⬜ | PyTom motor_easy scripts staged, not yet run |
+| [PyTom](PyTom/) | **0.134** (k=3) | — | _(pending)_ | <img src="../outputs/relion_motor_easy/confusion_pytom_k3_motor_easy_k3_v2mask.png" width="200"> | v2 cyl mask; k=2 ARI=0.090; k=3 ARI=0.134 (best) |
+| All others | ⬜ | — | ⬜ | ⬜ | EMAN2, DISCA, TomoFlow, ProTomo, STOPGAP not yet run on motor_easy |
 
 ---
 
