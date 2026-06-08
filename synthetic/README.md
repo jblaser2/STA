@@ -40,6 +40,40 @@ package runs reflect the redesigned classes.
 
 ---
 
+## Dataset 2 — motor_switch (complete 2026-06-08)
+
+**2-class + junk Borrelia burgdorferi flagellar motor CCW↔CW rotational switching.**
+
+| Class | Definition | N particles |
+|-------|-----------|-------------|
+| ccw | CCW rotational state (EMD-21884) | 200 |
+| cw | CW rotational state (EMD-21886) | 200 |
+| junk | Gaussian sphere (0.01× amplitude, pure noise) | 30 |
+| **Total** | | **430** |
+
+**Source:** Chang et al. 2020, *Nature Struct Mol Biol* 27:1041–1047 — in-situ subtomogram averaging of cryo-vitrified Borrelia burgdorferi cells. Both maps are SPA-incompatible (native Na⁺-driven stators fall off on purification; conformational change requires proton motive force in native context).
+
+**Difficulty:** Semi-difficult. FliG C-terminal domain repositions ~15–25 Å during CCW↔CW switching. Same mass, same topology in both states — no domain additions/removals. Masked CC between clean maps at 13.33 Å/px: **0.631** (harder than motor_easy A-B: 0.539).
+
+**Specifications:**
+- Pixel size: 13.33 Å/px; box size: 96³; tilt-series: ±60°; reconstruction: IMOD WBP
+- Maps: EMD-21884/21886 resampled from 2.747 Å/px → 13.33 Å/px (Gaussian anti-alias + zoom); transposed to Y-axis convention; scaled ±9V per map independently; embedded in 96³ box (motor at z:[33-61], y:[23-71], x:[33-61])
+- Orientation model: membrane-perpendicular ZXZ (same as motor_easy); orient_pool 1000 entries, seed=42
+
+**GT-aligned average validation:**
+- CCW avg vs CW avg masked CC: 0.266 (averages structurally distinguishable)
+- Signal/background ratio in GT averages: 2.9–3.8× (structural signal confirmed)
+- WBP inverts density (same convention as motor_easy; negated avg correlates +0.11/+0.17 with own clean map)
+
+**Local pipeline:** `~/Research/synthetic_sta/motor_switch/production/`
+- Coord files: `coords/run_01–06.txt` (35p each), `run_junk.txt` (30p)
+- Merged particles: `subtomos/merged_ccw/`, `subtomos/merged_cw/`, `subtomos/merged_junk/`
+- Master list: `subtomos/all_particles/labels.csv` (ccw/cw/junk)
+- GT averages: `subtomos/avg_ccw_aligned.mrc`, `subtomos/avg_cw_aligned.mrc`
+- Run scripts: `~/Research/synthetic_sta/motor_switch/run_class_{ccw,cw,junk}.sh`
+
+---
+
 ## `etsimulation/` — Pipeline documentation and scripts
 
 Contains documentation, quirks, and research notes for the ETSimulations pipeline used

@@ -2,9 +2,11 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-08** by Eben (EMAN2 T4P no-align pipeline rerun complete; results + research.md committed).
+> Last updated: **2026-06-08** by Eben + Claude (EMAN2 T4P no-align rerun complete 405/273; motor_switch dataset COMPLETE — 200 CCW + 200 CW + 30 junk = 430 particles; benchmark reorganization — dataset-centric structure + naming convention).
 
 ## Now / Next / Parked
+
+- **MOTOR_SWITCH DATASET COMPLETE (2026-06-08):** Borrelia burgdorferi flagellar motor CCW↔CW rotational switching. EMD-21884 (CCW) + EMD-21886 (CW) resampled to 13.33 Å/px, transposed to Y-axis convention, scaled ±9V independently, embedded in 96³. Junk: Gaussian sphere at 0.01× amplitude. 6 runs × 35p for CCW and CW (6+6), 1 run × 30p for junk. All simulations + IMOD WBP reconstructions + extractions + merges complete. **Totals: 200 CCW + 200 CW + 30 junk = 430 particles**. GT-aligned averages computed (200p each); GT-avg CC between classes = 0.266 (inverted WBP convention, same as motor_easy). Structural signal confirmed: signal/background ratio 2.9–3.8× in averages. Maps: `~/Research/synthetic_sta/motor_switch/maps/scaled/`. Production: `~/Research/synthetic_sta/motor_switch/production/`. Master particle list: `production/subtomos/all_particles/labels.csv`. **Next: run RELION (GT-seeded firstiter_cc), PEET, and Dynamo on motor_switch k=2 to establish baseline ARIs; no package runs yet.** Difficulty: semi-difficult (same topology CCW↔CW, ~15–25 Å FliG remodeling). Masked CC between clean maps = 0.631 (harder than motor_easy A-B = 0.539).
 
 - **REPO REORGANIZED (2026-06-06):** All package dirs moved to `packages/` (dynamo, peet, relion, PyTom, eman2, opusTomo, STOPGAP, disca, tomoflow, protomo). Dataset QC moved to `data/` (T4P_subtomos, T4P_mask, alignment_review, masked_average). Synthetic pipeline moved to `synthetic/etsimulation/`. Background docs moved to `docs/`. New files: `packages/README.md` (master progress table), per-package READMEs (11 total), `data/README.md`, `synthetic/README.md`, `docs/excluded-packages.md`. Old lowercase `stopgap/` consolidated; `TomoNet/` removed. `.gitignore` updated: `*.pkl`, `*.mat` added; STOPGAP binary patterns updated to `packages/STOPGAP/exec/lib*/`. `/handoff` skill updated with Package README Protocol (step 1a). Committed + pushed `d4e931c`.
 
@@ -82,6 +84,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
   Alignment QC done (`alignment_review/`, `review_alignment.py`). **Expert ground truth (Stefano):
   two distinct pili-phase classes**, recovered by Dynamo — the reference split for the benchmark.
 - **Synthetic — motor_easy (3-class flagellar motor, ~30 Å differences):** **CLASS C RE-SIMULATED + merged_all_aln REBUILT (2026-06-05/06)** — C_noRodHook = C-ring only (CUT2_C=46.5 base px). 5 runs, 177 particles. `merged_all_aln/` rebuilt (A=246, B=271, C=177=694). GT-aligned avg: `production/subtomos/avg_classC_aligned.mrc`. GT avg CCs (new C): A-B=0.539, A-C=0.339, B-C=0.027. Results so far: RELION iter1 ARI=0.475, PEET k=2 ARI=0.116, Dynamo dpkpca k=3 ARI=0.200. Mask: r=32 px, center=(48,38), 96³ box. Scoring infra: `scripts/eval/`. `~/Research/synthetic_sta/motor_easy/production/`.
+- **Synthetic — motor_switch (2-class + junk, flagellar motor CCW↔CW, semi-difficult):** **COMPLETE 2026-06-08.** Borrelia burgdorferi (EMD-21884 CCW, EMD-21886 CW). 200 CCW + 200 CW + 30 junk = 430 particles total. GT-aligned avg CC (ccw vs cw) = 0.266. Signal/bkg ratio 2.9–3.8×. `~/Research/synthetic_sta/motor_switch/production/`. No package runs yet.
 
 ## Open Decisions (owner)
 
