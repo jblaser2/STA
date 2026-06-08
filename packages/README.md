@@ -1,11 +1,13 @@
 # Packages — Benchmark Progress
 
 This directory contains all 10 actively-tested classification packages. Each package has its
-own subdirectory with a `README.md` tracking current status, results, and next steps. This
-file provides the master progress overview across all packages and datasets.
+own subdirectory organized into per-dataset workstreams (`T4P/`, `FM_easy/`, `FM_hard/`, `T4SS/`).
 
-See [docs/excluded-packages.md](../docs/excluded-packages.md) for packages that were
-evaluated but not included in the benchmark.
+See [docs/datasets.md](../docs/datasets.md) for the authoritative protocol: k values, masks,
+junk class handling, naming convention, and missing-wedge policy.
+
+See [docs/excluded-packages.md](../docs/excluded-packages.md) for packages evaluated but not
+included in the benchmark.
 
 ---
 
@@ -13,44 +15,55 @@ evaluated but not included in the benchmark.
 
 Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — not applicable
 
-### T4P Real Dataset (672 prealigned 80³ subtomograms, 13.33 Å/px)
+### T4P Real Dataset (672 pre-aligned 80³ subtomograms, 13.33 Å/px)
 
-**Reference (Stefano — ring\_complete / ring\_altered / junk, 509/95/68):**
+**Protocol:** k=3 total (2 signal + 1 junk), cylindrical mask v2 (r=13, h_pos=0, h_neg=25),
+no alignment step. OPUS-TOMO uses threshold mask (package-level exception — VAE cannot use
+tight cylindrical). See `docs/datasets.md` for junk class handling per package.
+
+**Reference class averages (Stefano — ring_complete / ring_altered / junk, 509/95/68):**
 
 <img src="figures/T4P/reference_class_avgs.png" width="420">
 
-| Package | k=2 | k=3 | k=4 | Converged? | Class Avgs (best k) | Notes |
-|---------|-----|-----|-----|------------|---------------------|-------|
-| [Dynamo](dynamo/) | ✅ 447/225 | — | — | **Yes** (reference result) | <img src="dynamo/dynamo_final_results/class_comparison.png" width="150"> | HAC; recovers both known pili phases |
-| [PEET](peet/) | ✅ 374/230/68 | — | — | **Yes** | <img src="figures/T4P/peet_v2_class_avgs.png" width="150"> | Cylindrical mask v2 (r=13, below-center); junk class = bottom 68 by CCC |
-| [PyTom](PyTom/) | ✅ 440/232 | ✅ 422/150/100 | ⬜ | **Yes** | <img src="figures/T4P/pytom_k2_class_avgs.png" width="150"> | v2 cyl mask + `-a` flag; prev failure was wrong mask |
-| [OPUS-TOMO](opusTomo/) | ✅ 447/225 | ✅ | ✅ | **Partial** | _(pending — run `gen_class_avg_panels.py`)_ | Threshold mask (31.2%): K=2 splits; cyl mask collapses (VAE too restrictive) |
-| [RELION](relion/) | ✅ | ✅ | ✅ | **No** | — | Algorithm-level SNR failure; all 6 variants collapse to 672/0 |
-| [EMAN2](eman2/) | ✅ 393/279 | ⬜ | ⬜ | **No** | _(pending — run `gen_class_avg_panels.py`)_ | Misses the two phases; k=3/4 not yet run |
-| [DISCA](disca/) | ✅ | ✅ | ✅ | **No** | <img src="disca/results/disca_k2_classes.png" width="150"> | All k: ~94% dominant class + small noisy outlier |
-| [TomoFlow](tomoflow/) | ✅ | ✅ | ✅ | **No** | <img src="tomoflow/results/tomoflow_k2_classes.png" width="150"> | Unimodal landscape; k=3 two large classes CC=0.956 |
-| [ProTomo](protomo/) | ✅ | — | — | **No** | <img src="protomo/results/class_averages_slices.png" width="150"> | 2-class on 234 particles; CC=0.921; one dominant class |
-| [STOPGAP](STOPGAP/) | ⬜ | ⬜ | ⬜ | — | ⬜ | Owned by Eben; full pipeline in STOPGAP/; not yet run |
+| Package | T4P Status | Result (signal classes) | Mask | Converged? | Class Avgs | Notes |
+|---------|-----------|------------------------|------|------------|------------|-------|
+| [Dynamo](dynamo/) | 🟡 | 447/225 (junk pending) | cyl v2 (pending re-run) | **Yes** | <img src="dynamo/T4P/results/dynamo_final_results/class_comparison.png" width="150"> | HAC; reference result; re-run needed with k=3+junk |
+| [PEET](peet/) | ✅ | **374/230** (+68 junk) | cyl v2 | **Yes** | <img src="figures/T4P/peet_v2_class_avgs.png" width="150"> | Cyl mask v2 critical; junk class = bottom 68 by CCC |
+| [PyTom](PyTom/) | 🟡 | 440/232 (junk pending) | cyl v2 | **Yes** | <img src="figures/T4P/pytom_k2_class_avgs.png" width="150"> | `-a` flag + v2 mask both required; re-run needed with k=3+junk |
+| [OPUS-TOMO](opusTomo/) | 🟡 | 447/225 (junk pending) | threshold (31.2%) | **Partial** | _(pending)_ | Threshold mask required for VAE; junk pending; ARI vs GT pending |
+| [RELION](relion/) | ✅ (exhausted) | 672/0 | cyl v2 | **No** | — | Algorithm-level SNR failure; all configs collapse |
+| [EMAN2](eman2/) | 🟡 | 393/279 (old run) | — | **No** | _(pending)_ | Wedge-fill patch applied; canonical k=3 run needed |
+| [DISCA](disca/) | 🟡 | ~630/42 (old run) | none | **No** | <img src="disca/T4P/results/disca_k2_classes.png" width="150"> | ~94% dominant class; k=3 canonical run needed |
+| [TomoFlow](tomoflow/) | 🟡 | — (old run) | none | **No** | <img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="150"> | Unimodal; k=3 canonical run needed |
+| [ProTomo](protomo/) | ✅ | 234/0 (438 filtered) | none | **No** | <img src="protomo/T4P/results/class_averages_slices.png" width="150"> | Centering filter = junk removal; CC=0.921 trivial |
+| [STOPGAP](STOPGAP/) | ⬜ | — | cyl v2 | — | ⬜ | Owned by Eben; crash guard needed before run |
 
-### Synthetic Dataset — motor_easy (694 particles, 3 classes, 30 Å differences)
+---
 
-> Class C redesigned 2026-06-05 (C_noRodHook = C-ring only). Re-simulation + `merged_all_aln/`
-> rebuild complete (A=246, B=271, C=177=694). All scores below use new C_noRodHook definition.
+### Synthetic Dataset — FM_easy (694 particles, 3 classes, 30 Å differences)
 
-**Ground-truth class averages (A=246, B=271, C=177):** _(pending — run `gen_class_avg_panels.py` with local GT MRCs → `figures/motor_easy/reference_class_avgs.png`)_
+> Class C redesigned 2026-06-05 (C_noRodHook = C-ring only). A=246, B=271, C=177.
+> All scores use new C_noRodHook definition.
+> **Protocol:** k=3, no junk class. Mask: TBD (see `docs/datasets.md`).
 
 **Perfect confusion matrix (ARI = 1.0):**
 
 <img src="figures/motor_easy/perfect_confusion.png" width="300">
 
-| Package | k=3 ARI | k=3 Split | Class Avgs (best k) | Best Confusion | Notes |
-|---------|---------|-----------|---------------------|----------------|-------|
-| [RELION](relion/) | **0.475** (iter 1) | — | _(pending)_ | <img src="../outputs/relion_motor_easy/Class3D/k3_wedge_v3_694/confusion_relion_k3_k3_wedge_v3_694_iter1.png" width="200"> | GT-seeded firstiter_cc; collapses to ~0.16 by iter 2 |
-| [PEET](peet/) | 0.050 | — | _(pending)_ | <img src="../outputs/peet_motor_easy/confusion_peet_k2_k2_pc1_5_cnew.png" width="200"> | Best k=3; k=2 best ARI=0.116 (pc1_5) shown; WMD-PCA limitation |
-| [Dynamo](dynamo/) | **0.200** (k=3) | — | _(pending)_ | <img src="dynamo/dynamo_outputs/motor_easy_pca/confusion_dynamo_k3_k3_pca_nc_best_cnew.png" width="200"> | dpkpca nc=17 sweep; class B 96-99% pure; HAC ARI≈0 |
-| [OPUS-TOMO](opusTomo/) | 0.021 | 479/130/85 | _(pending)_ | <img src="../outputs/confusion_opus-tomo_k3_threshold_mask.png" width="200"> | Threshold mask (28.3%); C perfectly isolated but A/B unseparated; VAE collapses |
-| [PyTom](PyTom/) | **0.134** (k=3) | — | _(pending)_ | <img src="../outputs/relion_motor_easy/confusion_pytom_k3_motor_easy_k3_v2mask.png" width="200"> | v2 cyl mask; k=2 ARI=0.090; k=3 ARI=0.134 (best) |
-| All others | ⬜ | — | ⬜ | ⬜ | EMAN2, DISCA, TomoFlow, ProTomo, STOPGAP not yet run on motor_easy |
+| Package | FM_easy Status | k=3 ARI | Best Confusion | Notes |
+|---------|---------------|---------|----------------|-------|
+| [RELION](relion/) | ✅ | **0.475** (iter 1 GT) / 0.006 (blind) | <img src="../outputs/FM_easy/relion/run_r01/Class3D/k3_wedge_v3_694/confusion_relion_k3_k3_wedge_v3_694_iter1.png" width="200"> | GT-seeded upper bound only; collapses by iter 2 |
+| [PEET](peet/) | ✅ | 0.050 (k=3); **0.116** (k=2 best) | <img src="../outputs/FM_easy/peet/peet_motor_easy/confusion_peet_k2_k2_pc1_5_cnew.png" width="200"> | WMD-PCA limitation on uniform-wedge stacks |
+| [Dynamo](dynamo/) | ✅ | **0.200** (k=3 dpkpca) | <img src="dynamo/FM_easy/results/motor_easy_pca/confusion_dynamo_k3_k3_pca_nc_best_cnew.png" width="200"> | dpkpca nc=17; class B 96–99% pure |
+| [OPUS-TOMO](opusTomo/) | ✅ | 0.021 | <img src="../outputs/FM_easy/opus/confusion_opus-tomo_k3_threshold_mask.png" width="200"> | Class C isolated; A/B unseparated |
+| [PyTom](PyTom/) | ✅ | **0.134** (k=3) | <img src="../outputs/FM_easy/pytom/confusion_pytom_k3_motor_easy_k3_v2mask.png" width="200"> | v2 cyl mask |
+| All others | ⬜ | — | ⬜ | EMAN2, DISCA, TomoFlow, ProTomo, STOPGAP not yet run |
+
+---
+
+### FM_hard (Planned) and T4SS (Planned)
+
+No runs yet. See `docs/datasets.md` for planned parameters.
 
 ---
 
@@ -58,16 +71,16 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — not a
 
 | Package | Algorithm | Environment | Key Characteristic |
 |---------|-----------|-------------|-------------------|
-| **Dynamo** | Hierarchical agglomerative clustering (HAC) on PCA-reduced subtomogram distances | MATLAB | Reference result for T4P benchmark; recovers both conformational states cleanly |
-| **PEET** | PCA + k-means on aligned subtomograms with cylindrical masks; WMD weighting | IMOD (`imod` env) | Best result with cylindrical mask aligned to T4P complex axis |
-| **PyTom** | FRM-based rotational alignment + k-means classification with cylindrical focus mask | `pytom_env` | Required `-a` flag (FRM module absent) and v2 cylindrical mask to converge |
-| **OPUS-TOMO** | Variational autoencoder (VAE) continuous latent-space clustering | `opuset` (cu128 PyTorch) | 4 bugs patched; K=2 successful with threshold mask; cyl mask too restrictive for VAE |
-| **RELION** | Soft EM (3D maximum-likelihood classification) | `relion-5.0` | Classic 3D subtomogram path retained in RELION 5; algorithm-level failure on low-SNR T4P |
-| **EMAN2** | PCA split on subtomogram stack with optional wedge-fill | `eman2` | Pre-aligned identity-pose particles; wedge-fill patch applied (2026-06-05) |
-| **DISCA** | Template-free deep unsupervised clustering (pytorch) | `disca` | Misses two T4P phases; good test of deep unsupervised methods |
-| **TomoFlow** | ContinuousFlex optical-flow-based conformational classification | `tomoflow` | Required CUDA texture-ref porting for sm_120; landscape unimodal |
-| **ProTomo (I3)** | Iterative alignment + classification on centered subtomograms | native binary | Edge-filtered to 234/672 particles; 2-class only |
-| **STOPGAP** | Subtomogram averaging + PCA + k-means (MATLAB MCR) | MATLAB R2023b MCR | Owned by Eben; full source + pipeline scripts committed |
+| **Dynamo** | HAC on PCA-reduced subtomogram distances | MATLAB | Reference result for T4P; recovers both conformational states |
+| **PEET** | PCA + k-means with cylindrical masks; WMD weighting | IMOD | Best result with cyl v2 mask; built-in CCC-based junk class |
+| **PyTom** | FRM-based rotational alignment + k-means with cylindrical focus mask | `pytom_env` | Requires `-a` flag and v2 mask; both critical |
+| **OPUS-TOMO** | Variational autoencoder (VAE) continuous latent-space clustering | `opuset` (cu128 PyTorch) | 4 bugs patched; threshold mask required (cyl too restrictive for VAE) |
+| **RELION** | Soft EM (3D maximum-likelihood classification) | `relion-5.0` | Algorithm-level failure on low-SNR T4P; FM_easy GT-seeded ARI=0.475 |
+| **EMAN2** | PCA split on subtomogram stack with wedge-fill | `eman2` | Wedge-fill patch applied 2026-06-05; canonical k=3 run needed |
+| **DISCA** | Template-free deep unsupervised clustering (pytorch) | `disca` | ~94% dominant class at all k — no domain priors = SNR failure |
+| **TomoFlow** | ContinuousFlex optical-flow conformational classification | `tomoflow` | Unimodal landscape; CUDA texture-ref porting for sm_120 |
+| **ProTomo (I3)** | Iterative alignment + multi-reference classification | native binary | 438/672 filtered; centering filter acts as junk removal |
+| **STOPGAP** | Subtomogram averaging + PCA + k-means (MATLAB MCR) | MATLAB R2023b MCR | Owned by Eben; pipeline ready; not yet run |
 
 ---
 
@@ -79,8 +92,9 @@ See [docs/excluded-packages.md](../docs/excluded-packages.md) for TomoNet, emCla
 
 ## How to Update This File
 
-After any STATUS.md update that touches a package result:
+After any result changes:
 1. Update the relevant row in the Progress Matrix above
-2. Update `packages/<pkg>/README.md` (results table + next steps)
+2. Update `packages/<pkg>/README.md` results summary table
 
-See `CLAUDE.md` §"Package README Protocol" for the full rule.
+See `docs/datasets.md` for naming convention and canonical parameters.
+See `CLAUDE.md` §"Package README Protocol" for the full update rule.

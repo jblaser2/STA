@@ -1,45 +1,40 @@
 # TomoFlow
 
-**Algorithm:** ContinuousFlex optical-flow-based conformational classification (requires subtomogram average reference)  
+**Algorithm:** ContinuousFlex optical-flow-based conformational classification  
 **Environment:** `tomoflow` conda env  
-**Status:** ✅ T4P k=2/3/4 complete — unimodal landscape, did not separate the two phases
+**Status:** ✅ T4P k=2 complete (unimodal landscape) — lower priority for remaining datasets
 
 ---
 
-## Results
+## Results Summary
 
-### T4P Real Dataset (672 particles)
+| Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
+|---------|--------|--------------------|------|-----|-------|-------|
+| **T4P** | ✅ | k=3 / k=2 | none | — (no GT) | — | Unimodal landscape; k=3 two large classes CC=0.956; did not separate phases |
+| **FM_easy** | ⬜ | k=3 / k=3 | none | — | — | Lower priority given T4P result |
+| **FM_hard** | ⬜ | — | — | — | — | Not yet run |
+| **T4SS** | ⬜ | — | — | — | — | Not yet run |
 
-| k | Outcome | Converged? |
-|---|---------|------------|
-| 2 | One dominant class | **No** |
-| 3 | Two large classes CC=0.956 + small third | **No** |
-| 4 | Similar collapse | **No** |
-
-The conformational landscape is effectively unimodal — k=3 produces two large classes with
-cross-correlation 0.956, meaning they are nearly identical. TomoFlow treats the T4P ensemble
-as a single structural state.
-
-### Synthetic — motor_easy
-
-Not yet run.
+> T4P: ran k=2, k=3, k=4 historically — all showed same collapse. Protocol run (k=3 with junk)
+> not yet done. Given the T4P result, FM_easy is lower priority.
 
 ---
 
 ## Key Findings
 
-- Optical-flow-based methods assume a continuous conformational landscape; T4P may have too
-  discrete a transition for this model.
-- Unlike MDTOMO/HEMNMA-3D, TomoFlow needs only a subtomogram-average reference (not an atomic
-  model), so it was included in the benchmark.
-- Required porting of `farneback3d` off CUDA texture-references for CUDA 13.2 / sm_120
-  (RTX 5080 specific). See `research.md` §2 for the patch details.
+- Optical-flow methods assume a continuous conformational landscape; T4P may have too discrete
+  a transition for this model (binary ring-complete vs ring-altered states).
+- k=3: two large classes with CC=0.956 — nearly identical; third class captures outliers.
+- Requires subtomogram-average reference (not an atomic model) — hence included in benchmark.
+- Required porting `farneback3d` off CUDA texture-references for CUDA 13.2 / sm_120 (RTX 5080).
+  See `research.md` §2 for the patch details.
 
 ---
 
 ## Next Steps
 
-- Run on motor_easy after class C re-simulation (lower priority given T4P result).
+- T4P: run k=3 (2+junk) per protocol.
+- FM_easy: run k=3 when bandwidth allows (lower priority).
 
 ---
 
@@ -47,6 +42,8 @@ Not yet run.
 
 | Path | Description |
 |------|-------------|
-| `packages/tomoflow/research.md` | Workflow notes; CUDA texture-ref porting patch for sm_120 |
-| `packages/tomoflow/results/` | Output directory |
+| `T4P/results/tomoflow_k2_classes.png` | k=2 result figure (both classes nearly identical) |
+| `T4P/results/tomoflow_landscape.png` | Conformational landscape visualization |
+| `T4P/results/RESULTS.md` | Run notes and output details |
+| `research.md` | Workflow notes; CUDA texture-ref porting patch for sm_120 |
 | `scripts/data_prep/tomoflow_run.py` | Input preparation and run script |

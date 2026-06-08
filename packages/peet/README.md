@@ -1,34 +1,24 @@
 # PEET
 
-**Algorithm:** PCA + k-means on aligned subtomograms with cylindrical masks; WMD (wedge-model-based) weighting  
+**Algorithm:** PCA + k-means on aligned subtomograms with cylindrical masks; WMD weighting  
 **Environment:** IMOD (system install)  
-**Status:** ✅ T4P complete (two runs) · ✅ motor_easy run (ARI=0.026, WMD limitation confirmed)
+**Status:** ✅ T4P complete (v2 mask, best result) · ✅ FM_easy complete (WMD limitation confirmed)
 
 ---
 
-## Results
+## Results Summary
 
-### T4P Real Dataset (672 particles)
+| Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
+|---------|--------|--------------------|------|-----|-------|-------|
+| **T4P** | ✅ | k=3 / k=2 | cyl v2 | — (no GT) | **374 / 230** (+68 junk) | Converged; junk class matches Stefano's bottom-68-by-CCC exactly |
+| **FM_easy** | ✅ | k=3 / k=3 | — | **0.050** (k=3); 0.116 (k=2) | — | WMD-PCA broken on uniform-wedge stacks; set WMD=off |
+| **FM_hard** | ⬜ | — | — | — | — | Not yet run |
+| **T4SS** | ⬜ | — | — | — | — | Not yet run |
 
-| Run | Mask | k | Split | AIC | Converged? |
-|-----|------|---|-------|-----|------------|
-| v1 | Cylindrical r=11.2, h_pos=9.8, h_neg=15.8 | 3 | 388 / 216 / 68 | 518 | **Yes** |
-| v2 (best) | Cylindrical r=13, h_pos=0, h_neg=25 (below-center) | 3 | **374 / 230 / 68** | 659 | **Yes** |
-
-**v2 is the canonical result.** Class labels: `ring_complete` / `ring_altered` / `junk`.
-The junk class (68 particles) matches exactly the bottom-68-by-CCC set flagged by Stefano.
-
-Key insight: with the cylindrical mask, PC1 captures structural signal (include it). With a
-sphere mask, PC1 captures noise (exclude it). The mask geometry is critical.
-
-### Synthetic — motor_easy (694 particles)
-
-| Config | k | ARI | Notes |
-|--------|---|-----|-------|
-| WMD-PCA, r=32px mask | 3 | **0.026** | Confirms WMD-PCA limitation on uniform-wedge pre-aligned stacks |
-
-WMD weights are not meaningful when all particles have identical tilt geometry (pre-aligned
-identity poses). This is expected; motor_easy was included to validate the scoring pipeline.
+> T4P canonical result: v2 mask (r=13, h_pos=0, h_neg=25, below-center only), k=3 (2+junk).
+> Class labels: `ring_complete` (374) / `ring_altered` (230) / `junk` (68).
+> With cylindrical mask, PC1 captures structural signal (include it). With sphere mask, PC1
+> captures noise (exclude it).
 
 ---
 
@@ -36,7 +26,7 @@ identity poses). This is expected; motor_easy was included to validate the scori
 
 - Cylindrical mask aligned to the complex axis is essential — sphere masks suppress the structural PC.
 - v2 (below-center only, r=13) is best; extending above the pilus entry point adds noise.
-- WMD-PCA should be avoided for uniform-wedge pre-aligned stacks (motor_easy ARI ≈ 0).
+- WMD-PCA meaningless for uniform-wedge pre-aligned stacks — set `flgWedgeWeight=0` always.
 - Best available soft-GT for the real-data benchmark track until Stefano's MOTL files are shared.
 
 ---
@@ -52,11 +42,13 @@ identity poses). This is expected; motor_easy was included to validate the scori
 
 | Path | Description |
 |------|-------------|
-| `packages/peet/results/` | Class average figures; v1/v2 mask comparison PNG |
-| `packages/peet/motor_easy.prm` | PEET project file for synthetic data |
-| `packages/peet/motor_easy_stack.py` | Synthetic data stack-building script |
-| `packages/peet/kmeans_motor_easy.py` | k-means scoring script for motor_easy |
-| `packages/peet/PEET_classification_research.md` | Detailed research notes |
-| `packages/peet/PEET_usage_guide.md` | Usage guide |
-| `outputs/peet_motor_easy/` | Synthetic run outputs |
-| `results/` | Aggregated scoring CSVs |
+| `T4P/results/class_averages_v2_masked_xy_diff.png` | Canonical T4P result figure |
+| `T4P/results/mask_v2_preview.png` | Cylindrical mask v2 preview (middle column = canonical mask) |
+| `T4P/results/peet_final_class_assignments_v2.csv` | Per-particle class assignments (374/230/68) |
+| `T4P/configs/peet_project_single.prm` | PEET project file for T4P |
+| `T4P/scripts/` | Class average generation, comparison scripts |
+| `T4P/PEET_usage_guide.md` | Parameter reference and mask notes |
+| `T4P/PEET_classification_research.md` | Detailed research notes |
+| `FM_easy/configs/motor_easy.prm` | PEET project file for FM_easy |
+| `FM_easy/scripts/` | k-means scoring and stack-building scripts |
+| `outputs/FM_easy/peet/` | FM_easy run outputs (confusion PNGs, prediction CSVs) |

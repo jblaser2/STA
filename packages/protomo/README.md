@@ -2,41 +2,36 @@
 
 **Algorithm:** Iterative 3D alignment + multi-reference classification on centered subtomograms  
 **Environment:** Native binary (I3 / ProTomo 3.1.0, system install)  
-**Status:** ✅ T4P 2-class run complete — did not separate the two phases
+**Status:** ✅ T4P 2-class run complete (did not separate the two phases) — lower priority for remaining datasets
 
 ---
 
-## Results
+## Results Summary
 
-### T4P Real Dataset (672 → 234 centered particles)
+| Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
+|---------|--------|--------------------|------|-----|-------|-------|
+| **T4P** | ✅ | k=2 / k=2 | none | — (no GT) | 234 particles (438 filtered) | CC=0.921 between classes; trivial solution; centering filter acts as junk removal |
+| **FM_easy** | ⬜ | k=3 / k=3 | none | — | — | Lower priority |
+| **FM_hard** | ⬜ | — | — | — | — | Not yet run |
+| **T4SS** | ⬜ | — | — | — | — | Not yet run |
 
-| k | Particles | CC | Converged? |
-|---|-----------|-----|------------|
-| 2 | 234 (of 672) | 0.921 | **No** |
-
-Only 234 of 672 particles passed the centering/edge filter (438 edge-filtered). The 2-class
-result gives CC=0.921 between classes, meaning they are nearly identical — one dominant class
-with no structural differentiation.
-
-### Synthetic — motor_easy
-
-Not yet run.
+> T4P note: ProTomo's centering/edge filter removes 438 of 672 particles before classification —
+> this acts as junk removal at the pre-classification stage, so k=2 is the reported result.
+> Standard protocol (k=3, 2+junk) does not apply in the same way as other packages.
 
 ---
 
 ## Key Findings
 
-- ProTomo's edge-filtering step discards a large fraction of T4P particles (438/672 removed),
-  reducing statistical power before classification begins.
-- The high inter-class CC (0.921) indicates the method converged to a trivial solution.
-- I3/ProTomo is primarily an alignment package; classification is a secondary capability.
+- Centering filter discards 438/672 particles — reduces statistical power before classification.
+- High inter-class CC (0.921) indicates trivial solution; one dominant class.
+- ProTomo is primarily an alignment package; classification is a secondary capability.
 
 ---
 
 ## Next Steps
 
-- Lower priority given T4P result; revisit if motor_easy results from other packages suggest
-  a path where alignment quality is the bottleneck.
+- Lower priority given T4P result. Revisit only if alignment quality is identified as the bottleneck.
 
 ---
 
@@ -44,6 +39,6 @@ Not yet run.
 
 | Path | Description |
 |------|-------------|
-| `packages/protomo/research.md` | Detailed workflow and configuration notes |
-| `packages/protomo/results/` | Output directory |
-| `packages/protomo/tutorial/` | Example data |
+| `T4P/results/class_averages_slices.png` | Central slice comparison of two classes |
+| `T4P/results/clustering_scatter.png` | Clustering scatter plot |
+| `research.md` | Detailed workflow and configuration notes |
