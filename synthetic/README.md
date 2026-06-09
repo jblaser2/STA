@@ -28,8 +28,10 @@ package runs reflect the redesigned classes.
 **Specifications:**
 - Pixel size: 13.33 Å/px (matched to real T4P data)
 - Box size: 80³ (particles), 96³ (reconstruction)
-- Tilt-series: ±60°, simulated with ETSimulations
-- Reconstruction: IMOD WBP
+- Tilt-series: ±54°, 3° step (37 tilts), simulated with ETSimulations + TEM-Simulator
+- CTF: applied at simulation (1 µm underfocus); **no CTF correction** before reconstruction
+- Reconstruction: IMOD WBP, `-RADIAL "0.35,0.05"` filter; **no missing wedge compensation**
+- Missing wedge: ~72° uncompensated cone; affects all particles equally (deliberate, matches real data conditions)
 - SNR: matched to real T4P data
 
 **Ground-truth separability (old class C):**
@@ -56,7 +58,10 @@ package runs reflect the redesigned classes.
 **Difficulty:** Semi-difficult. FliG C-terminal domain repositions ~15–25 Å during CCW↔CW switching. Same mass, same topology in both states — no domain additions/removals. **Pixel size chosen as 5 Å/px** (not 13.33 like motor_easy) because FliG difference is sub-pixel at 13.33 Å/px (1.1–1.9 vox → ARI≈0); 5 Å/px gives 3–5 vox difference. Typical published in-situ STA of flagellar motors uses 3–8 Å/px. Masked CC between clean maps at 5 Å/px: **0.650** (vs motor_easy A-B: 0.539). GT-avg CC: **0.615**.
 
 **Specifications:**
-- Pixel size: **5 Å/px**; box size: **160³**; tilt-series: ±60°; reconstruction: IMOD WBP (THICKNESS=350)
+- Pixel size: **5 Å/px**; box size: **160³**; tilt-series: ±60°, 3° step (41 tilts)
+- CTF: applied at simulation (~1 µm underfocus); **no CTF correction** before reconstruction
+- Reconstruction: IMOD WBP (THICKNESS=350), `-RADIAL "0.35,0.05"` filter; **no missing wedge compensation**
+- Missing wedge: ~60° uncompensated cone; affects all particles equally (deliberate)
 - Maps: EMD-21884/21886 resampled from 2.747 Å/px → 5 Å/px (Gaussian anti-alias + zoom 0.5494×); transposed to Y-axis convention (Z→Y); scaled ±9V per map independently; embedded in 160³ (motor 77×132×77 at Y-offset 14)
 - Orientation model: membrane-perpendicular ZXZ (same as motor_easy); orient_pool reused (seed=42)
 - Sim config: magnification=30000, det=1000×1000 (5 Å/px at detector); no reconstruct_metadata.py needed (metadata written before kill at this detector size)

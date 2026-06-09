@@ -216,6 +216,54 @@ directory, edit it, and point `config:` in `configs.yaml` to the local copy.
 
 ---
 
+## CTF, Reconstruction Method, and Missing Wedge
+
+### CTF
+
+TEM-Simulator **applies CTF during simulation** using the defocus specified in `sim.txt`
+(or overridden by `defocus_values` in `configs.yaml`). The output tilt series therefore
+contains realistic phase-contrast modulation.
+
+**No CTF correction is applied before or during reconstruction.** This matches standard
+real-data STA workflows where per-tilt CTF estimation and correction are often deferred
+to refinement inside the classification package (e.g., RELION's CTF refinement), not
+performed at the WBP stage.
+
+### Reconstruction: IMOD WBP with radial filter
+
+All datasets are reconstructed with IMOD's `tilt` program using **Weighted Back Projection**:
+
+```bash
+tilt -InputProjections <ts.mrc> -OutputFile <rec.mrc> \
+     -TILTFILE <angles.rawtlt> -THICKNESS <px> -RADIAL "0.35,0.05"
+```
+
+- **Algorithm:** WBP — no SART, no SIRT.
+- **`-RADIAL "0.35,0.05"`:** Low-pass radial filter applied in Fourier space during
+  back-projection. Cuts at 0.35× Nyquist with a 0.05 cosine falloff. This is the
+  "weighting" step, not a full ramp/Ram-Lak filter, but it is the standard IMOD default
+  and matches how most published cryoET workflows reconstruct tomograms.
+- Output is `clip rotx`-ed (90° rotation around X) so the Z axis in the MRC array
+  corresponds to the physical Z axis of the sample.
+
+### Missing wedge
+
+The tilt range (±54° for motor_easy/nora_test, ±60° for motor_switch) leaves a
+**~72° or ~60° missing wedge**, respectively, along the beam axis. This missing cone of
+Fourier-space information is present and uncompensated in all subtomograms. Effects:
+
+- Density is elongated along Z (the tilt axis normal) — the "missing wedge artifact."
+- Resolution is anisotropic: lateral (XY) resolution is much better than axial (Z).
+- The artifact affects all particles equally, since all come from the same tilt geometry
+  and the orientation pool is membrane-constrained (motors upright).
+
+**This is deliberate.** Real experimental subtomograms are not missing-wedge-compensated
+at the reconstruction stage. Introducing compensation here would make the synthetic data
+easier than real data and would not reflect what classification packages actually receive
+as input in practice. The benchmark is designed to test packages under realistic conditions.
+
+---
+
 ## Completed Test Runs
 
 | Run | Map | Particles | Stacks | Output |
