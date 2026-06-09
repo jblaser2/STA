@@ -51,7 +51,7 @@ else:
 
 hdf_files = sorted(
     f for f in glob.glob(os.path.join(sptcls_dir, "threed_*.hdf"))
-    if not (f.endswith("_even.hdf") or f.endswith("_odd.hdf"))
+    if not ("_even" in f or "_odd" in f or "unmasked" in f)
 )
 if not hdf_files:
     print(f"ERROR: No threed_*.hdf files found in {sptcls_dir}/")
@@ -74,7 +74,16 @@ col_labels = [
 
 for row, hdf_path in enumerate(hdf_files):
     cls_name = os.path.splitext(os.path.basename(hdf_path))[0]
-    print(f"  Loading {hdf_path}")
+    # Count particles in matching lst file
+    lst_path = os.path.join(sptcls_dir, cls_name.replace("threed_", "ptcls_cls") + ".lst")
+    n_ptcls = 0
+    if os.path.exists(lst_path):
+        with open(lst_path) as f:
+            lines = [l for l in f if not l.startswith("#") and l.strip()]
+        n_ptcls = len(lines)
+    row_label = f"{cls_name}\n(n={n_ptcls})"
+
+    print(f"  Loading {hdf_path}  [{n_ptcls} particles]")
     arr = load_volume(hdf_path)
     images = central_slices(arr) + mip(arr)
 
@@ -86,7 +95,7 @@ for row, hdf_path in enumerate(hdf_files):
         if row == 0:
             ax.set_title(col_labels[col], fontsize=9)
         if col == 0:
-            ax.set_ylabel(cls_name, fontsize=9)
+            ax.set_ylabel(row_label, fontsize=9)
 
     # vertical divider between slices and MIPs
     if row == 0:
