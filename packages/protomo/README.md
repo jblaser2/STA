@@ -2,7 +2,7 @@
 
 **Algorithm:** Iterative 3D alignment + multi-reference classification on centered subtomograms  
 **Environment:** Native binary (I3 / ProTomo 3.1.0, system install)  
-**Status:** ✅ T4P 2-class run complete (did not separate the two phases) — lower priority for remaining datasets
+**Status:** ✅ T4P 2-class run complete on all 672 particles (did not separate the two phases) — lower priority for remaining datasets
 
 ---
 
@@ -10,31 +10,27 @@
 
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
-| **T4P** | 🟡 | k=2 / k=2 | none | — (no GT) | 234 particles (438 filtered) → rerun all 672 in progress | CC=0.921 between classes; trivial solution; edge filter discarded 65% of particles — see limitation note below |
+| **T4P** | ✅ | k=2 / k=2 | none | — (no GT) | 352/194/126 junk (all 672) | CC=0.921 between classes; trivial solution — same result as 234-particle run. Symlink rebuild required after repo reorg (June 2026). See limitation note below. |
 | **FM_easy** | ⬜ | k=3 / k=3 | none | — | — | Lower priority |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 
-> **T4P edge-filter limitation:** ProTomo's `.i3i` format stores original tomogram bounds for
-> each particle. When individual pre-extracted 80³ MRCs are assembled into a dataset, ProTomo
-> checks whether each extraction box has ≥80% overlap with its source tomogram volume
-> (`MRAAREA=0.8`). 438 of 672 T4P particles (65%) fail this check because they were picked
-> near the z-boundaries of their source tomograms without a margin exclusion. The initial run
-> used the 234 "fully-centred" particles only. All other benchmark packages ingest the
-> pre-extracted MRCs directly and do not apply this check — so the initial ProTomo result is
-> **not comparable** to the rest of the benchmark. A rerun on all 672 is in progress
-> (`~/Research/protomo/full672/`): `MRAPKR="0 0 0"` (translation-free, particles prealigned) and
-> `MSAIMGSIZE="32 32 32"` (SVD uses only the central 32³ cube, unaffected by edge zero-padding)
-> should make the classification valid even for edge particles. Class averages may appear
-> slightly off-axis for the edge-particle subset but the SVD-based class assignments are valid.
+> **T4P edge-filter note:** ProTomo's `MRAAREA` parameter checks whether each particle's
+> aligned position falls within 80% of the box volume. 438/672 T4P particles (65%) have
+> overlap 0.63–0.64 — they were picked near the z-boundaries of their source tomograms,
+> leaving one side of the 80³ box zero-padded. The initial run filtered these to 234
+> particles only. The full-672 rerun used `MRAPKR="0 0 0"` (no translation search) and
+> `MRAAREA=0.0` (no overlap filtering) with `MSAIMGSIZE="32 32 32"` (SVD on central 32³
+> cube only, unaffected by edge zero-padding). Result is identical: CC=0.921 — the zero-
+> padded particles do not affect classification. The repo reorganization (2026-06-06) also
+> broke the symlinks in `prepare/stacks/`; these were rebuilt pointing to `data/T4P_subtomos/`.
 
 ---
 
 ## Key Findings
 
-- **Initial run used only 234/672 particles** — not comparable to other benchmark packages.
-  Root cause: ProTomo's `.i3i` metadata check discarded 438 particles as "near-edge" (see limitation note above). Rerun on all 672 in progress.
-- High inter-class CC (0.921) in 234-particle run indicates trivial solution; one dominant class.
+- Full-672 rerun complete: split 352/194/126 junk, inter-class CC=0.921 — identical to the 234-particle result. The edge particles do not affect the classification outcome.
+- High inter-class CC (0.921) confirms ProTomo does not separate the two T4P phases — one dominant class.
 - ProTomo is primarily an alignment package; classification is a secondary capability.
 
 ---
