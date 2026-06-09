@@ -25,6 +25,16 @@
 > padded particles do not affect classification. The repo reorganization (2026-06-06) also
 > broke the symlinks in `prepare/stacks/`; these were rebuilt pointing to `data/T4P_subtomos/`.
 
+> **⚠️ Cylindrical mask not used — pending revisit:** ProTomo 3.1.0 does **not** support a
+> cylindrical mask type. Supported shapes: `elliptic`, `Gaussian`, `rectangular`, and `molecular`
+> (external MRC file). Current config uses `elliptic 35 35 35` (radius-35 sphere ≈ whole box),
+> providing almost no structural discrimination. The benchmark protocol requires the v2 cylindrical
+> mask (r=13). This CAN be added via `MRAMOLMSK` pointing to `data/T4P_mask/cylindrical_mask_v2.mrc`
+> without changing the native mask type — but requires a re-run from `subvolalign.sh` onward.
+> Since ProTomo is already confirmed to not separate T4P phases (CC=0.921 trivial), this re-run
+> is deferred. If revisiting: also set `MRAPKR="5 5 0"` to allow XY centering (T4P is ~4 px
+> off-center in Y).
+
 ---
 
 ## Key Findings
