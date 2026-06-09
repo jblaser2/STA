@@ -2,7 +2,7 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-09** by Claude (motor_switch PEET k=2 complete — ARI≈0; RELION ARI corrected to 0.379; packages/README.md FM_switch section added).
+> Last updated: **2026-06-09** by Claude (ProTomo T4P corrected: converges on right phases, numbers fixed 352→334/194→212/CC=0.921→0.943; PyTom T4P class avg figure fixed; eman2 README wording cleanup).
 
 ## Now / Next / Parked
 
