@@ -2,7 +2,7 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-09** by Josh + Claude (ProTomo full-672 rerun complete; EMAN2 canonical T4P k=3 complete — 270/317+85 junk; motor_switch re-simulated at 5 Å/px).
+> Last updated: **2026-06-09** by Claude (motor_switch PEET k=2 complete — ARI≈0; RELION ARI corrected to 0.379; packages/README.md FM_switch section added).
 
 ## Now / Next / Parked
 
@@ -12,7 +12,7 @@
 
 - **BENCHMARK REORGANIZATION PUSHED (2026-06-09):** Dataset-centric structure (`T4P/`, `FM_easy/`, `FM_hard/`, `T4SS/` subdirs in all 10 packages), `docs/datasets.md` created, naming convention documented. Merged with Eben's EMAN2 k=2 result (19b3f04). All pushed.
 
-- **MOTOR_SWITCH RE-SIMULATED AT 5 Å/px + RELION COMPLETE (2026-06-09):** Original 13.33 Å/px simulation gave ARI≈0. Borrelia maps (EMD-21884/21886) re-simulated at 5 Å/px, 160³ box, 208 CCW + 208 CW + 35 junk = 451 particles. GT-avg CC=0.615, signal/bkg 2.1–2.5×. **RELION GT-seeded k=2 (v3, GT-aligned particles + firstiter_cc):** iter1 ARI=**0.445** (AMI=0.352, V=0.353). Class 1: 170/31 CCW/CW (77% pure); Class 2: 38/177 CCW/CW (77% pure). Collapses to ARI≈0 by iter5 (same pattern as motor_easy). GT-aligned particles at `production_5apix/subtomos/all_particles_aligned/`. Script: `scripts/run_relion_motor_switch_v3.sh`; output: `outputs/FM_switch/relion/run_r02/Class3D/k2_v3/`. **Next: run PEET and Dynamo on motor_switch k=2.**
+- **MOTOR_SWITCH — RELION + PEET COMPLETE (2026-06-09):** Borrelia flagellar motor CCW↔CW, 5 Å/px, 160³, 208 CCW + 208 CW + 35 junk = 451 particles. GT-avg CC=0.615. **RELION GT-seeded k=2 (v3):** iter1 ARI=**0.379** (AMI=0.279, V=0.281, Acc=0.769). Class 1: 170 CCW/31 CW (77% CCW); Class 2: 38 CCW/177 CW (77% CW). Collapses to ARI≈0 by iter5. GT-aligned particles at `production_5apix/subtomos/all_particles_aligned/`. Script: `scripts/run_relion_motor_switch_v3.sh`. **PEET k=2 (WMD-PCA):** ARI=**0.007** (best pc1_10) — CCW/CW equally split across both clusters; same WMD-PCA limitation as FM_easy. Stack: `~/Research/peet/motor_switch/results/stacked.mrc`; scripts: `packages/peet/FM_switch/scripts/`. Scores in `results/synthetic_scores.csv`. **Next: run Dynamo on motor_switch k=2.**
 
 - **REPO REORGANIZED (2026-06-06):** All package dirs moved to `packages/` (dynamo, peet, relion, PyTom, eman2, opusTomo, STOPGAP, disca, tomoflow, protomo). Dataset QC moved to `data/` (T4P_subtomos, T4P_mask, alignment_review, masked_average). Synthetic pipeline moved to `synthetic/etsimulation/`. Background docs moved to `docs/`. New files: `packages/README.md` (master progress table), per-package READMEs (11 total), `data/README.md`, `synthetic/README.md`, `docs/excluded-packages.md`. Old lowercase `stopgap/` consolidated; `TomoNet/` removed. `.gitignore` updated: `*.pkl`, `*.mat` added; STOPGAP binary patterns updated to `packages/STOPGAP/exec/lib*/`. `/handoff` skill updated with Package README Protocol (step 1a). Committed + pushed `d4e931c`.
 

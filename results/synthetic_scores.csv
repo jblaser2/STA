@@ -36,3 +36,7 @@ pytom,motor_easy,2,motor_easy_k2_v2mask,694,0.089961,0.082516,0.084010,0.474063,
 pytom,motor_easy,3,motor_easy_k3_v2mask,694,0.027334,0.032741,0.035325,0.397695,outputs/relion_motor_easy/pytom_motor_easy_k3.csv,
 pytom,motor_easy,3,motor_easy_k3_v2mask,694,0.134116,0.118826,0.121229,0.521614,outputs/relion_motor_easy/pytom_motor_easy_k3.csv,
 opus-tomo,motor_easy,3,threshold_mask,694,0.021115,0.123923,0.126586,0.436599,/home/jblaser2/Research/STA/outputs/opus_tomo_motor_easy_k3.csv,
+peet,motor_switch,2,k2_pc1_3,451,0.005410,0.060021,0.062918,0.552106,outputs/FM_switch/peet/predictions_k2_pc1_3.csv,
+peet,motor_switch,2,k2_pc1_5,451,0.000439,0.057766,0.060410,0.492239,outputs/FM_switch/peet/predictions_k2_pc1_5.csv,
+peet,motor_switch,2,k2_pc1_10,451,0.006830,0.062224,0.064852,0.507761,outputs/FM_switch/peet/predictions_k2_pc1_10.csv,
+relion,motor_switch,2,k2_v3_GT_seeded_iter1,451,0.378898,0.279452,0.281461,0.769401,outputs/FM_switch/relion/run_r02/relion_motor_switch_k2_v3_it1.csv,GT-seeded+firstiter_cc+skip_align; iter1 best; collapses by iter5

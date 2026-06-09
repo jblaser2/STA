@@ -1,0 +1,54 @@
+# PEET parameter file — motor_switch 5 A/px synthetic data
+# 451 GT-aligned subtomograms (160^3, 5.0 A/px) stacked along Z
+# Particles at (80, 80, 80+i*160) for i=0..450
+# Identity MOTL — all euler angles = 0 (particles already GT-aligned)
+# tiltRange [-60,60] + flgWedgeWeight=1 — native WMD in Fourier space
+# pcaFnParticleMask: RELION ellipsoidal solvent mask (r_xz=38, r_y=65 + soft edge)
+#   Motor occupies Y:[14:146], XZ:[41:118] in 160^3 box.
+# szVol=160 (full box): no alignment search needed.
+# outsideMaskRadius=74: full-box sphere for averaging reference computation.
+
+fnVolume = {'/home/jblaser2/Research/peet/motor_switch/results/stacked.mrc'}
+fnModParticle = {'/home/jblaser2/Research/peet/motor_switch/results/stacked.mod'}
+
+initMOTL = {'/home/jblaser2/Research/peet/motor_switch/results/motor_switch_MOTL_Tom1_Iter1.csv'}
+
+fnOutput = 'motor_switch'
+szVol = [160 160 160]
+
+maskType = 'sphere'
+insideMaskRadius = 0
+outsideMaskRadius = 74
+
+pcaFnParticleMask = '/home/jblaser2/Research/STA/outputs/FM_switch/relion/run_r02/solvent_mask.mrc'
+
+yaxisType = 0
+sampleSphere = 'none'
+
+dPhi   = {[0], [0]}
+dTheta = {[0], [0]}
+dPsi   = {[0], [0]}
+searchRadius = {[0], [0]}
+
+lowCutoff = {[0.05 0.05], [0.05 0.05]}
+hiCutoff  = {[0.45 0.05], [0.45 0.05]}
+
+flgFairReference = 0
+reference = '/home/jblaser2/Research/peet/motor_switch/results/motor_switch_initial_ref.mrc'
+
+refThreshold  = [451, 451]
+refFlagAllTom = 1
+
+tiltRange = {[-60, 60]}
+flgWedgeWeight = 1
+nWeightGroup = 8
+
+lstThresholds = [451]
+lstFlagAllTom = 1
+
+pixelSpacing = 5.0
+CCMode      = 0
+flgAbsValue = 1
+particlePerCPU = 8
+debugLevel = 1
+nIter = 2
