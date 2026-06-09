@@ -10,7 +10,7 @@
 set -Eeuo pipefail
 trap 'echo "ACHTUNG!!! compile failed at line $LINENO: $BASH_COMMAND" >&2; exit 1' ERR
 
-SG=/home/ejl62/summerResearch/STA/STOPGAP
+SG=/home/ejl62/summerResearch/STA/packages/STOPGAP   # persistent hub (this repo)
 OUT=$SG/exec/lib_r2023b
 
 module load matlab/r2023b
@@ -56,10 +56,11 @@ for b in stopgap stopgap_parser stopgap_watcher sg_toolbox; do
     fi
 done
 
-# Backup R2020b binaries if present, then install new ones
-mkdir -p "$SG/exec/lib_r2020b"
+# Backup whatever binaries are currently installed, then install the new ones.
+# (The live binaries are already R2023b; this just preserves the prior build.)
+mkdir -p "$SG/exec/lib_prev"
 for b in stopgap stopgap_parser stopgap_watcher sg_toolbox; do
-    [ -f "$SG/exec/lib/$b" ] && cp -n "$SG/exec/lib/$b" "$SG/exec/lib_r2020b/" 2>/dev/null || true
+    [ -f "$SG/exec/lib/$b" ] && cp -f "$SG/exec/lib/$b" "$SG/exec/lib_prev/" 2>/dev/null || true
 done
 cp "$OUT"/{stopgap,stopgap_parser,stopgap_watcher,sg_toolbox} "$SG/exec/lib/"
 chmod +x "$SG"/exec/lib/{stopgap,stopgap_parser,stopgap_watcher,sg_toolbox}
@@ -93,4 +94,4 @@ fi
 rm -rf "$TMPD"
 
 echo "=== recompile_stopgap.slurm finished cleanly ==="
-echo "    Binaries in $SG/exec/lib/  (r2020b backup in exec/lib_r2020b/)"
+echo "    Binaries in $SG/exec/lib/  (previous build backed up in exec/lib_prev/)"

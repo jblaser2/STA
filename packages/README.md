@@ -36,7 +36,7 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 | [DISCA](disca/) | 🟡 | ~630/42 (old run) | none | **No** | <img src="disca/T4P/results/disca_k2_classes.png" width="150"> | ~94% dominant class; k=3 canonical run needed |
 | [TomoFlow](tomoflow/) | 🟡 | — (old run) | none | **No** | <img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="150"> | Unimodal; k=3 canonical run needed |
 | [ProTomo](protomo/) | ✅ | 334/212/126 junk (all 672) | none | **Yes** | <img src="protomo/T4P/results/class_averages_slices.png" width="150"> | Separates the two phases (visual). CC=0.943. MRAPKR=0 bug fixed (shifting 437 particles +22px); alignment bypassed. |
-| [STOPGAP](STOPGAP/) | ⬜ | — | cyl v2 | — | ⬜ | Owned by Eben; crash guard needed before run |
+| [STOPGAP](STOPGAP/) | ✅ | PCA 336/336 · MRA **70/602** (k=2) | cyl (tight r=8/h=26) | **No** | <img src="STOPGAP/T4P/results/meta/class_pca_class_avg_k2.png" width="150"> | Owned by Eben; k=2/3/4 done (job 12114811). PCA k-means vs MRA disagree at chance (ARI≈0.001–0.003); does not separate the two phases |
 
 ---
 
@@ -97,7 +97,7 @@ No runs yet. See `docs/datasets.md` for planned parameters.
 | **DISCA** | Template-free deep unsupervised clustering (pytorch) | `disca` | ~94% dominant class at all k — no domain priors = SNR failure |
 | **TomoFlow** | ContinuousFlex optical-flow conformational classification | `tomoflow` | Unimodal landscape; CUDA texture-ref porting for sm_120 |
 | **ProTomo (I3)** | Iterative alignment + multi-reference classification | native binary | Full-672 rerun complete 2026-06-09; CC=0.921 trivial (same as 234-particle run) |
-| **STOPGAP** | Subtomogram averaging + PCA + k-means (MATLAB MCR) | MATLAB R2023b MCR | Owned by Eben; pipeline ready; not yet run |
+| **STOPGAP** | Subtomogram averaging + PCA + k-means (MATLAB MCR) | MATLAB R2023b MCR | Owned by Eben; T4P k=2/3/4 complete (2026-06-09); does not separate two phases (ARI≈0); FM/T4SS pending |
 
 ---
 
