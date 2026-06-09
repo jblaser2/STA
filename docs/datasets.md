@@ -158,34 +158,75 @@ should be left at defaults unless a research.md note documents a specific overri
 
 ## Missing Wedge — Synthetic Data
 
-**Q: Do FM_easy particles need missing-wedge correction before classification?**
+**Q: Do synthetic particles need missing-wedge correction before classification?**
 
 **A: No.** Here is why this is a settled question:
 
-The ETSimulations pipeline simulates a ±54° tilt series (37 tilts, 3° step) with TEM-Simulator,
-then reconstructs the tomogram with IMOD WBP. This introduces a real missing wedge — there is
-a cone-shaped region of Fourier space with no signal, corresponding to the un-sampled tilt
-angles beyond ±54°.
+The ETSimulations pipeline simulates a ±54° tilt series (motor_easy/nora_test) or ±60°
+(motor_switch) with TEM-Simulator, then reconstructs the tomogram with IMOD WBP
+(`-RADIAL "0.35,0.05"`; no CTF correction). This introduces a real missing wedge — a
+cone-shaped region of Fourier space with no signal corresponding to the un-sampled tilt angles.
 
-However, all 694 particles are extracted at their **known ground-truth orientations** (identity
-pose, meaning they are all rotated to face the same reference direction before extraction). This
-means the missing wedge is in the **same Fourier-space direction** for every particle, in every
-class.
+All particles are extracted at their **known ground-truth orientations** (aligned to a common
+reference frame before extraction). This means the missing wedge points in the **same
+Fourier-space direction** for every particle, in every class.
 
 **Consequence:** The missing wedge is a constant artifact shared by all particles. It does not
-discriminate between classes A, B, and C — it degrades all particles equally. Classification
-algorithms that look for *differences* between particles are not misled by it.
+discriminate between classes — it degrades all particles equally. Classification algorithms that
+look for *differences* between particles are not misled by it. The artifact does reduce
+per-particle resolution and makes classification harder, which is intentional — it tests packages
+under realistic cryo-ET conditions.
 
-**What this rules out:**
-- WMD (Weighted Missing-Wedge) weighting in PEET — WMD is designed to handle particles
-  with *different* wedge orientations. With a uniform wedge, WMD has nothing to exploit and
-  can actually hurt (confirmed: PEET ARI=0.026 with WMD on FM_easy vs. ARI=0.116 without).
-  Always set `flgWedgeWeight=0` for FM_easy.
-- Per-particle wedge correction — pointless since all wedges are identical.
+### Per-package wedge handling
 
-**What this does NOT rule out:** general noise/SNR considerations — the missing wedge does
-reduce the effective resolution of individual particles, making classification harder. This is
-intentional; it tests packages under realistic cryo-ET conditions.
+Packages fall into four categories:
+
+**Statistical pseudo-subtomogram modeling — RELION (full pipeline)**
+RELION's proper STA pipeline builds a pseudo-subtomogram per particle by back-projecting all 2D
+tilt images into 3D, weighted by CTF². A paired weight volume records which Fourier-space voxels
+were sampled. During classification the EM likelihood is evaluated only over *sampled* voxels —
+the missing wedge region is skipped implicitly; no mask needed.
+*Caveat for our runs:* we supplied pre-extracted subtomograms with a flat STAR file, bypassing
+the tilt-series pipeline. RELION therefore treated particles as SPA data with no wedge modeling.
+This is a contributing factor to the ARI≈0 collapse and would be fixed by running the full
+`relion_tomo_subtomo` pseudo-subtomogram pipeline.
+
+**Wedge-masked cross-correlation — Dynamo, PEET, PyTom, I3/ProTomo, STOPGAP**
+These packages zero out the missing wedge in Fourier space before computing cross-correlation
+between a subtomogram and reference: FFT both volumes, multiply the reference by a binary wedge
+mask (1 = sampled, 0 = missing cone), then correlate. This prevents empty-wedge voxels from
+contributing spurious signal.
+*For our uniform-wedge data this is largely irrelevant* — all particles share the same wedge
+orientation, so the mask cancels symmetrically and provides no discriminative benefit. Empirically
+confirmed with PEET: ARI=0.026 with WMD on vs. ARI=0.116 without. **Always set
+`flgWedgeWeight=0` for synthetic datasets; do not enable per-particle wedge weighting.**
+
+**Reference-based wedge filling — EMAN2 (`--wedge-fill`)**
+EMAN2's `e2spt_pcasplit.py` can extrapolate density into the missing wedge region using the
+current class reference before PCA. Tested on T4P: wedge-fill on vs. off gave an identical
+405/273 split. Irrelevant for uniform-wedge data. Safe to include `--wedge-fill` in the command
+(it is the documented flag) but it has no measurable effect.
+
+**No explicit handling — OPUS-TOMO, TomoFlow, DISCA**
+All three are deep learning approaches (VAE, neural field, CNN). They process subtomograms as
+voxel grids and learn features directly from the data distribution. The missing wedge artifact is
+part of the input the network sees. No masking or compensation is performed. For uniform-wedge
+data this is not a disadvantage relative to the masking-based packages above.
+
+### Summary table
+
+| Package | Wedge handling | Effect on synthetic data |
+|---|---|---|
+| RELION (full pipeline) | Pseudo-subtomogram; likelihood over sampled voxels only | Correct; bypassed in our runs |
+| STOPGAP | Wedge-masked FSC/CC | Irrelevant for uniform wedge |
+| Dynamo | Wedge-masked CC + Fourier PCA | Irrelevant for uniform wedge |
+| PEET | WMD per-particle weighting | Actively hurts — always `flgWedgeWeight=0` |
+| PyTom | Wedge-masked FLCF | Irrelevant for uniform wedge |
+| I3/ProTomo | Wedge-masked CC | Irrelevant for uniform wedge |
+| EMAN2 | Reference-based wedge fill | Tested, no effect |
+| OPUS-TOMO | None (VAE) | Fine for uniform wedge |
+| TomoFlow | None (neural field) | Fine for uniform wedge |
+| DISCA | None (CNN) | Fine for uniform wedge |
 
 ---
 

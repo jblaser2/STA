@@ -2,9 +2,15 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-09** by Claude (motor_switch RE-SIMULATED at 5 Å/px — 208 CCW + 208 CW + 35 junk = 451 particles; GT-avg CC=0.615; Borrelia maps at 5 Å/px, 160³ box).
+> Last updated: **2026-06-09** by Josh + Claude (ProTomo full-672 rerun complete; EMAN2 canonical T4P k=3 complete — 270/317+85 junk; motor_switch re-simulated at 5 Å/px).
 
 ## Now / Next / Parked
+
+- **EMAN2 T4P CANONICAL k=3 COMPLETE (2026-06-09):** eman2 2.99.72 nogui installed on Josh's account (`~/miniforge3/envs/eman2`, cryoem conda channel). Workspace: `~/Research/eman2_project/`. No-align PCA-split (NCLASS=3, NBASIS=12, MAXRES=60Å, cyl v2 mask). Split: **270/317/85 junk** (class 3, FSC=152Å vs 82Å for signal). Re-run with cyl v2 mask gives identical split — mask does not change result. PCA captures intensity/contrast axis, not conformational axis. Result: **No convergence** (same conclusion as RELION). Simple per-class averages computed and visually inspected — density orientation confirmed correct (WBP inversion consistent across packages). Results committed `db010c7`; run script: `packages/eman2/T4P/scripts/run_pipeline.sh` (NONINTERACTIVE=1, NCLASS=3).
+
+- **PROTOMO FULL-672 RERUN COMPLETE (2026-06-09):** Initial T4P run used only 234/672 particles — not benchmark-comparable. Root cause: (1) ProTomo's `MRAAREA=0.8` overlap filter excluded 438 edge particles, and (2) repo reorg (2026-06-06) broke symlinks in `prepare/stacks/` (pointed to old `subtomos_mrc/`, now `data/T4P_subtomos/`). Fixed: rebuilt symlinks, set `MRAAREA=0.0`, kept `MRAPKR="0 0 0"` + `MSAIMGSIZE="32 32 32"`. Result: 352/194/126 junk (all 672), CC=0.921 — **identical to 234-particle run**. Edge-padded particles do not affect classification. Committed `ee4300e`. Local workspace: `~/Research/protomo/process/` (scripts: `run_full672.sh`, `resume_full672.sh`, `finish_full672.sh`).
+
+- **BENCHMARK REORGANIZATION PUSHED (2026-06-09):** Dataset-centric structure (`T4P/`, `FM_easy/`, `FM_hard/`, `T4SS/` subdirs in all 10 packages), `docs/datasets.md` created, naming convention documented. Merged with Eben's EMAN2 k=2 result (19b3f04). All pushed.
 
 - **MOTOR_SWITCH RE-SIMULATED AT 5 Å/px (2026-06-09):** Original 13.33 Å/px simulation gave ARI≈0 (FliG difference 1.1–1.9 vox, sub-pixel). Vibrio pair (EMD-21819/21837) also ruled out at 13.33 Å/px (CC=0.981). **Kept Borrelia maps (EMD-21884 CCW / EMD-21886 CW), re-simulated at 5 Å/px, 160³ box.** Zoom 2.747→5 Å/px + Y-axis transpose + ±9V scaling. New production: `~/Research/synthetic_sta/motor_switch/production_5apix/`. **Totals: 208 CCW + 208 CW + 35 junk = 451 particles.** GT-aligned averages computed; GT-avg CC (CCW vs CW) = **0.615** (clean map CC = 0.650; semi-difficult, harder than motor_easy A-B = 0.539). WBP density inversion confirmed (negated avg CC +0.39/+0.49 vs clean maps). Signal/bkg = 2.1–2.5×. Sim config: magnification=30000, det=1000×1000, THICKNESS=350. **Next: set up RELION GT-seeded k=2 on motor_switch 5 Å/px to get baseline ARI.**
 
