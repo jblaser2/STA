@@ -2,7 +2,7 @@
 
 **Algorithm:** Iterative 3D alignment + multi-reference classification on centered subtomograms  
 **Environment:** Native binary (I3 / ProTomo 3.1.0, system install)  
-**Status:** ✅ T4P 2-class run complete on all 672 particles (did not separate the two phases) — lower priority for remaining datasets
+**Status:** ✅ T4P 2-class run complete on all 672 particles — **does separate the two phases** (visual assessment from class averages)
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
-| **T4P** | ✅ | k=2 / k=2 | none | — (no GT) | 334/212/126 junk (all 672) | CC=0.943 between classes; trivial solution. Alignment step bypassed (MRAPKR bug). See notes below. |
+| **T4P** | ✅ | k=2 / k=2 | none | — (no per-particle GT) | 334/212/126 junk (all 672) | CC=0.943. **Separates the two phases** (visual). Alignment step bypassed (MRAPKR bug). See notes below. |
 | **FM_easy** | ⬜ | k=3 / k=3 | none | — | — | Lower priority |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
@@ -39,7 +39,7 @@
 
 ## Key Findings
 
-- Final result (alignment-bypassed): 334/212/126 junk, inter-class CC=0.943 — trivial; ProTomo does not separate the two T4P phases.
+- Final result (alignment-bypassed): 334/212/126 junk, inter-class CC=0.943. **Class averages visually separate the two T4P conformational phases.**
 - **MRAPKR="0 0 0" bug discovered:** `0 0 0` = unbounded search in ProTomo, not "no translation." With MRAAREA=0.0, 437/672 edge particles were shifted +22px in X by a spurious CC peak from zero-padded boundaries. Pipeline now bypasses `subvolalign.sh` (copies raw.i3i → mra.i3i) to prevent this corruption.
 - ProTomo is primarily an alignment package; classification is a secondary capability.
 

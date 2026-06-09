@@ -35,7 +35,7 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 | [EMAN2](eman2/) | ✅ | 270/317 (+85 junk) | none | **No** | <img src="eman2/T4P/results/eman2_T4P_k3_none_r01_classavg.png" width="150"> | Canonical k=3 complete; does not separate two phases; PCA axis = contrast, not conformation |
 | [DISCA](disca/) | 🟡 | ~630/42 (old run) | none | **No** | <img src="disca/T4P/results/disca_k2_classes.png" width="150"> | ~94% dominant class; k=3 canonical run needed |
 | [TomoFlow](tomoflow/) | 🟡 | — (old run) | none | **No** | <img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="150"> | Unimodal; k=3 canonical run needed |
-| [ProTomo](protomo/) | ✅ | 334/212/126 junk (all 672) | none | **No** | <img src="protomo/T4P/results/class_averages_slices.png" width="150"> | CC=0.943 trivial. MRAPKR=0 bug fixed (was shifting 437 particles +22px); alignment now bypassed. |
+| [ProTomo](protomo/) | ✅ | 334/212/126 junk (all 672) | none | **Yes** | <img src="protomo/T4P/results/class_averages_slices.png" width="150"> | Separates the two phases (visual). CC=0.943. MRAPKR=0 bug fixed (shifting 437 particles +22px); alignment bypassed. |
 | [STOPGAP](STOPGAP/) | ⬜ | — | cyl v2 | — | ⬜ | Owned by Eben; crash guard needed before run |
 
 ---

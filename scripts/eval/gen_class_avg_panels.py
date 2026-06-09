@@ -32,8 +32,24 @@ import matplotlib.patches as mpatches
 from pathlib import Path
 
 
+def _read_em(path: str) -> np.ndarray:
+    """Read a PyTom EM-format volume, return float32 (nz, ny, nx)."""
+    import struct
+    with open(path, 'rb') as f:
+        header = f.read(512)
+        nx = struct.unpack_from('<i', header, 4)[0]
+        ny = struct.unpack_from('<i', header, 8)[0]
+        nz = struct.unpack_from('<i', header, 12)[0]
+        dtype_code = struct.unpack_from('<i', header, 16)[0]
+        dtype_map = {1: np.int8, 2: np.int16, 4: np.int32,
+                     5: np.float32, 9: np.float64}
+        dtype = dtype_map.get(dtype_code, np.float32)
+        raw = np.frombuffer(f.read(), dtype=dtype)
+    return raw.reshape(nz, ny, nx).astype(np.float32)
+
+
 def load_slice(path: str) -> np.ndarray:
-    """Return a 2D float32 array for a given MRC or PNG/JPG input."""
+    """Return a 2D float32 array for a given MRC, EM, or PNG/JPG input."""
     p = Path(path)
     if p.suffix.lower() in (".mrc", ".mrcs", ".map"):
         try:
@@ -47,6 +63,10 @@ def load_slice(path: str) -> np.ndarray:
             z = data.shape[0] // 2
             return data[z]
         return data
+    elif p.suffix.lower() == ".em":
+        vol = _read_em(path)
+        z = vol.shape[0] // 2
+        return vol[z]
     else:
         img = plt.imread(path)
         if img.ndim == 3:
