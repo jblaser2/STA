@@ -10,21 +10,31 @@
 
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
-| **T4P** | ✅ | k=2 / k=2 | none | — (no GT) | 234 particles (438 filtered) | CC=0.921 between classes; trivial solution; centering filter acts as junk removal |
+| **T4P** | 🟡 | k=2 / k=2 | none | — (no GT) | 234 particles (438 filtered) → rerun all 672 in progress | CC=0.921 between classes; trivial solution; edge filter discarded 65% of particles — see limitation note below |
 | **FM_easy** | ⬜ | k=3 / k=3 | none | — | — | Lower priority |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 
-> T4P note: ProTomo's centering/edge filter removes 438 of 672 particles before classification —
-> this acts as junk removal at the pre-classification stage, so k=2 is the reported result.
-> Standard protocol (k=3, 2+junk) does not apply in the same way as other packages.
+> **T4P edge-filter limitation:** ProTomo's `.i3i` format stores original tomogram bounds for
+> each particle. When individual pre-extracted 80³ MRCs are assembled into a dataset, ProTomo
+> checks whether each extraction box has ≥80% overlap with its source tomogram volume
+> (`MRAAREA=0.8`). 438 of 672 T4P particles (65%) fail this check because they were picked
+> near the z-boundaries of their source tomograms without a margin exclusion. The initial run
+> used the 234 "fully-centred" particles only. All other benchmark packages ingest the
+> pre-extracted MRCs directly and do not apply this check — so the initial ProTomo result is
+> **not comparable** to the rest of the benchmark. A rerun on all 672 is in progress
+> (`~/Research/protomo/full672/`): `MRAPKR="0 0 0"` (translation-free, particles prealigned) and
+> `MSAIMGSIZE="32 32 32"` (SVD uses only the central 32³ cube, unaffected by edge zero-padding)
+> should make the classification valid even for edge particles. Class averages may appear
+> slightly off-axis for the edge-particle subset but the SVD-based class assignments are valid.
 
 ---
 
 ## Key Findings
 
-- Centering filter discards 438/672 particles — reduces statistical power before classification.
-- High inter-class CC (0.921) indicates trivial solution; one dominant class.
+- **Initial run used only 234/672 particles** — not comparable to other benchmark packages.
+  Root cause: ProTomo's `.i3i` metadata check discarded 438 particles as "near-edge" (see limitation note above). Rerun on all 672 in progress.
+- High inter-class CC (0.921) in 234-particle run indicates trivial solution; one dominant class.
 - ProTomo is primarily an alignment package; classification is a secondary capability.
 
 ---

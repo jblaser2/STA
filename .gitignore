@@ -69,3 +69,5 @@ packages/STOPGAP/exec/lib*/stopgap_watcher
 # eman2 settings files
 .eman2settings.json
 trash/
+trash/
+.eman2log.txt
