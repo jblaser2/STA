@@ -10,7 +10,7 @@
 
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
-| **T4P** | ✅ | k=2 / k=2 | none | — (no GT) | 352/194/126 junk (all 672) | CC=0.921 between classes; trivial solution — same result as 234-particle run. Symlink rebuild required after repo reorg (June 2026). See limitation note below. |
+| **T4P** | ✅ | k=2 / k=2 | none | — (no GT) | 334/212/126 junk (all 672) | CC=0.943 between classes; trivial solution. Alignment step bypassed (MRAPKR bug). See notes below. |
 | **FM_easy** | ⬜ | k=3 / k=3 | none | — | — | Lower priority |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
@@ -39,8 +39,8 @@
 
 ## Key Findings
 
-- Full-672 rerun complete: split 352/194/126 junk, inter-class CC=0.921 — identical to the 234-particle result. The edge particles do not affect the classification outcome.
-- High inter-class CC (0.921) confirms ProTomo does not separate the two T4P phases — one dominant class.
+- Final result (alignment-bypassed): 334/212/126 junk, inter-class CC=0.943 — trivial; ProTomo does not separate the two T4P phases.
+- **MRAPKR="0 0 0" bug discovered:** `0 0 0` = unbounded search in ProTomo, not "no translation." With MRAAREA=0.0, 437/672 edge particles were shifted +22px in X by a spurious CC peak from zero-padded boundaries. Pipeline now bypasses `subvolalign.sh` (copies raw.i3i → mra.i3i) to prevent this corruption.
 - ProTomo is primarily an alignment package; classification is a secondary capability.
 
 ---

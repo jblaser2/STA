@@ -35,7 +35,7 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 | [EMAN2](eman2/) | ✅ | 270/317 (+85 junk) | none | **No** | <img src="eman2/T4P/results/eman2_T4P_k3_none_r01_classavg.png" width="150"> | Canonical k=3 complete; does not separate two phases; PCA axis = contrast, not conformation |
 | [DISCA](disca/) | 🟡 | ~630/42 (old run) | none | **No** | <img src="disca/T4P/results/disca_k2_classes.png" width="150"> | ~94% dominant class; k=3 canonical run needed |
 | [TomoFlow](tomoflow/) | 🟡 | — (old run) | none | **No** | <img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="150"> | Unimodal; k=3 canonical run needed |
-| [ProTomo](protomo/) | ✅ | 352/194/126 junk (all 672) | none | **No** | <img src="protomo/T4P/results/class_averages_slices.png" width="150"> | CC=0.921 trivial; same result as 234-particle run. Full-672 rerun 2026-06-09. |
+| [ProTomo](protomo/) | ✅ | 334/212/126 junk (all 672) | none | **No** | <img src="protomo/T4P/results/class_averages_slices.png" width="150"> | CC=0.943 trivial. MRAPKR=0 bug fixed (was shifting 437 particles +22px); alignment now bypassed. |
 | [STOPGAP](STOPGAP/) | ⬜ | — | cyl v2 | — | ⬜ | Owned by Eben; crash guard needed before run |
 
 ---
@@ -57,6 +57,23 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 | [Dynamo](dynamo/) | ✅ | **0.200** (k=3 dpkpca) | <img src="dynamo/FM_easy/results/motor_easy_pca/confusion_dynamo_k3_k3_pca_nc_best_cnew.png" width="200"> | dpkpca nc=17; class B 96–99% pure |
 | [OPUS-TOMO](opusTomo/) | ✅ | 0.021 | <img src="../outputs/FM_easy/opus/confusion_opus-tomo_k3_threshold_mask.png" width="200"> | Class C isolated; A/B unseparated |
 | [PyTom](PyTom/) | ✅ | **0.134** (k=3) | <img src="../outputs/FM_easy/pytom/confusion_pytom_k3_motor_easy_k3_v2mask.png" width="200"> | v2 cyl mask |
+| All others | ⬜ | — | ⬜ | EMAN2, DISCA, TomoFlow, ProTomo, STOPGAP not yet run |
+
+---
+
+### Synthetic Dataset — FM_switch (451 particles, 2 classes + junk, ~15–25 Å differences)
+
+> Borrelia burgdorferi flagellar motor CCW↔CW rotational switching (EMD-21884/21886, Chang et al. 2020).
+> Re-simulated at 5 Å/px, 160³. 208 CCW + 208 CW + 35 junk = 451 particles. GT-avg CC=0.615.
+> **Protocol:** k=2 (CCW vs CW, exclude junk from ARI). Mask: RELION ellipsoidal (r_xz=38, r_y=65 + soft edge).
+
+| Package | FM_switch Status | k=2 ARI | Best Confusion | Notes |
+|---------|-----------------|---------|----------------|-------|
+| [RELION](relion/) | ✅ | **0.379** (iter 1 GT) | <img src="relion/FM_switch/results/confusion_relion_k2_k2_v3_GT_seeded_iter1.png" width="200"> | GT-seeded+firstiter_cc+skip_align; collapses to ARI≈0 by iter5 |
+| [PEET](peet/) | ✅ | **0.007** (k=2 pc1_10) | <img src="peet/FM_switch/results/confusion_peet_k2_motor_switch_k2_pc1_10.png" width="200"> | WMD-PCA ARI≈0; CCW/CW equally split; same limitation as FM_easy |
+| [Dynamo](dynamo/) | ⬜ | — | ⬜ | Not yet run |
+| [OPUS-TOMO](opusTomo/) | ⬜ | — | ⬜ | Not yet run |
+| [PyTom](PyTom/) | ⬜ | — | ⬜ | Not yet run |
 | All others | ⬜ | — | ⬜ | EMAN2, DISCA, TomoFlow, ProTomo, STOPGAP not yet run |
 
 ---
