@@ -65,7 +65,11 @@
   preserved as constraint; five concerns about the framework raised in §7 (not edited into README).
   → **Next: team review of benchmarkIdeas.md before execution; resolve the 5 open questions (Qs 1–5 in §11).**
 
-- **GROUND TRUTH (Stefano consult, 2026-06-01; updated 2026-06-05):** this T4P dataset has **two distinct, obvious pili-phase classes**, and **Dynamo recovers them well** (`dynamo/`). **PEET also separates** (v2 cyl mask, 374/230/68). **PyTom NOW SEPARATES** (v2 cyl mask + auto_focus + -a flag: 440/232). **RELION, Protomo, DISCA, TomoFlow still fail** (one dominant class; RELION exhausted all 6 configs, algorithm-level SNR failure). **OPUS-TOMO: partial result** — K=2 gives 447/225 split (threshold mask) but ARI vs GT not yet computed; Y-axis cylindrical mask (matching PyTom v2) collapses K=2 (VAE needs broader mask). Benchmark signal: correct-mask versions of Dynamo/PEET/PyTom vs algorithm-level failures of the others.
+- **GROUND TRUTH (Stefano consult, 2026-06-01; updated 2026-06-11):** this T4P dataset has **two distinct, obvious pili-phase classes**. Packages now fall into **three groups** (see `packages/figures/T4P/cross_pkg_correlation.png`):
+  - **Recover the conformational split:** **Dynamo** (447/225, reference), **PEET** (374/230/68), **PyTom** (440/232), **ProTomo** (334/212/126, CC=0.943, separates visually). Pairwise ARI among Dynamo/PEET/PyTom = 0.36–0.53.
+  - **Split on a non-conformational (contrast) axis:** **OPUS-TOMO** (447/225, threshold mask) and **DISCA** (398/274, cyl v2 mask) — both produce balanced splits that **agree with each other (ARI=0.678)** but are **uncorrelated with the conformational cluster (ARI≈0)**. The two learned-feature methods cluster on intensity/contrast, not conformation.
+  - **No split / collapse:** **RELION** (672/0, algorithm-level SNR failure, all 6 configs), **TomoFlow** (unimodal landscape), **EMAN2** (~60/40 PCA split = contrast axis, doesn't map to the two phases).
+  - Benchmark signal: alignment/CC-based methods (Dynamo/PEET/PyTom/ProTomo) recover the conformational axis; learned-feature methods (OPUS-TOMO/DISCA) default to a contrast axis; EM/optical-flow methods collapse.
 
 - **Package completion status (2026-06-02, updated 2026-06-08):** 9 of 15 packages run on real T4P (RELION, Dynamo, PyTom,
   Protomo, DISCA, TomoFlow, EMAN2, OPUS-TOMO, PEET partial). EMAN2 k=2 rerun complete with no-align pipeline (table now ✅). k=3/k=4 not yet run. STOPGAP owned by Eben, not started. MDTOMO/HEMNMA
