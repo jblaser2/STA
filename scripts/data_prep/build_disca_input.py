@@ -52,7 +52,14 @@ def main():
     ap.add_argument("--subtomo-dir", default="subtomos_mrc")
     ap.add_argument("--out", default=os.path.expanduser("~/Research/disca_work/disca_input_672.pickle"))
     ap.add_argument("--box", type=int, default=32, help="DISCA box size (default 32)")
+    ap.add_argument("--mask", default=None, help="optional MRC mask (same box as subtomograms) applied before Fourier crop")
     args = ap.parse_args()
+
+    mask = None
+    if args.mask:
+        with mrcfile.open(args.mask, permissive=True) as mrc:
+            mask = mrc.data.astype(np.float32)
+        print(f"mask: {args.mask}  nonzero={np.count_nonzero(mask)}/{mask.size} ({100*np.count_nonzero(mask)/mask.size:.1f}%)")
 
     files = sorted(f for f in os.listdir(args.subtomo_dir) if f.endswith(".mrc"))
     if not files:
@@ -63,6 +70,8 @@ def main():
         key = os.path.splitext(fname)[0]            # e.g. aligned_tom100_P0001
         with mrcfile.open(os.path.join(args.subtomo_dir, fname), permissive=True) as mrc:
             d = mrc.data.astype(np.float32)
+        if mask is not None:
+            d = d * mask
         v = fourier_crop(d, args.box)
         v = (v - v.mean()) / (v.std() + 1e-8)        # per-subtomo standardisation
         vs[key] = {"v": v, "m": None, "id": key}

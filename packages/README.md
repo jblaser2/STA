@@ -33,7 +33,7 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 | [OPUS-TOMO](opusTomo/) | 🟡 | 447/225 (junk pending) | threshold (31.2%) | **Partial** | _(pending)_ | Threshold mask required for VAE; junk pending; ARI vs GT pending |
 | [RELION](relion/) | ✅ (exhausted) | 672/0 | cyl v2 | **No** | — | Algorithm-level SNR failure; all configs collapse |
 | [EMAN2](eman2/) | ✅ | 270/317 (+85 junk) | none | **No** | <img src="eman2/T4P/results/eman2_T4P_k3_none_r01_classavg.png" width="150"> | Canonical k=3 complete; does not separate two phases; PCA axis = contrast, not conformation |
-| [DISCA](disca/) | 🟡 | ~630/42 (old run) | none | **No** | <img src="disca/T4P/results/disca_k2_classes.png" width="150"> | ~94% dominant class; k=3 canonical run needed |
+| [DISCA](disca/) | ✅ | **398/274** (cyl v2) | cyl v2 | **No** | <img src="disca/T4P/results/disca_k2_classes.png" width="150"> | Masked: balanced split but ARI≈0 vs converging pkgs; splits on contrast axis. Agrees w/ OPUS-TOMO (ARI=0.678). Misses the two phases |
 | [TomoFlow](tomoflow/) | 🟡 | — (old run) | none | **No** | <img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="150"> | Unimodal; k=3 canonical run needed |
 | [ProTomo](protomo/) | ✅ | 334/212/126 junk (all 672) | none | **Yes** | <img src="protomo/T4P/results/class_averages_slices.png" width="150"> | Separates the two phases (visual). CC=0.943. MRAPKR=0 bug fixed (shifting 437 particles +22px); alignment bypassed. |
 | [STOPGAP](STOPGAP/) | ⬜ | — | cyl v2 | — | ⬜ | Owned by Eben; crash guard needed before run |
@@ -94,7 +94,7 @@ No runs yet. See `docs/datasets.md` for planned parameters.
 | **OPUS-TOMO** | Variational autoencoder (VAE) continuous latent-space clustering | `opuset` (cu128 PyTorch) | 4 bugs patched; threshold mask required (cyl too restrictive for VAE) |
 | **RELION** | Soft EM (3D maximum-likelihood classification) | `relion-5.0` | Algorithm-level failure on low-SNR T4P; FM_easy GT-seeded ARI=0.475 |
 | **EMAN2** | PCA split on subtomogram stack | `eman2` (Josh + Eben) | T4P k=3 canonical done; PCA captures contrast axis, not conformation |
-| **DISCA** | Template-free deep unsupervised clustering (pytorch) | `disca` | ~94% dominant class at all k — no domain priors = SNR failure |
+| **DISCA** | Template-free deep unsupervised clustering (pytorch) | `disca` | Unmasked: ~94% dominant class. Masked (cyl v2): balanced 398/274 but ARI≈0 vs converging pkgs — clusters on contrast axis, agrees w/ OPUS-TOMO (0.678) |
 | **TomoFlow** | ContinuousFlex optical-flow conformational classification | `tomoflow` | Unimodal landscape; CUDA texture-ref porting for sm_120 |
 | **ProTomo (I3)** | Iterative alignment + multi-reference classification | native binary | Full-672 rerun complete 2026-06-09; CC=0.921 trivial (same as 234-particle run) |
 | **STOPGAP** | Subtomogram averaging + PCA + k-means (MATLAB MCR) | MATLAB R2023b MCR | Owned by Eben; pipeline ready; not yet run |

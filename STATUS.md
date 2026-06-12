@@ -6,6 +6,19 @@
 
 ## Now / Next / Parked
 
+- **DISCA MASKED T4P + CROSS-PKG FIGURE FIXED (2026-06-11):** Re-ran DISCA on T4P with the cylindrical
+  v2 mask (same mask as PyTom/PEET/OPUS). `build_disca_input.py` gained a `--mask` arg; driver
+  `scripts/data_prep/run_disca_cyl_v2.sh`. Result: **k=2 → 398/274** (balanced, vs the old unmasked
+  ~94% collapse), **but ARI≈0 vs PEET/PyTom/Dynamo** — DISCA splits on a contrast/intensity axis, not
+  the conformational one. Strongly agrees with OPUS-TOMO (**ARI=0.678**): the two learned-feature
+  methods cluster together on a non-conformational discriminant. Conclusion unchanged (misses the two
+  phases) but mechanism now quantified. Assignments: `results/disca_cyl_v2_k{2,3,4}.csv`; scorer:
+  `scripts/eval/score_disca_t4p.py`. **Also fixed `gen_cross_pkg_correlation.py`**: its hardcoded
+  Dynamo/PEET paths were stale post-reorg (silently skipped both); now points to in-repo canonical
+  files and includes DISCA (5 pkgs, 10 pairwise panels). Canonical T4P pairwise ARIs: PEET–PyTom 0.532,
+  Dynamo–PyTom 0.492, Dynamo–PEET 0.362 (converging cluster); OPUS–DISCA 0.678 (contrast cluster);
+  cross-cluster ≈0.
+
 - **EMAN2 T4P CANONICAL k=3 COMPLETE (2026-06-09):** eman2 2.99.72 nogui installed on Josh's account (`~/miniforge3/envs/eman2`, cryoem conda channel). Workspace: `~/Research/eman2_project/`. No-align PCA-split (NCLASS=3, NBASIS=12, MAXRES=60Å, cyl v2 mask). Split: **270/317/85 junk** (class 3, FSC=152Å vs 82Å for signal). Re-run with cyl v2 mask gives identical split — mask does not change result. PCA captures intensity/contrast axis, not conformational axis. Result: **No convergence** (same conclusion as RELION). Simple per-class averages computed and visually inspected — density orientation confirmed correct (WBP inversion consistent across packages). Results committed `db010c7`; run script: `packages/eman2/T4P/scripts/run_pipeline.sh` (NONINTERACTIVE=1, NCLASS=3).
 
 - **PROTOMO T4P COMPLETE (2026-06-09):** Full-672 rerun with MRAAREA=0.0 and alignment bypassed (MRAPKR="0 0 0" = unbounded search, not no-translation — was shifting 437 edge particles +22px). Fix: copy raw.i3i → mra.i3i before SVD. **Result: 334/212/126 junk (all 672), CC=0.943. Class averages visually separate the two T4P conformational phases.** Committed `09f20fc`. Local workspace: `~/Research/protomo/process/`.
@@ -79,7 +92,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 | EMAN2 | ✅ | `eman2` | ✅ | ✅ | ⬜ | ⬜ | ✅ | **No-align rerun complete (2026-06-08, Eben).** Split: **405 / 273** (cls02/cls01). Consensus FSC: masked=82 Å, masked-tight=71 Å; per-class both 82 Å. **Result: still misses the two phases** — ~60/40 partition does not map to ring_complete/ring_altered; class averages nearly identical by eye at 82 Å. Pipeline: identity `particle_parms` via `make_identity_parms.py` → `e2spt_average` → `e2refine_postprocess` → `e2spt_pcasplit` (mask=`spt_noalign/mask_tight.hdf`, maxres=60 Å). Wedgefill patch (Patch 2) active. Outputs: `packages/eman2/results/`; workspace `~/src/eman2_project/`; docs: `packages/eman2/research.md`. k=3/k=4 not yet run. |
 | emClarity | ✅ | MCR R2019a | ⬜ (real data n/a) | — | — | — | — | **installed + GPU-verified on RTX 5080/sm_120** (1.5.3.11 + MCR R2019a; CUDA-10 kernels JIT to Blackwell via the 13.2 driver). **Cannot run on real T4P:** tilt-series pipeline, no path to ingest pre-extracted subtomos → **synthetic-data track only**. See `EMCLARITY.md` |
 | PyTom | ✅ | `pytom_env` | ✅ | ✅ | ✅ | ⬜ | — | **T4P FIXED (2026-06-05):** v2 cylindrical mask (r=13, h_pos=0, h_neg=25) + `-a` flag (FRM module absent — see memory). k=2: **440/232** (converged iter 5, class 1≈PEET ring_altered). k=3: **422/150/100** (iter 11). Results: `results/pytom_v2mask_k{2,3}.csv`; figures: `PyTom/figures_v2mask_k{2,3}/`. Previous failure was wrong mask. k=4 not yet run. **motor_easy (prior session):** k=2 ARI=0.090, k=3 ARI=**0.134** (v2mask). Scripts: `packages/PyTom/setup_motor_easy_pytom.py`, `run_motor_easy_pytom.sh`. |
-| DISCA | ✅ | `disca` | ✅ `build_disca_input.py` | ✅ | ✅ | ✅ | ✅ | template-free unsupervised deep clustering (torch, native sm_120); k=2/3/4 → one dominant ~94% class + small noisy outliers — **missed the two real phases** (cf. Dynamo). `disca/research.md` + `disca/results/` |
+| DISCA | ✅ | `disca` | ✅ `build_disca_input.py` (now `--mask`) | ✅ | ✅ | ✅ | ✅ | template-free unsupervised deep clustering (torch, native sm_120). **Unmasked:** one dominant ~94% class. **Cyl v2 mask (2026-06-11):** balanced **398/274** (k=2), but **ARI≈0 vs PEET/PyTom/Dynamo** — split is on a contrast axis, not conformational. Agrees with OPUS-TOMO (ARI=0.678). **Still misses the two phases.** CSVs: `results/disca_cyl_v2_k{2,3,4}.csv`; scoring: `scripts/eval/score_disca_t4p.py`. |
 | HEMNMA-3D | ❌ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | Part of Scipion3 ContinuousFlex plug-in; requires initial atomic model/reference map; cannot sort datasets like we're doing right now. |
 | AC3D | ❌ | — | ⬜ | ⬜ | ⬜ | ⬜ | — | Implemented as part of PyTom, run with that one. |
 | TomoNet | ❌ | — | ❌ | — | — | — | — | **evaluated, rejected** — IsoNet denoising only, no classification workflow built-in. Would require custom autoencoder training (see `TomoNet/research.md`), contrary to benchmark scope (out-of-box packages). Denoising as pre-processing could be explored separately if needed. |

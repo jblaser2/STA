@@ -32,16 +32,18 @@ REPO = Path(__file__).resolve().parents[2]
 DEFAULT_PKGS = [
     dict(
         name="Dynamo",
-        csv=REPO / "packages/dynamo/dynamo_final_results/class_assignments.csv",
+        csv=REPO / "packages/dynamo/T4P/results/dynamo_final_results/class_assignments.csv",
         id_col="particle",
         label_col="class",
+        sep=",",
         class_names=None,
     ),
     dict(
         name="PEET",
-        csv=REPO / "packages/peet/results/peet_final_class_assignments_v2.csv",
+        csv=REPO / "packages/peet/T4P/results/peet_final_class_assignments_v2.csv",
         id_col="particle",
         label_col="class",
+        sep=",",
         class_names={1: "ring_complete", 2: "ring_altered", 3: "junk"},
     ),
     dict(
@@ -49,6 +51,7 @@ DEFAULT_PKGS = [
         csv=REPO / "results/pytom_v2mask_k2.csv",
         id_col="file",
         label_col="pred_label",
+        sep=",",
         class_names=None,
     ),
     dict(
@@ -56,6 +59,15 @@ DEFAULT_PKGS = [
         csv=REPO / "results/opus_tomo_k2.csv",
         id_col="file",
         label_col="pred_label",
+        sep=",",
+        class_names=None,
+    ),
+    dict(
+        name="DISCA",
+        csv=REPO / "results/disca_cyl_v2_k2.csv",
+        id_col="file",
+        label_col="pred_label",
+        sep=",",
         class_names=None,
     ),
 ]
@@ -63,7 +75,7 @@ DEFAULT_PKGS = [
 
 def load_pkg(cfg: dict) -> pd.Series:
     """Load a package CSV; return a Series indexed by particle basename."""
-    df = pd.read_csv(cfg["csv"])
+    df = pd.read_csv(cfg["csv"], sep=cfg.get("sep", ","))
     df[cfg["id_col"]] = df[cfg["id_col"]].apply(lambda x: os.path.basename(str(x)))
     s = df.set_index(cfg["id_col"])[cfg["label_col"]]
     return s
@@ -145,9 +157,9 @@ def main():
     nrows = (len(pairs) + 1) // ncols
 
     fig, axes = plt.subplots(nrows, ncols,
-                             figsize=(ncols * 4.2, nrows * 3.6))
+                             figsize=(ncols * 4.2, nrows * 3.6 + 0.5))
     fig.suptitle("T4P — Cross-Package Particle Agreement",
-                 fontsize=12, fontweight="bold")
+                 fontsize=12, fontweight="bold", y=0.995)
     axes_flat = axes.flat if hasattr(axes, "flat") else [axes]
 
     im_ref = None
@@ -166,7 +178,7 @@ def main():
         fig.colorbar(im_ref, ax=list(axes.flat)[:len(pairs)],
                      fraction=0.02, pad=0.02, label="Recall (row-normalized)")
 
-    plt.tight_layout()
+    plt.tight_layout(rect=[0, 0, 1, 0.97])
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(out, dpi=150, bbox_inches="tight")
