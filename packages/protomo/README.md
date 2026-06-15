@@ -2,7 +2,7 @@
 
 **Algorithm:** Iterative 3D alignment + multi-reference classification on centered subtomograms  
 **Environment:** Native binary (I3 / ProTomo 3.1.0, system install)  
-**Status:** ✅ T4P 2-class run complete on all 672 particles — **does separate the two phases** (visual assessment from class averages)
+**Status:** ✅ T4P 2-class complete — **separates the two phases** (visual). ✅ FM_easy k=3 complete — **ARI≈0, collapses to a dominant cluster** (misses the 3-class structure)
 
 ---
 
@@ -11,7 +11,7 @@
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
 | **T4P** | ✅ | k=2 / k=2 | none | — (no per-particle GT) | 334/212/126 junk (all 672) | CC=0.943. **Separates the two phases** (visual). Alignment step bypassed (MRAPKR bug). See notes below. |
-| **FM_easy** | ⬜ | k=3 / k=3 | none | — | — | Lower priority |
+| **FM_easy** | ✅ | k=3 / k=3 | FM_easy solvent sphere r=32 Y-10 (96³), applied as `MSAMASK` | **−0.003** | 517/103/74 (no junk) | SVD+HAC collapse to dominant cluster 0 (≈75%); class C 174/0/3 → almost all in cluster 0. Misses 3-class structure (unlike T4P). |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 
@@ -39,15 +39,24 @@
 
 ## Key Findings
 
-- Final result (alignment-bypassed): 334/212/126 junk, inter-class CC=0.943. **Class averages visually separate the two T4P conformational phases.**
+- **T4P** final result (alignment-bypassed): 334/212/126 junk, inter-class CC=0.943. **Class averages visually separate the two T4P conformational phases.**
 - **MRAPKR="0 0 0" bug discovered:** `0 0 0` = unbounded search in ProTomo, not "no translation." With MRAAREA=0.0, 437/672 edge particles were shifted +22px in X by a spurious CC peak from zero-padded boundaries. Pipeline now bypasses `subvolalign.sh` (copies raw.i3i → mra.i3i) to prevent this corruption.
 - ProTomo is primarily an alignment package; classification is a secondary capability.
+- **FM_easy (2026-06-15): ARI=−0.003**, split 517/103/74. SVD on the FM_easy-masked stack + Ward HAC on factors 1–4 collapse to a single dominant cluster; the 3-class conformational structure is not recovered (GT class C lands 174/0/3 in cluster 0). Unlike T4P (2 large, visually distinct phases), the 3-way ~30 Å motor_easy differences are below ProTomo's SVD+HAC discrimination at this SNR.
+
+### Pipeline-build gotchas (ProTomo 3.1.0, discovered building FM_easy)
+
+- **The subtomo *series* `dataset.i3i` is built with `tomoprepare`** (consuming a `.prep` of `search`/`attach`/`save`), **not `tomoprocess`** (the workflow doc was wrong; `tomoprocess` lacks the `attach` command) and **not `i3concat`** (that produces a 4D *hypervolume* which `tomoclass` reads as a single image → "1 by N data matrix"). A valid series has **centered spatial coords (`[-48..47]`) + a 0-based index axis** and stores the member files by basename, resolved via `i3_filepath`/`DATADIR` at run time.
+- **`tomoclass dataset` rejects absolute paths** (use relative + `DATADIR`); `MSAMASK` accepts an absolute path.
+- **"No junk" = leave `CLSHVO`/`CLSHVM` empty** (not `0` — `hacoptions 0 0` errors as "invalid option"). Empty makes `subvolhac.sh` omit the `hacoptions` line entirely.
+- **`cycle-000/param.sh` is copied at `subvolinitial` and overrides later edits to `param-template.sh`** — sync both (or re-init) when changing parameters.
+- **SVD without central crop:** set `MSAIMGSIZE` = full box (`96 96 96`) and `MSAMASK` = the dataset mask `.i3i` (convert an MRC mask with `i3preproc <in.mrc> <out.i3i>`).
 
 ---
 
 ## Next Steps
 
-- Lower priority given T4P result. Revisit only if alignment quality is identified as the bottleneck.
+- FM_hard / T4SS when ready. T4P/FM_easy complete.
 
 ---
 
@@ -58,3 +67,6 @@
 | `T4P/results/class_averages_slices.png` | Central slice comparison of two classes |
 | `T4P/results/clustering_scatter.png` | Clustering scatter plot |
 | `research.md` | Detailed workflow and configuration notes |
+| `outputs/FM_easy/protomo/protomo_motor_easy_k3.csv` | Per-particle FM_easy assignments (k=3) |
+| `outputs/FM_easy/protomo/confusion_protomo_k3_motor_easy_k3.png` | FM_easy confusion matrix (ARI=−0.003) |
+| `~/Research/protomo/motor_easy/` | Local workspace: `prepare/dataset.prep`, `process/param-template.sh`, `run_motor_easy.sh` (not committed) |

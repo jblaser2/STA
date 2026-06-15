@@ -12,6 +12,21 @@
 
 run('/home/jblaser2/Research/dynamo/dynamo_activate.m');
 
+% --- Parallel-pool hardening (160^3 boxes; 2026-06-15) ---
+% The 2026-06-11 run died at ccmatrix when the implicit 24-worker pool tore
+% down mid-parfor (libgtk-x11-2.0 ServiceHost crash-loop noise + contention at
+% 160^3). Quiet the non-essential MathWorks ServiceHost helper, then start one
+% explicit, fixed pool that survives across prealign -> ccmatrix.
+setenv('MW_SERVICE_HOST_DISABLE', '1');
+NWORKERS = 16;                       % was '*' (24); fewer workers = less 160^3 pressure
+if isempty(gcp('nocreate'))
+    pool = parpool('Processes', NWORKERS);
+else
+    pool = gcp;
+end
+pool.IdleTimeout = Inf;              % do not reclaim the pool between steps
+fprintf('Parpool ready: %d workers, IdleTimeout=Inf\n', pool.NumWorkers);
+
 OUTDIR    = '/home/jblaser2/Research/STA/packages/dynamo/dynamo_outputs/motor_switch_pca';
 DATA_DIR  = fullfile(OUTDIR, 'data');
 TBL_FILE  = fullfile(OUTDIR, 'motor_switch_pca.tbl');
@@ -36,7 +51,7 @@ else
     wb.setBand([0.05, 0.45, 2]);
     wb.setSym('c1');
     wb.settings.general.bin.value = 0;
-    wb.settings.computing.cores.value  = '*';
+    wb.settings.computing.cores.value  = NWORKERS;
     wb.settings.computing.useGpus.value = false;
     wb.setBatch(100);
     wb.unfold();

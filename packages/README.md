@@ -57,7 +57,9 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 | [Dynamo](dynamo/) | ✅ | **0.200** (k=3 dpkpca) | <img src="dynamo/FM_easy/results/motor_easy_pca/confusion_dynamo_k3_k3_pca_nc_best_cnew.png" width="200"> | dpkpca nc=17; class B 96–99% pure |
 | [OPUS-TOMO](opusTomo/) | ✅ | 0.021 | <img src="../outputs/FM_easy/opus/confusion_opus-tomo_k3_threshold_mask.png" width="200"> | Class C isolated; A/B unseparated |
 | [PyTom](PyTom/) | ✅ | **0.134** (k=3) | <img src="../outputs/FM_easy/pytom/confusion_pytom_k3_motor_easy_k3_v2mask.png" width="200"> | v2 cyl mask |
-| All others | ⬜ | — | ⬜ | EMAN2, DISCA, TomoFlow, ProTomo, STOPGAP not yet run |
+| [DISCA](disca/) | ✅ | 0.036 | <img src="../outputs/FM_easy/disca/confusion_disca_k3_motor_easy_k3.png" width="200"> | Balanced 269/227/198 but each GT class smeared across all 3 clusters; contrast axis, not conformational (same as T4P) |
+| [ProTomo](protomo/) | ✅ | −0.003 | <img src="../outputs/FM_easy/protomo/confusion_protomo_k3_motor_easy_k3.png" width="200"> | SVD+HAC collapse to dominant cluster (517/103/74); class C 174/0/3 in cluster 0; misses 3-class structure (unlike T4P) |
+| All others | ⬜ | — | ⬜ | EMAN2, TomoFlow, STOPGAP not yet run |
 
 ---
 
@@ -71,7 +73,7 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 |---------|-----------------|---------|----------------|-------|
 | [RELION](relion/) | ✅ | **0.379** (iter 1 GT) | <img src="relion/FM_switch/results/confusion_relion_k2_k2_v3_GT_seeded_iter1.png" width="200"> | GT-seeded+firstiter_cc+skip_align; collapses to ARI≈0 by iter5 |
 | [PEET](peet/) | ✅ | **0.007** (k=2 pc1_10) | <img src="peet/FM_switch/results/confusion_peet_k2_motor_switch_k2_pc1_10.png" width="200"> | WMD-PCA ARI≈0; CCW/CW equally split; same limitation as FM_easy |
-| [Dynamo](dynamo/) | ⬜ | — | ⬜ | Not yet run |
+| [Dynamo](dynamo/) | ✅ | **−0.001** (k=2 dpkpca) | <img src="dynamo/FM_switch/results/confusion_dynamo_k2_k2_pca_motor_switch.png" width="200"> | dpkpca 50 eigs, k-means k=2 → 229/222; CCW/CW split ~50/50 across both clusters; same unsupervised failure as PEET |
 | [OPUS-TOMO](opusTomo/) | ⬜ | — | ⬜ | Not yet run |
 | [PyTom](PyTom/) | ⬜ | — | ⬜ | Not yet run |
 | All others | ⬜ | — | ⬜ | EMAN2, DISCA, TomoFlow, ProTomo, STOPGAP not yet run |

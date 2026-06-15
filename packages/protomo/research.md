@@ -82,7 +82,7 @@ extract ../pos/col0.pos to stacks/col0.i3i
 extract ../pos/col1.pos to stacks/col1.i3i
 ...
 ```
-Run with: `tomoprocess -f extract.prep`
+Run with: `tomoprepare extract.prep` (positional arg; `tomoprepare`, not `tomoprocess`).
 
 ### Step 3: Assemble dataset (`dataset.prep`)
 ```
@@ -92,10 +92,14 @@ attach col1.i3i
 ...
 save dataset.i3i
 ```
-Run with: `tomoprocess -f dataset.prep`
+Run with: `tomoprepare dataset.prep` (positional arg, **not** `tomoprocess -f` — verified
+2026-06-15 on ProTomo 3.1.0; `tomoprocess` has no `attach` command).
 
-This creates a single `dataset.i3i` image stack containing all subtomograms — the input to
-the classification workflow.
+This creates a `dataset.i3i` image *series* — a lightweight index referencing the member
+subtomograms by basename (resolved at run time via `i3_filepath`/`DATADIR`), with **centered
+spatial coords (`[-N/2..N/2-1]`) and a 0-based index axis**. Do NOT build it with `i3concat`:
+that yields a 4D *hypervolume* which `tomoclass` reads as a single image. This series is the
+input to the classification workflow.
 
 ---
 
@@ -256,9 +260,9 @@ source ~/Applications/protomo-3.1.0/setup.sh
 # --- Data preparation (run once) ---
 # 1. Pick particles → place .pos files in pos/
 # 2. Extract subtomograms
-tomoprocess -f prepare/extract.prep
-# 3. Assemble dataset
-tomoprocess -f prepare/dataset.prep
+tomoprepare prepare/extract.prep
+# 3. Assemble dataset (series index; for pre-extracted MRCs use search/attach/save)
+tomoprepare prepare/dataset.prep
 
 # --- Classification (copy and edit process/template-initial.sh as param.sh) ---
 cp process/template-initial.sh param.sh
