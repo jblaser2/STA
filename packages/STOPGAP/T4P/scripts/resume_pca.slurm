@@ -16,7 +16,7 @@ set -Eeuo pipefail
 # long compute that does not depend on the PCA results).
 
 ############################ USER CONFIG ############################
-SG=/home/ejl62/summerResearch/STA/STOPGAP
+SG=/home/ejl62/summerResearch/STA/packages/STOPGAP   # persistent hub (this repo)
 export STOPGAPHOME=$SG/exec
 ROOT=/home/ejl62/Pili_class
 KS=(2 3 4)
@@ -26,7 +26,7 @@ NC=$SLURM_NTASKS
 ####################################################################
 
 module load matlab/r2023b
-MLP="addpath(genpath('$SG/src'));addpath(genpath('$SG/sg_toolbox'));addpath('$SG/scripts');"
+MLP="addpath(genpath('$SG/src'));addpath(genpath('$SG/sg_toolbox'));addpath('$SG/T4P/scripts');"
 
 mkdir -p "$ROOT" "$ROOT/logs"
 cd "$ROOT"

@@ -4,22 +4,28 @@
 > re-reading. STOPGAP is a **subtomogram averaging (STA) workflow written in
 > MATLAB** that does template matching, high-resolution alignment/averaging, and
 > **classification** (PCA + k-means, and multireference alignment). Source +
-> example bash scripts + MCR binaries (recompiled here for **R2023b**; R2020b
-> originals backed up in `exec/lib_r2020b/`).
-> Repo root: `/home/ejl62/summerResearch/STA/STOPGAP/`.
+> example bash scripts + MCR binaries (compiled here for **R2023b** via
+> `recompile_stopgap.slurm`; the upstream-shipped R2020b binaries are not used).
+> Repo root (persistent hub): `/home/ejl62/summerResearch/STA/packages/STOPGAP/`.
 >
 > **This file is the single replication reference.** Part I (§1–9) maps the STOPGAP
-> codebase; **Part II (§10–14)** documents *our* T4P pre-picked-particle
+> codebase; **Part II (§10–15)** documents *our* T4P pre-picked-particle
 > classification pipeline — the actual scripts, the run procedure, the bugs we hit
-> and fixed, and parameters/tuning. A new group member should be able to reproduce
-> the work from Part II alone, dropping into Part I for internals.
+> and fixed, parameters/tuning, and (§15) the **results of the completed k=2/3/4
+> run**. A new group member should be able to reproduce the work from Part II alone,
+> dropping into Part I for internals.
+>
+> **Status (2026-06-09): the full T4P pipeline has run end-to-end** (PCA+k-means and
+> MRA, k=2/3/4). All scripts, params, masks, eigenvalues, class averages, and figures
+> are committed under `T4P/` (see §10, §15). Everything below is current; nothing in
+> the pipeline is "pending" anymore.
 
 ---
 
 ## 1. Top-level layout
 
 ```
-STOPGAP/
+packages/STOPGAP/                       # ← persistent replication hub ($SG in scripts)
 ├── src/                  # MATLAB source compiled into the runtime binaries
 │   ├── stopgap/          # main entry (stopgap.m), watcher, compile_*.m scripts
 │   ├── subtomo/          # subtomogram alignment & averaging (exec/func/parser/watcher)
@@ -32,17 +38,29 @@ STOPGAP/
 ├── sg_toolbox/           # ~300 standalone `sg_*` helper functions + toolbox entry
 │   ├── io/{pca,subtomo,tm,tps,vmap}/   # per-task parser arg defs / settings / field types
 │   ├── other/, tom/, private/, standalone/
-├── exec/                 # everything that ships to run STOPGAP (the "bin")
-│   ├── bash/             # USER-FACING template scripts (edit these to run jobs)
+├── exec/                 # everything that ships to run STOPGAP (the "bin"); $STOPGAPHOME
+│   ├── bash/             # USER-FACING upstream template scripts (reference only)
 │   ├── bin/              # launcher wrappers (call compiled binaries)
-│   └── lib/              # config (MCR paths), MCR prep, compiled binaries get placed here
-├── stopgap_0.7.5_manual.pdf
-└── changes.txt           # 0.7.4 → 0.7.5 = TM tilesize parallelization change
+│   ├── lib/              # config (MCR paths) + MCR prep + the 4 compiled R2023b binaries
+│   │                     #   (stopgap, stopgap_parser, stopgap_watcher, sg_toolbox — GITIGNORED)
+│   ├── lib_r2023b/       # mcc build artifacts/logs from the last recompile (not the binaries)
+│   └── lib_prev/         # previous build, auto-created on the next recompile (may be absent)
+├── T4P/                  # ← OUR T4P classification experiment (the actual pipeline)
+│   ├── scripts/          # run_pipeline.slurm, resume_pca.slurm + build_*.m / *_results.m / kmeans fn
+│   └── results/          # committed run outputs (see §15): lists/ ref/ pca/ meta/ params/ masks/ fsc/
+├── FM_hard/  T4SS/       # placeholders for the other datasets (.gitkeep; not yet run)
+├── recompile_stopgap.slurm   # rebuild the 4 binaries for R2023b + install to exec/lib/
+├── research.md           # THIS FILE — single replication reference
+├── setup_notes.md        # deep technical guide (shared files, data structures, modules)
+├── README.md             # package status + results summary + file index
+├── stopgap_0.7.5_manual.pdf  /  stopgap_0.7.5.md  /  changes.txt
 ```
 
 `$STOPGAPHOME` env var must point to a dir containing `bin/` and `lib/` (i.e. a
-populated `exec/`). The bash scripts reference `${STOPGAPHOME}/bin/*.sh` and
-`${STOPGAPHOME}/lib/*`.
+populated `exec/`); the SLURM scripts set `STOPGAPHOME=$SG/exec` with
+`SG=…/packages/STOPGAP`. The bash scripts reference `${STOPGAPHOME}/bin/*.sh` and
+`${STOPGAPHOME}/lib/*`. **The compiled binaries in `exec/lib/` are gitignored** — a
+fresh clone must run `recompile_stopgap.slurm` once before the pipeline will launch.
 
 ---
 
@@ -292,8 +310,11 @@ are compiled headless (`nojvm`,`nodisplay`); the toolbox needs JVM+display.
 The compile must add to the MATLAB path: `src/**` and `sg_toolbox/**`.
 
 **Current state:** all four binaries (`stopgap`, `stopgap_parser`, `stopgap_watcher`,
-`sg_toolbox`) are compiled for R2023b and installed in `exec/lib/`; R2020b originals
-are in `exec/lib_r2020b/`. To rebuild, submit `recompile_stopgap.slurm` (§10). `mcc`
+`sg_toolbox`) are compiled for R2023b and installed in `exec/lib/` (gitignored — they
+do not travel with the repo). `recompile_stopgap.slurm` builds into `exec/lib_r2023b/`
+(mcc artifacts), backs up any currently-installed binaries to `exec/lib_prev/`, then
+installs into `exec/lib/`. The upstream R2020b binaries are not used. To (re)build,
+submit `recompile_stopgap.slurm` (§10). `mcc`
 is the MATLAB Compiler — it ships *inside* the install (`/apps/matlab/r2023b/bin/mcc`),
 is **not** a separate Lmod module (`module spider mcc` fails — expected), and is on
 `PATH` after `module load matlab/r2023b`. The compile node needs license-server
@@ -307,8 +328,8 @@ connectivity (`27002@lice`).
   also `r2018b`, `r2024a`. A separate MCR module exists only for `r2018b`
   (`matlab-runtime/r2018b`) — so for r2023b we run binaries against the **full
   MATLAB r2023b install's runtime** (`/apps/matlab/r2023b/{runtime,bin,sys}/glnxa64`).
-- Binaries in `exec/lib/` are now built for **R2023b** (recompiled via
-  `recompile_stopgap.slurm`); R2020b originals kept in `exec/lib_r2020b/`.
+- Binaries in `exec/lib/` are built for **R2023b** (recompiled via
+  `recompile_stopgap.slurm`) and gitignored; the upstream R2020b binaries are unused.
 - Dataset: `/home/ejl62/groups/grp_tomo/Pili_PCA/particles/` — **672** files named
   `aligned_tom<T>_P<NNNN>.mrc`, 80³, T4P (Vibrio) pili, particle centered, pilus axis
   along Z (in-plane angle free). Filenames encode tomogram + particle, **not** a
@@ -328,21 +349,26 @@ connectivity (`27002@lice`).
 
 ## 10. The pipeline files (all on disk, all runnable)
 
-Two SLURM scripts drive everything; the MATLAB helpers live in `scripts/` and are
-called via `matlab -batch` with `src/`, `sg_toolbox/`, and `scripts/` on the path.
+Two SLURM scripts drive everything; the MATLAB helpers live in `T4P/scripts/` and are
+called via `matlab -batch` with `src/`, `sg_toolbox/`, and `T4P/scripts/` on the path.
+The SLURM scripts set `SG=…/packages/STOPGAP` and add `$SG/T4P/scripts` to the MATLAB
+path, so the whole pipeline is self-contained in this repo (no external paths beyond
+the particle data and `$ROOT` working dir). `recompile_stopgap.slurm` lives at the
+package root; the pipeline + helpers live in `T4P/scripts/`.
 
 | File | Role |
 |---|---|
-| `recompile_stopgap.slurm` | Recompile the 4 binaries for R2023b, back up R2020b, install to `exec/lib/`, smoke-test the parser. Run once (already done). |
-| `run_pipeline.slurm` | Full end-to-end classification. Edit the USER CONFIG block, `sbatch` it. |
-| `scripts/build_inputs.m` | Symlink `aligned_tom*_P*.mrc` → `subtomograms/subtomo_<n>.mrc`; write `lists/allmotl_1.star` (type-2 motl, 16 fields); odd→halfset A / even→B; dump `meta/tomo_nums.csv`. |
-| `scripts/build_wedgelist.m` | One wedgelist row per tomogram×tilt from **tilt range only** (CTF/exposure off); reads px + box from `subtomo_1.mrc` header. |
-| `scripts/build_masks_ref.m` | Cylindrical alignment mask (`mask_align.mrc`) + tighter CC mask (`mask_cc.mrc`) along Z; initial reference = normalized global average, written to **`ref_1.mrc`, `ref_A_1.mrc`, `ref_B_1.mrc`** (per-halfset — see §11). Mask radii **tightened 2026-06-04** (§12). |
-| `scripts/inspect_global_avg.m` | Diagnostic (not in the pipeline): render `ref_1.mrc` XY/XZ central slices + radial density profile to `meta/global_avg_profile.png` to size the mask. Run via `matlab -batch`. |
-| `scripts/build_pca_aux.m` | Write `lists/filter_list.star` (**exactly one** bandpass entry — deletes any existing file first, since `sg_pca_append_filter_list` appends; see §11 bug #10) + `pca_settings.txt` (`calc_ctf=0`, `calc_exp=0`). |
-| `scripts/sg_pca_kmeans_cluster_fn.m` | Parameterized k-means over PCA eigenvalues → `lists/allmotl_pca_k<k>_<ITER>.star`. Auto-finds the `calc_pca_ccmat` row; `kmeans(X,k,'Replicates',20)`, `rng(0)`. |
-| `scripts/visualize_results.m` | Headless PNGs to `meta/`: PC1–2 & PC1–3 gscatter colored by class; XY/XZ/YZ central-slice montage of each class average. |
-| `scripts/compare_methods.m` | ARI + NMI + co-occurrence matrix (PCA vs MRA), aligned by `subtomo_num` → `meta/pca_vs_mra_agreement.csv` + `cooccur_k*.png`. |
+| `recompile_stopgap.slurm` | Recompile the 4 binaries for R2023b, back up the prior build to `exec/lib_prev/`, install to `exec/lib/`, smoke-test the parser. Run once per machine/MATLAB version. |
+| `T4P/scripts/run_pipeline.slurm` | Full end-to-end classification. Edit the USER CONFIG block, `sbatch` it. |
+| `T4P/scripts/resume_pca.slurm` | Resume the PCA branch from the k-means stage, reusing existing `pca/eigenval_*.csv` + `rvol/rwei` (skips alignment + PCA recompute). MRA not included. |
+| `T4P/scripts/build_inputs.m` | Symlink `aligned_tom*_P*.mrc` → `subtomograms/subtomo_<n>.mrc`; write `lists/allmotl_1.star` (type-2 motl, 16 fields); odd→halfset A / even→B; dump `meta/tomo_nums.csv`. |
+| `T4P/scripts/build_wedgelist.m` | One wedgelist row per tomogram×tilt from **tilt range only** (CTF/exposure off); reads px + box from `subtomo_1.mrc` header. |
+| `T4P/scripts/build_masks_ref.m` | Cylindrical alignment mask (`mask_align.mrc`) + tighter CC mask (`mask_cc.mrc`) along Z; initial reference = normalized global average, written to **`ref_1.mrc`, `ref_A_1.mrc`, `ref_B_1.mrc`** (per-halfset — see §11). Mask radii **tightened 2026-06-04** (§12). |
+| `T4P/scripts/inspect_global_avg.m` | Diagnostic (not in the pipeline): render `ref_1.mrc` XY/XZ central slices + radial density profile to `meta/global_avg_profile.png` to size the mask. Run via `matlab -batch`. |
+| `T4P/scripts/build_pca_aux.m` | Write `lists/filter_list.star` (**exactly one** bandpass entry — deletes any existing file first, since `sg_pca_append_filter_list` appends; see §11 bug #10) + `pca_settings.txt` (`calc_ctf=0`, `calc_exp=0`). |
+| `T4P/scripts/sg_pca_kmeans_cluster_fn.m` | Parameterized k-means over PCA eigenvalues → `lists/allmotl_pca_k<k>_<ITER>.star`. Auto-finds the `calc_pca_ccmat` row; `kmeans(X,k,'Replicates',20)`, `rng(0)`. |
+| `T4P/scripts/visualize_results.m` | Headless PNGs to `meta/`: PC1–2 & PC1–3 gscatter colored by class; XY/XZ/YZ central-slice montage of each class average. |
+| `T4P/scripts/compare_methods.m` | ARI + NMI + co-occurrence matrix (PCA vs MRA), aligned by `subtomo_num` → `meta/pca_vs_mra_agreement.csv` + `cooccur_k*.png`. |
 
 ### Stage flow (as orchestrated by `run_pipeline.slurm`)
 ```
@@ -475,18 +501,17 @@ recompile** (`recompile_stopgap.slurm`); the algorithm code is untouched.
 
 **Resuming without recomputing PCA:** the ~1h `run_pca` stage writes `pca/eigenval_*.csv`
 plus 672 `rvol_*`/`rwei_*`. After a downstream crash, run **`resume_pca.slurm`**
-(kmeans → run_avg_pca → viz_pca, `ITER=3`) against those existing outputs instead of
-rerunning the whole `run_pipeline.slurm`. The PCA branch first ran clean **2026-06-04** (resume path, loose mask):
-outputs in `meta/` (`class_pca_pca_scatter.png`, `class_pca_class_avg_k{2,3,4}.png`),
-`ref/class_pca_k*` (+ `_A_`/`_B_` halfsets), `lists/allmotl_pca_k{2,3,4}_3.star`.
-*Results caveat (that run):* k-means split almost entirely along PC1 and the class
-averages were noise-dominated/streaky at every k. Diagnosed as the **too-loose mask**
-(§12/§14.3), not a code bug — retightened (`ali r=8/h=26`, `cc r=6/h=20`).
-*Status of the tight-mask rerun:* the end-to-end job **12097551** (`DO_MRA=1`) **timed
-out before producing any results** — it deadlocked in `run_pca` (bug #10) and never
-reached k-means. After fixing #10, `$ROOT` was wiped to a clean slate (2026-06-05); a
-fresh full run is pending. **The tight mask is therefore still unverified** — the noise
-vs over-cropping question (§14.3) is open until that run completes.
+(kmeans → run_avg_pca → viz_pca) against those existing outputs instead of rerunning the
+whole `run_pipeline.slurm`. (Set its `ITER` to match the run that produced the PCA:
+`ITER=1` for the default `DO_ALIGN=0` path, `ITER=3` if alignment was run.)
+
+**History:** the PCA branch first ran clean **2026-06-04** (resume path, loose mask):
+k-means split almost entirely along PC1 and the class averages were noise-dominated/streaky
+at every k. Diagnosed as the **too-loose mask** (§12/§14.3), not a code bug — retightened
+(`ali r=8/h=26`, `cc r=6/h=20`). A first tight-mask attempt (job **12097551**, `DO_MRA=1`)
+timed out in `run_pca` on bug #10 before reaching k-means; after fixing #10 and wiping
+`$ROOT`, the **full run completed end-to-end** with the tight mask and `DO_ALIGN=0`
+(`ITER=1`). Those are the committed results in `T4P/results/` — see **§15**.
 
 > **IMPORTANT — any `src/` edit needs a recompile.** STOPGAP runs as compiled MCR
 > binaries in `exec/lib/`; editing a `.m` file has **no effect** until you resubmit
@@ -550,12 +575,16 @@ reset between reruns also clear `rm -f $ROOT/{crash_*,pca/*,rvol/*,temp/*,fsc/*,
 ## 13. How to run (from scratch)
 
 ```bash
-cd /home/ejl62/summerResearch/STA/STOPGAP
-# 1) (once) recompile for R2023b — already done; rerun only if source/MATLAB changes
-sbatch recompile_stopgap.slurm          # set --account/--partition first
-# 2) edit run_pipeline.slurm USER CONFIG: real MINT/MAXT/STEP, --account/--partition,
-#    ntasks, DO_ALIGN/DO_MRA, KS; ROOT defaults to /home/ejl62/Pili_class
-sbatch run_pipeline.slurm
+cd /home/ejl62/summerResearch/STA/packages/STOPGAP
+# 1) (once per machine) recompile the gitignored binaries for R2023b. REQUIRED on a
+#    fresh clone — exec/lib/ ships empty. Rerun only if source/MATLAB changes.
+sbatch recompile_stopgap.slurm                    # set --account/--partition first
+# 2) edit T4P/scripts/run_pipeline.slurm USER CONFIG: real MINT/MAXT/STEP,
+#    --account/--partition, ntasks, DO_ALIGN/DO_MRA, KS, PARTICLES path;
+#    ROOT defaults to /home/ejl62/Pili_class. SG is already set to this repo.
+sbatch T4P/scripts/run_pipeline.slurm
+# 3) (optional) if a downstream stage crashed but PCA finished:
+sbatch T4P/scripts/resume_pca.slurm
 ```
 Outputs land in `$ROOT`: `lists/allmotl_pca_k*` & `allmotl_mra_k*` (class labels),
 `ref/` (class averages, `ref_*` maps), `pca/eigenval_1.csv`, `meta/` (scatter +
@@ -568,17 +597,20 @@ the `matlab -batch` steps; the STOPGAP `srun` steps need only the R2023b MCR lib
 sourced by `stopgap_config_slurm.sh`.
 
 ## 14. Open items / before trusting results
-1. **Tilt range** — set real `MINT/MAXT/STEP` (placeholder `-60/60/3`).
-2. **`lp_rad`** — re-derive from the confirmed px = 13.328 Å (currently 13.33; PCA aux
-   and align should match the intended resolution cutoff).
-3. **Mask geometry** — *retightened, NOT yet verified.* The original loose mask
-   (`r=20/h=64`) confirmed the "too loose → noise drives PCA" failure mode: class
-   averages were noise-dominated at every k. Retightened to `ali r=8/h=26`, `cc r=6/h=20`
-   from the global-average radial profile (`inspect_global_avg.m`). The verification run
-   (12097551) timed out on bug #10 before producing averages, so the tight mask is
-   untested. On the next full run, **check the new class averages** for the opposite
-   failure — over-cropping that clips conformational signal — and relax toward `r=10–13`
-   if so. See §12 Mask bullet.
+1. **Tilt range** — the completed run used the placeholder `MINT/MAXT/STEP = -60/60/3`;
+   set the real per-tomogram tilt scheme if the missing-wedge weighting needs to be exact
+   (it only affects the symmetric wedge mask, not the alignment-free class assignment).
+2. **`lp_rad`** — the run used `13.33` Fourier px (≈ Nyquist for px = 13.328 Å, box 80);
+   re-derive if a different target resolution cutoff is intended. PCA aux and align match.
+3. **Mask geometry** — *retightened and run to completion; class averages saved but not
+   yet visually validated.* The original loose mask (`r=20/h=64`) confirmed the
+   "too loose → noise drives PCA" failure mode. Retightened to `ali r=8/h=26`,
+   `cc r=6/h=20` from the global-average radial profile (`inspect_global_avg.m`); the
+   full run then completed with this mask (§15). The class averages
+   (`T4P/results/ref/class_pca_k*`, `ref_mra_k*`) exist but have **not** been compared
+   against the PEET `ring_complete`/`ring_altered` reference — do that next to check for
+   the opposite failure (over-cropping that clips conformational signal); relax toward
+   `r=10–13` if the maps look clipped. See §12 Mask bullet and §15.
 4. **Symmetry** — default C1; only set Cn if T4P helical symmetry is intended (for
    averaging, not classification).
 5. **MRA ref/iteration handoff** — `avg_multiclass` seed writes refs at `iteration=ITER`
@@ -588,3 +620,82 @@ sourced by `stopgap_config_slurm.sh`.
    enough for ~30 Å, maybe ~10 Å, differences); missing wedge without CTF makes
    weighting approximate (fine for classification, not for final high-res maps); no
    reliable ground truth on this real dataset (hence cross-method ARI/NMI).
+
+---
+
+## 15. Results of the completed T4P run (committed)
+
+**Run config (the run behind `T4P/results/`):** 672 prealigned 80³ T4P subtomograms,
+px = 13.328 Å; `DO_ALIGN=0` (particles prealigned at (0,0,0), so `ITER=1` and `rot_vol`
+applies identity); tight mask (`ali r=8/h=26`, `cc r=6/h=20`); `DO_MRA=1`; k = 2/3/4;
+PCA on PCs 1–3 of `eigenval_1.csv`; MRA = classify-only `ali_multiref` (6 iterations,
+phi/theta fixed) seeded from random classes. Two **independent** classifiers on the same
+particles: **PCA + k-means** (primary) and **MRA** (secondary).
+
+**Provenance:** SLURM job **12114811**, run **2026-06-05** on 64 cores, finished cleanly
+(~58 min wall: `init`→`compare` 13:53→14:51; `run_pca` ~19 min was the longest stage; empty
+`.err`). The log's ARI values match `meta/pca_vs_mra_agreement.csv` exactly. `$ROOT` was
+`/home/ejl62/Pili_class` (8.4 GB working dir; only the §15.4 core set is committed).
+
+### 15.1 Class splits (per-class particle counts, all 672)
+
+| k | PCA + k-means (`allmotl_pca_k*_1`) | MRA final (`allmotl_mra_k*_6`) |
+|---|------------------------------------|--------------------------------|
+| 2 | **336 / 336** | **70 / 602** |
+| 3 | 251 / 274 / 147 | 24 / 391 / 257 |
+| 4 | 194 / 121 / 189 / 168 | 22 / 317 / 23 / 310 |
+
+### 15.2 Cross-method agreement (`meta/pca_vs_mra_agreement.csv`)
+
+| k | ARI | NMI |
+|---|-----|-----|
+| 2 | 0.0012 | 0.0049 |
+| 3 | 0.0027 | 0.0020 |
+| 4 | 0.0034 | 0.0110 |
+
+### 15.3 Interpretation (honest read)
+
+The two methods **do not agree and neither finds a stable discrete partition**:
+
+- **PCA k-means** produces near-uniform splits — *exactly* 336/336 at k=2 — i.e. it is
+  slicing a **continuous PC axis** into equal halves rather than recovering two
+  populations. This is the classic "no gap in the embedding" signature.
+- **MRA** collapses to one **dominant class** (602/672 at k=2; 391 and 317 dominate at
+  k=3/4) with tiny satellite classes — the CC-based assignment can't reliably separate
+  conformers, so most particles flow to the highest-scoring reference.
+- **ARI ≈ 0.001–0.003** (≈ chance): the PCA and MRA labelings are essentially
+  uncorrelated, so the split is **not reproducible across methods**.
+
+Conclusion: on this real T4P set, STOPGAP — like **RELION, DISCA, and TomoFlow** in this
+benchmark — does **not** cleanly recover the two pili phases. The most likely cause is
+**per-particle SNR too low for CC-based discrimination** at 672 particles / 13.3 Å px,
+not a pipeline defect (the pipeline runs clean and deterministically). This is a
+legitimate, reportable benchmark outcome, not a failed run.
+
+### 15.4 Where the outputs live (`T4P/results/`, ~44 MB)
+
+| Subdir | Contents | Committed? |
+|--------|----------|-----------|
+| `lists/` | class assignments: `allmotl_pca_k{2,3,4}_1.star`, `allmotl_mra_k{2,3,4}_6.star`, input `allmotl_1.star`, `wedgelist.star`, `filter_list.star` | `.star` gitignored; local-only |
+| `ref/` | class averages `class_pca_k*_1_*.mrc`, MRA refs `ref_mra_k*_6_*.mrc`, `ref_1.mrc` | `.mrc` gitignored; local-only |
+| `pca/` | `eigenval_1.csv` (per-particle PCA coords), `eigenfac_1.csv` | **yes** |
+| `meta/` | `class_pca_pca_scatter.png`, `class_pca_class_avg_k{2,3,4}.png`, `cooccur_k{2,3,4}.png`, `pca_vs_mra_agreement.csv` | **yes** |
+| `params/` | run configs: `pca_param.star`, `mra_k{2,3,4}.star`, `mraseed_param.star`, `avg_pca_param.star` | no (`.star` gitignored) |
+| `masks/` | `mask_align.mrc`, `mask_cc.mrc` | gitignored |
+| `fsc/` | per-class gold-standard FSC curves (PDF) for every iteration | **yes** |
+| `pca_settings.txt` | `calc_ctf=0`, `calc_exp=0` | **yes** |
+
+The committed record (PNG figures, CSVs, FSC PDFs, `pca_settings.txt`) is enough to read
+the result without the binaries; everything `.mrc`/`.star` — including `params/`, `lists/`,
+`ref/`, `masks/` — is local-only (gitignored, regenerated by a rerun). Half-maps
+(`ref_mra_k2_{A,B}_6_*`) were **not** copied — recompute from `$ROOT` if gold-standard
+per-class FSC at full split is needed.
+
+### 15.5 Still to do (analysis, not pipeline)
+
+1. **Visually compare** `ref/ref_mra_k2_6_{1,2}.mrc` and `ref/class_pca_k2_1_{1,2}.mrc`
+   against the PEET `ring_complete`/`ring_altered` references — is the 70-particle MRA
+   minority a real phase or junk, and are the tight-mask averages over-cropped (§14.3)?
+2. **ARI vs PEET soft ground truth** — score the STOPGAP labels against the PEET
+   assignment (the project's cross-package T4P comparison; `scripts/eval/`).
+3. Then **FM_hard / T4SS** (placeholders staged; pipeline reusable as-is).

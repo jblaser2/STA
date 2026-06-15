@@ -17,7 +17,7 @@ STAR="$SCRIPT_DIR/particles.star"
 POSES="$SCRIPT_DIR/pose_euler.pkl"
 MASK="$SCRIPT_DIR/mask.mrc"
 OUTDIR="$SCRIPT_DIR/output"
-DATADIR="$HOME/Research/STA/subtomos_mrc"
+DATADIR="$HOME/src/particles"
 
 for f in "$STAR" "$POSES" "$MASK"; do
     [[ -f "$f" ]] || { echo "ERROR: $f not found — run prerequisite scripts first."; exit 1; }
@@ -38,8 +38,19 @@ if [[ $# -ge 1 ]]; then
     echo "Resuming from epoch $RESUME_EPOCH ..."
 fi
 
-echo "Starting training -> $OUTDIR"
-dsd train_tomo "$STAR" \
+# Launcher: by default skip the in-training orientation search (data is already
+# aligned at Euler 0,0,0). This runs the non-invasive wrapper that monkeypatches
+# VanillaDecoder.get_particle_hopfs -- opusTomo source is left untouched.
+# Set ALIGN=1 to fall back to the stock search-on path (`dsd train_tomo`).
+if [[ "${ALIGN:-0}" -eq 1 ]]; then
+    echo "Starting training (orientation search ON) -> $OUTDIR"
+    LAUNCH=(dsd train_tomo)
+else
+    echo "Starting training (skip-align: orientation search OFF) -> $OUTDIR"
+    LAUNCH=(python "$SCRIPT_DIR/train_skipalign.py")
+fi
+
+"${LAUNCH[@]}" "$STAR" \
     --poses "$POSES" \
     -n 20 \
     -b 16 \

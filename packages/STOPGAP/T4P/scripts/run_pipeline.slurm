@@ -10,7 +10,7 @@
 set -Eeuo pipefail
 
 ############################ USER CONFIG ############################
-SG=/home/ejl62/summerResearch/STA/STOPGAP
+SG=/home/ejl62/summerResearch/STA/packages/STOPGAP   # persistent hub (this repo)
 export STOPGAPHOME=$SG/exec
 ROOT=/home/ejl62/Pili_class                      # project working dir
 PARTICLES=/home/ejl62/groups/grp_tomo/Pili_PCA/particles
@@ -19,15 +19,15 @@ DO_ALIGN=0                                         # 0 = skip alignment; particl
 DO_MRA=1                                           # 1 = also run MRA + cross-method compare
 KS=(2 3 4)                                         # k values for clustering
 PX=AUTO                                            # 'AUTO' = read from header; or set Å/px
-# LP_RAD below is set to 17 (placeholder). Derive the real value once pixel
-# size is confirmed: lp_rad ~ box/2 * (px / target_res_A), or use Nyquist
-# e.g. for px=5.4A, box=80, 17 Fourier px ≈ 19A resolution cutoff.
+# Bandpass lp_rad is hardcoded to 13.33 Fourier px below (CONE_INPLANE and the
+# build_pca_aux call). Re-derive if the target resolution changes:
+# lp_rad ~ box/2 * (px / target_res_A); px = 13.328 Å, box = 80.
 NC=$SLURM_NTASKS
 ####################################################################
 
 module load matlab/r2023b
 # MATLAB path added to every matlab -batch call
-MLP="addpath(genpath('$SG/src'));addpath(genpath('$SG/sg_toolbox'));addpath('$SG/scripts');"
+MLP="addpath(genpath('$SG/src'));addpath(genpath('$SG/sg_toolbox'));addpath('$SG/T4P/scripts');"
 
 mkdir -p "$ROOT" "$ROOT/logs"
 cd "$ROOT"

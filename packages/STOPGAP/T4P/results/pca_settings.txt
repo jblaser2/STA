@@ -1,0 +1,2 @@
+calc_ctf=0
+calc_exp=0

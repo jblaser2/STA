@@ -10,7 +10,7 @@ particle at it. With --ctfalpha 0 --ctfbeta 0 these values are never applied.
 """
 import glob, os, sys
 
-PARTICLE_DIR = os.path.expanduser('~/Research/STA/subtomos_mrc')
+PARTICLE_DIR = os.path.expanduser('~/src/particles')
 SCRIPT_DIR   = os.path.dirname(os.path.abspath(__file__))
 OUT_STAR     = os.path.join(SCRIPT_DIR, 'particles.star')
 DUMMY_CTF    = os.path.join(PARTICLE_DIR, 'dummy_ctf.star')
