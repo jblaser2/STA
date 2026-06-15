@@ -43,3 +43,4 @@ relion,motor_switch,2,k2_v3_GT_seeded_iter1,451,0.378898,0.279452,0.281461,0.769
 dynamo,motor_switch,2,k2_pca_motor_switch,451,-0.000957,-0.001708,0.001085,0.481153,packages/dynamo/dynamo_outputs/motor_switch_pca/predictions_k2.csv,
 disca,motor_easy,3,motor_easy_k3,694,0.036325,0.036197,0.038762,0.426513,outputs/FM_easy/disca/disca_motor_easy_k3.csv,cyl solvent mask r=32 Y-10 96^3; Fourier-crop 96->32; 80 EM iter; native sm_120
 protomo,motor_easy,3,motor_easy_k3,694,-0.002735,0.076947,0.079888,0.381844,outputs/FM_easy/protomo/protomo_motor_easy_k3.csv,I3/ProTomo 3.1.0; 96^3 series via tomoprepare; alignment bypassed (raw->mra); SVD masked by FM_easy solvent mask (MSAIMGSIZE 96^3); HAC 3 classes no junk (CLSHVO/HVM empty)
+eman2,motor_easy,3,motor_easy_k3,694,-0.001501,0.096084,0.098967,0.394813,outputs/FM_easy/eman2/eman2_motor_easy_k3.csv,EMAN2 no-align PCA split (e2spt_pcasplit); k=3 no junk (no --clean); NBASIS=12 MAXRES=40A; auto-tight mask; identity parms

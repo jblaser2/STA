@@ -59,7 +59,8 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 | [PyTom](PyTom/) | ✅ | **0.134** (k=3) | <img src="../outputs/FM_easy/pytom/confusion_pytom_k3_motor_easy_k3_v2mask.png" width="200"> | v2 cyl mask |
 | [DISCA](disca/) | ✅ | 0.036 | <img src="../outputs/FM_easy/disca/confusion_disca_k3_motor_easy_k3.png" width="200"> | Balanced 269/227/198 but each GT class smeared across all 3 clusters; contrast axis, not conformational (same as T4P) |
 | [ProTomo](protomo/) | ✅ | −0.003 | <img src="../outputs/FM_easy/protomo/confusion_protomo_k3_motor_easy_k3.png" width="200"> | SVD+HAC collapse to dominant cluster (517/103/74); class C 174/0/3 in cluster 0; misses 3-class structure (unlike T4P) |
-| All others | ⬜ | — | ⬜ | EMAN2, TomoFlow, STOPGAP not yet run |
+| [EMAN2](eman2/) | ✅ | −0.002 | <img src="../outputs/FM_easy/eman2/confusion_eman2_k3_motor_easy_k3.png" width="200"> | PCA split collapses to dominant cluster (81/94/519); class C 0/0/177; contrast-axis, misses structure (same as T4P) |
+| All others | ⬜ | — | ⬜ | TomoFlow, STOPGAP not yet run |
 
 ---
 

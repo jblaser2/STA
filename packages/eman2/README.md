@@ -1,8 +1,8 @@
 # EMAN2
 
 **Algorithm:** PCA split on subtomogram stack with reference-based wedge-fill  
-**Environment:** `eman2` conda env (Josh: `~/miniforge3/envs/eman2`; Eben: `~/miniforge3/envs/eman2`)  
-**Status:** ✅ T4P canonical k=3 run complete (270/317 + 85 junk); does not separate two pili phases
+**Environment:** `eman2` conda env (Josh: `~/conda-envs/eman2`; Eben: `~/miniforge3/envs/eman2`)  
+**Status:** ✅ T4P canonical k=3 (270/317 + 85 junk) + ✅ FM_easy k=3 (81/94/519, ARI≈0); collapses to a dominant cluster on both — contrast-axis PCA, not conformational
 
 ---
 
@@ -11,7 +11,7 @@
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
 | **T4P** | ✅ | k=3 / k=2 | auto-tight (density) | — (no GT) | 270 / 317 (+85 junk) | Canonical no-align k=3 run; class 3 (85p, 152Å FSC) = junk; does not separate two pili phases |
-| **FM_easy** | ⬜ | — | — | — | — | Not yet run |
+| **FM_easy** | ✅ | k=3 / k=3 | auto-tight (density) | **−0.002** | 81 / 94 / 519 (no junk) | No-align PCA split, no `--clean`, NBASIS=12, MAXRES=40 Å. Collapses to dominant cluster (519); GT class C 0/0/177 entirely in it; A/B smeared. Contrast-axis, misses 3-class structure. |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 
@@ -41,13 +41,22 @@
   give identical splits. Per-particle intensity/contrast variance is global — present in any spatial sub-region —
   so no masking strategy can suppress it or change the PCA result.
 - Workspace: `~/Research/eman2_project/` (local, not committed). Run script: `T4P/scripts/run_pipeline.sh`.
+- **FM_easy (2026-06-15): ARI=−0.002**, split 81/94/519. Same failure mode as T4P on data with known GT: PCA
+  collapses to one dominant cluster (~75%) and class C lands 100% inside it (0/0/177); A/B smeared. MAXRES was
+  set to 40 Å (finer than T4P's 60) specifically to resolve the ~30 Å conformational differences — it still
+  collapses, confirming the discriminant is contrast/intensity, not the conformational axis.
+- **`e2spt_pcasplit --clean` adds an outlier class (NCLASS+1):** with NCLASS=3, `--clean` produced 4 disjoint
+  classes (31 outliers + 493/91/79). For the no-junk FM_easy protocol, drop `--clean` → exactly 3 classes
+  (81/94/519, all 694 assigned). (The T4P "85 junk" in the canonical k=3 run is this `--clean` outlier class.)
+- **Env path note (Josh's machine):** the eman2 env is at `~/conda-envs/eman2`, NOT `~/miniforge3/envs/eman2`;
+  `conda activate eman2` works by name, but a hardcoded `$CONDA_BASE/envs/eman2/bin` PATH export is wrong here.
 
 ---
 
 ## Next Steps
 
-1. Run FM_easy (k=3, no junk) — EMAN2 not yet run on motor_easy.
-2. T4P result is final: PCA does not separate conformational states at this SNR level.
+1. T4P/FM_easy complete. FM_hard / T4SS when ready.
+2. Both results final: EMAN2 PCA does not separate conformational states at this SNR (collapses to contrast axis).
 
 ---
 
@@ -61,4 +70,7 @@
 | `T4P/results/eman2_T4P_k3_none_r01_assignments.csv` | Per-particle class assignments (class 3 = junk) |
 | `T4P/results/eman2_T4P_k3_none_r01_classavg.png` | Class average slice panels (3 classes) |
 | `research.md` | Qt/OpenGL Wayland fix, pipeline refactor, wedge-fill patch details |
-| **Workspace:** `~/Research/eman2_project/` | Local workspace — sptcls_00/, spt_noalign/ outputs |
+| **Workspace (T4P):** `~/Research/eman2_project/` | Local workspace — sptcls_00/, spt_noalign/ outputs |
+| **Workspace (FM_easy):** `~/Research/eman2_motor_easy/` | Local — `make_project.py`, `run_motor_easy.sh`, sptcls_01/ (k=3 no-clean) |
+| `outputs/FM_easy/eman2/eman2_motor_easy_k3.csv` | Per-particle FM_easy assignments (k=3) |
+| `outputs/FM_easy/eman2/confusion_eman2_k3_motor_easy_k3.png` | FM_easy confusion matrix (ARI=−0.002) |
