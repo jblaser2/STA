@@ -1,0 +1,8 @@
+N=423 GT={'A': 246, 'C': 177} pred={2: 206, 1: 217}
+raw confusion rows=GT['A', 'C'] cols=pred[1, 2]
+[[118 128]
+ [ 99  78]]
+oriented rows=GT cols=pred-mapped ['A', 'C']
+[[128 118]
+ [ 78  99]]
+ARI=0.003 best-match-acc=0.537

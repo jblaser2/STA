@@ -2,9 +2,52 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-16** by Claude (FM_easy classification-failure root-cause analysis: nuisance variance not SNR; design pivot to easy 2-class).
+> Last updated: **2026-06-16** by Claude (FM_easy: HIGH-CONTRAST regeneration test — contrast doubles the supervised ceiling and takes Dynamo from chance to near-usable; the wall is REPRESENTATIONAL, not signal absence).
 
 ## Now / Next / Parked
+
+- **FM_easy — HIGH-CONTRAST REGENERATION TEST COMPLETE (2026-06-16, decisive):** Regenerated A/C through
+  the real ETSim→WBP→extract pipeline at higher model contrast (×3/×6/×10 of base vs production ×0.1) and
+  classified blind. **Findings:** (1) **SNR saturates ~0.4** — scaling model amplitude past ×3–×6 does NOT
+  raise SNR (×10 *dropped* to 0.30); strong-phase nonlinearity caps achievable SNR. So you can't buy
+  arbitrary SNR via contrast. (2) **Narrowing the missing wedge doesn't help** — ±70°/2°/71 (40° wedge) vs
+  ±60°/3°/41 (60° wedge) at matched contrast/dose: ARI 0.12 vs 0.18 (same within noise). Wedge is NOT the
+  dominant nuisance. (3) **But contrast strongly helps the recoverable signal:** at the best condition
+  (×6, SNR 0.36, 354 particles) the **supervised 5-fold ceiling jumped to ARI 0.796 / 95% acc** (was 0.43
+  at production SNR 0.21). (4) **Real-package payoff — Dynamo dpkpca k=2 went 0.003 → 0.280** (acc 0.77,
+  a 95%-pure C cluster: 99 C / 5 A); blind masked-PCA 20-seed = 0.151±0.006. **CONCLUSION: the wall is
+  REPRESENTATIONAL, not signal-absence** — blind clustering optimizes dominant variance (nuisance/contrast
+  axis), but the class difference is strongly present & 95%-recoverable with labels at higher contrast. An
+  **achievable easy tier = higher contrast + a method pointed at the class axis** (GT-seeded RELION, nc-swept
+  Dynamo, or a good projection like band-Y 0.81); blind voxel k-means is the weak link, and that
+  blind-failure-with-ground-truth is itself the headline benchmark result. Pipeline: `synthetic_sta/motor_easy/
+  hc_test*/` (`run_contrast.sh`, `run_narrow_wedge.sh`, `run_full.sh`, `align_classify_full.py`); proxies
+  `scripts/eval/colored_noise_{snr,jitter}_proxy_motor_easy.py`; Dynamo hc run
+  `packages/dynamo/dynamo_outputs/easy_pair_AC_hc/` (ARI 0.280, `confusion_dynamo_hc.png`). **Visual
+  confirmation (2026-06-16):** rendered high-contrast subtomos (legible per-particle: A shows the full motor
+  with density extending down the box, C truncated to the top base), GT class averages (A=extended assembly,
+  C=base only), and **Dynamo's two cluster averages — which match the GT classes** (cluster1 95%-pure C =
+  truncated/empty-below, cluster2 A-enriched = extended density), i.e. Dynamo split on the *real* structural
+  axis, not a nuisance axis. **NEXT: nc-sweep Dynamo + GT-seeded RELION on the hc set to see how close to the
+  0.80 ceiling a real method reaches; decide easy-tier contrast level for a full regeneration.**
+
+- **FM_easy — SNR IS A REAL LEVER (CORRECTION, 2026-06-16 later):** The earlier "SNR is a dead lever"
+  conclusion (below) was based on an **idealized white-noise, no-wedge** sweep and is **WRONG**. A
+  **faithful proxy** (real ±60° Z-wedge + colored noise whose 3D PSD is *measured* from real class-A
+  subtomos) separates A–C at **ARI≈1.0 even at the real SNR 0.21** — so wedge + colored noise + low SNR
+  are NOT the wall. **The wall is per-particle registration JITTER:** injecting ~20–30° equivalent rigid
+  pose jitter (stand-in for WBP/wedge/noise-induced misregistration of reconstructed densities) drops ARI
+  to ~0 at matching SNR, reproducing the real failure. **Jitter and SNR trade off (rescue curve):** at 20°
+  jitter a 2× SNR boost (0.21→0.42) lifts ARI from ~0 to **0.77**; at 30° jitter it needs 4–8× and stays
+  noisy. So raising **contrast** (not dose — dose is saturated at ~2000 e/Å²) can rescue the easy tier if
+  effective jitter is moderate. Empirical pipeline facts: wedge is **perpendicular to the motor/difference
+  axis and common-mode** (favorable, not the smear I earlier guessed); **no membrane is modeled** (motor
+  floats in ice; "plates" = MS/P-L ring densities). Scripts: `scripts/eval/{colored_noise_snr_proxy_motor_easy,
+  colored_noise_jitter_proxy_motor_easy}.py`; rescue curve `outputs/FM_easy/input_qc/snr_rescue_curve.png`.
+  Real-package A–C runs (diff mask, raw aligned): Dynamo dpkpca **0.003**, RELION Class3D **0.014**;
+  RELION local-realign best **0.047** (global realign scrambles GT poses → 0.004). **NEXT: regenerate a
+  small A/C batch at higher contrast (model amp ×2–×5, target SNR≈0.6) through ETSim→WBP→extract and
+  classify — decisive test of the rescue curve on the real pipeline.**
 
 - **FM_easy ROOT-CAUSE ANALYSIS COMPLETE — WHY BLIND CLASSIFICATION FAILS (2026-06-16):** Full writeup
   `docs/fm_easy_classification_analysis.md`; durable memory [[fm-easy-classification-wall]]. Findings:
@@ -13,9 +56,10 @@
   (2) **Signal is present; failure is representational** — a 1-D band-position feature separates B–C at
   **ARI 0.81 unsupervised**; supervised ceilings A–B 0.20 / A–C 0.43 / B–C 0.54; but blind masked
   PCA+kmeans ≤0.15. (3) **Real-package confirmation:** Dynamo dpkpca k=2 on raw aligned subtomos + best
-  spherical mask → **A–C ARI=0.001, A–B=0.026** (chance). (4) **SNR is NOT the wall** — in-silico idealized
-  particles separate at ARI=1.0 at every SNR incl. 0.05 → raising dose is a dead lever. **The wall is
-  nuisance variance** (residual 3D misalignment + CTF/colored-noise/WBP/wedge): 3D-jitter sweep collapses
+  spherical mask → **A–C ARI=0.001, A–B=0.026** (chance). (4) **[PARTIALLY SUPERSEDED — see CORRECTION above]**
+  The wall is per-particle **nuisance/jitter variance**, confirmed — but the original "raising SNR is a dead
+  lever" sub-claim is WRONG (it rested on a white-noise, no-wedge sweep). The faithful colored-noise+wedge
+  proxy shows SNR and jitter **trade off**, and raising contrast *can* rescue. 3D-jitter sweep collapses
   A–B at 20°/3px, A–C at 40°/4px (B–C robust), reproducing the real failure ordering. (5) **Deep finding:**
   biologically-real assembly intermediates are NESTED (additive) → "subtle additions on shared bulk" →
   least nuisance-robust; the only robust geometry (disjoint density, B–C) is biologically impossible →
@@ -23,8 +67,9 @@
   spherical mask r≈22 px (~293 Å).** Scripts: `scripts/eval/{qc_motor_easy_class_avgs,
   pairwise_pca_kmeans_motor_easy,diffmask_test_motor_easy,snr_sweep_motor_easy,nuisance_sweep_motor_easy}.py`
   + `packages/dynamo/FM_easy/scripts/{setup_easy_pair_pca.py,dynamo_easy_pair_pca.m,score_easy_pair.py}`.
-  **NEXT: craft the EASY 2-class dataset** — early cytoplasmic base (C) vs mature full motor (A), best
-  achievable alignment (don't raise SNR); hard 3-class = nested stages.
+  **NEXT (UPDATED — see CORRECTION above):** craft the EASY 2-class dataset = early cytoplasmic base (C)
+  vs mature full motor (A); levers are (i) higher contrast, (ii) lower jitter/better reconstruction,
+  (iii) grosser/disjoint difference — NOT "don't raise SNR" (that was wrong). Hard 3-class = nested stages.
 
 - **EMAN2 FM_easy (motor_easy) COMPLETE (2026-06-15):** EMAN2 no-align PCA split (`e2spt_pcasplit`) on the 694 GT-aligned particles, **k=3 no junk** (no `--clean`), NBASIS=12, **MAXRES=40 Å** (finer than T4P's 60 to resolve the ~30 Å conformational differences at 13.329 Å/px), auto-tight density mask, identity orientations. **Result: split 81/94/519, ARI=−0.0015** (AMI=0.096, V=0.099, Acc=0.395) — collapses to one dominant cluster (519, ~75%); GT class C lands 100% in it (0/0/177), A/B smeared. **Misses the 3-class structure** — same contrast/intensity-axis PCA behavior documented on T4P, now on data with GT. **Note:** `e2spt_pcasplit --clean` adds an extra outlier class (NCLASS+1) = de-facto junk rejection, so for the no-junk protocol I dropped `--clean` to get a clean 3-way partition. Project: `~/Research/eman2_motor_easy/` (local; env at `~/conda-envs/eman2`). Pred CSV `outputs/FM_easy/eman2/eman2_motor_easy_k3.csv`; confusion `outputs/FM_easy/eman2/confusion_eman2_k3_motor_easy_k3.png`. **FM_easy now 8/10: RELION 0.475(GT) / Dynamo 0.200 / PyTom 0.134 / PEET 0.116 / DISCA 0.036 / OPUS 0.021 / ProTomo −0.003 / EMAN2 −0.002. Next FM_easy: TomoFlow, STOPGAP.** Pattern: every package except GT-seeded RELION and Dynamo dpkpca collapses or splits on a non-conformational axis; the dominant cluster consistently absorbs all of class C (ProTomo/EMAN2/OPUS).
 

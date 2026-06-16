@@ -1,0 +1,18 @@
+%% Parameter list in workflow
+settings.computing.batch 100 
+settings.computing.cores * 
+settings.computing.cropAroundMask 1 
+settings.computing.destination matlab_parfor 
+settings.computing.gpus 0  1 
+settings.computing.prealign 1 
+settings.computing.scratch empty (char) 
+settings.computing.useGpus 0 
+settings.general.bandpassNyquist 0         0.1 
+settings.general.bin 0 
+settings.general.nEigs 50 
+settings.general.sym c1 
+settings.input.data empty (double) 
+settings.input.mask empty (double) 
+settings.input.table empty (double) 
+steps.tsne.tsneFirstEigenvector 1 
+steps.tsne.tsneLastEigenvector 10 

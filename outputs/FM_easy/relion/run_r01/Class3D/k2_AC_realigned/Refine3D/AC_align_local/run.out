@@ -1,0 +1,27 @@
+gpu-ids not specified, threads will automatically be mapped to devices (incrementally).
+ Thread 0 mapped to device 0
+ Thread 1 mapped to device 0
+ Thread 2 mapped to device 0
+ Thread 3 mapped to device 0
+ Thread 4 mapped to device 0
+ Thread 5 mapped to device 0
+ Thread 6 mapped to device 0
+ Thread 7 mapped to device 0
+ Running CPU instructions in double precision. 
+in: /home/jblaser2/Research/relion/src/metadata_table.cpp, line 1353
+ERROR: 
+MetaDataTable::read: File /home/jblaser2/Research/STA/outputs/FM_easy/relion/run_r01/Class3D/k2_AC_realigned/particles_wedge_AC.star does not exist
+=== Backtrace  ===
+/home/jblaser2/Research/relion/build/bin/relion_refine(_ZN11RelionErrorC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES7_l+0x63) [0x4c13d3]
+/home/jblaser2/Research/relion/build/bin/relion_refine() [0x438b26]
+/home/jblaser2/Research/relion/build/bin/relion_refine(_ZN16ObservationModel10loadSafelyENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERS_R13MetaDataTableS5_ib+0xc7) [0x5cd1d7]
+/home/jblaser2/Research/relion/build/bin/relion_refine(_ZN10Experiment4readE8FileNameS0_S0_bbbbbi+0x422) [0x639e12]
+/home/jblaser2/Research/relion/build/bin/relion_refine(_ZN11MlOptimiser17initialiseGeneralEi+0x713) [0x512633]
+/home/jblaser2/Research/relion/build/bin/relion_refine(_ZN11MlOptimiser10initialiseEv+0x5f) [0x51eb7f]
+/home/jblaser2/Research/relion/build/bin/relion_refine(main+0xe34) [0x4aeec4]
+/lib64/libc.so.6(+0x2a58e) [0x7f739be5158e]
+/lib64/libc.so.6(__libc_start_main+0x89) [0x7f739be51649]
+/home/jblaser2/Research/relion/build/bin/relion_refine(_start+0x25) [0x4b3675]
+==================
+ERROR: 
+MetaDataTable::read: File /home/jblaser2/Research/STA/outputs/FM_easy/relion/run_r01/Class3D/k2_AC_realigned/particles_wedge_AC.star does not exist

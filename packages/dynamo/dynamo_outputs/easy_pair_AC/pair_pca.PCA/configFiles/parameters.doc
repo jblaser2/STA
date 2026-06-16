@@ -1,0 +1,18 @@
+%% Parameter list in workflow
+settings.computing.batch 100 
+settings.computing.cores 16 
+settings.computing.cropAroundMask 1 
+settings.computing.destination matlab_parfor 
+settings.computing.gpus 0  1 
+settings.computing.prealign 1 
+settings.computing.scratch empty (char) 
+settings.computing.useGpus 0 
+settings.general.bandpassNyquist 0.05        0.45           2 
+settings.general.bin 0 
+settings.general.nEigs 50 
+settings.general.sym c1 
+settings.input.data /home/jblaser2/Research/STA/packages/dynamo/dynamo_outputs/easy_pair_AC/data 
+settings.input.mask pair_pca.PCA/input/mask.em 
+settings.input.table /home/jblaser2/Research/STA/packages/dynamo/dynamo_outputs/easy_pair_AC/pair.tbl 
+steps.tsne.tsneFirstEigenvector 1 
+steps.tsne.tsneLastEigenvector 10 

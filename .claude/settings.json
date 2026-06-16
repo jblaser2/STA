@@ -29,12 +29,12 @@
       "Bash(git log:*)",
       "Bash(git diff:*)",
       "Bash(git show:*)",
-      "Bash(git branch)"
+      "Bash(git branch)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": [
-      "Bash(git push:*)",
-      "Bash(rm:*)"
+      "Bash(git push:*)"
     ]
   }
 }
