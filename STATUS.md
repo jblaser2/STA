@@ -2,9 +2,29 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-15** by Claude (EMAN2 FM_easy complete — ARI≈0, collapses to dominant cluster; ProTomo + DISCA + Dynamo FM_switch earlier same day).
+> Last updated: **2026-06-16** by Claude (FM_easy classification-failure root-cause analysis: nuisance variance not SNR; design pivot to easy 2-class).
 
 ## Now / Next / Parked
+
+- **FM_easy ROOT-CAUSE ANALYSIS COMPLETE — WHY BLIND CLASSIFICATION FAILS (2026-06-16):** Full writeup
+  `docs/fm_easy_classification_analysis.md`; durable memory [[fm-easy-classification-wall]]. Findings:
+  (1) **Classes are axial halves**, not C-ring edits — A=whole motor, B=periplasmic/upper plate,
+  C=cytoplasmic/lower plate (EMD-5311 geometric cuts; `noCring`/`noRodHook` names corrected in memory).
+  (2) **Signal is present; failure is representational** — a 1-D band-position feature separates B–C at
+  **ARI 0.81 unsupervised**; supervised ceilings A–B 0.20 / A–C 0.43 / B–C 0.54; but blind masked
+  PCA+kmeans ≤0.15. (3) **Real-package confirmation:** Dynamo dpkpca k=2 on raw aligned subtomos + best
+  spherical mask → **A–C ARI=0.001, A–B=0.026** (chance). (4) **SNR is NOT the wall** — in-silico idealized
+  particles separate at ARI=1.0 at every SNR incl. 0.05 → raising dose is a dead lever. **The wall is
+  nuisance variance** (residual 3D misalignment + CTF/colored-noise/WBP/wedge): 3D-jitter sweep collapses
+  A–B at 20°/3px, A–C at 40°/4px (B–C robust), reproducing the real failure ordering. (5) **Deep finding:**
+  biologically-real assembly intermediates are NESTED (additive) → "subtle additions on shared bulk" →
+  least nuisance-robust; the only robust geometry (disjoint density, B–C) is biologically impossible →
+  in-situ assembly-intermediate classification is intrinsically hard for blind STA (publishable). **Best
+  spherical mask r≈22 px (~293 Å).** Scripts: `scripts/eval/{qc_motor_easy_class_avgs,
+  pairwise_pca_kmeans_motor_easy,diffmask_test_motor_easy,snr_sweep_motor_easy,nuisance_sweep_motor_easy}.py`
+  + `packages/dynamo/FM_easy/scripts/{setup_easy_pair_pca.py,dynamo_easy_pair_pca.m,score_easy_pair.py}`.
+  **NEXT: craft the EASY 2-class dataset** — early cytoplasmic base (C) vs mature full motor (A), best
+  achievable alignment (don't raise SNR); hard 3-class = nested stages.
 
 - **EMAN2 FM_easy (motor_easy) COMPLETE (2026-06-15):** EMAN2 no-align PCA split (`e2spt_pcasplit`) on the 694 GT-aligned particles, **k=3 no junk** (no `--clean`), NBASIS=12, **MAXRES=40 Å** (finer than T4P's 60 to resolve the ~30 Å conformational differences at 13.329 Å/px), auto-tight density mask, identity orientations. **Result: split 81/94/519, ARI=−0.0015** (AMI=0.096, V=0.099, Acc=0.395) — collapses to one dominant cluster (519, ~75%); GT class C lands 100% in it (0/0/177), A/B smeared. **Misses the 3-class structure** — same contrast/intensity-axis PCA behavior documented on T4P, now on data with GT. **Note:** `e2spt_pcasplit --clean` adds an extra outlier class (NCLASS+1) = de-facto junk rejection, so for the no-junk protocol I dropped `--clean` to get a clean 3-way partition. Project: `~/Research/eman2_motor_easy/` (local; env at `~/conda-envs/eman2`). Pred CSV `outputs/FM_easy/eman2/eman2_motor_easy_k3.csv`; confusion `outputs/FM_easy/eman2/confusion_eman2_k3_motor_easy_k3.png`. **FM_easy now 8/10: RELION 0.475(GT) / Dynamo 0.200 / PyTom 0.134 / PEET 0.116 / DISCA 0.036 / OPUS 0.021 / ProTomo −0.003 / EMAN2 −0.002. Next FM_easy: TomoFlow, STOPGAP.** Pattern: every package except GT-seeded RELION and Dynamo dpkpca collapses or splits on a non-conformational axis; the dominant cluster consistently absorbs all of class C (ProTomo/EMAN2/OPUS).
 
