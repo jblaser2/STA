@@ -21,6 +21,10 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — not a
 no alignment step. OPUS-TOMO uses threshold mask (package-level exception — VAE cannot use
 tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 
+**Classification mask (cylindrical v2, red contour on the global average):**
+
+<img src="figures/T4P/mask_overlay.png" width="720">
+
 **Reference class averages (Stefano — ring_complete / ring_altered / junk, 509/95/68):**
 
 <img src="figures/T4P/reference_class_avgs.png" width="420">
@@ -57,9 +61,17 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 Class C = early cytoplasmic base, truncated. The two subtomo averages are what each blind package
 is trying to recover.)*
 
+**Classification mask (A-vs-C diff sphere, red contour on the global average):**
+
+<img src="figures/FM_easy/mask_overlay.png" width="720">
+
 The **Class averages** column shows each package's two predicted clusters (mean of the subtomos it
 assigned to each), same central slice — a package "finds the class axis" when its two averages look
 like the A and C panels above (one full motor, one truncated).
+
+**Perfect classification reference (ARI = 1.0) — what a confusion-column entry looks like at the top of the table:**
+
+<img src="figures/FM_easy/perfect_confusion.png" width="300">
 
 | Package | k=2 ARI (blind) | Acc | Class averages (2 predicted clusters) | Confusion | Notes |
 |---------|-----------------|-----|---------------------------------------|-----------|-------|
@@ -85,6 +97,34 @@ like the A and C panels above (one full motor, one truncated).
 (PEET many-PC, DISCA, Dynamo: ARI 0.25–0.45) and those that collapse onto a *nuisance/contrast axis*
 (TomoFlow, PyTom, ProTomo, EMAN2, RELION soft-EM, OPUS: ARI≈0) — even though the supervised ceiling
 is 0.75. The old 3-class set put *every* package at ≈0; this 2-class hc set resolves the blind field.
+
+#### Do packages misclassify the *same* subtomos?
+
+Mostly **no** — and that is itself a result. Per-particle errors (best-permutation map of each package's
+clusters to GT) were compared across all 9 blind packages (`scripts/eval/fm_easy_error_overlap.py`):
+
+- **No particle is missed by all 9** packages (max 7/9, only 4 particles); errors are spread across the
+  set (modal miss-count 3–4 of 9), not concentrated on a small universally-hard subset.
+- **The three recovering packages miss nearly disjoint sets.** PEET–DISCA error overlap = **Jaccard 0.00**,
+  PEET–Dynamo 0.02 — *below* the chance level expected if their errors were independent (0.09–0.11). **0
+  particles are missed by all three** of PEET/DISCA/Dynamo. So a consensus of these three would correct
+  almost everything — the methods are complementary, keying on different parts of the signal.
+- The **collapsed** packages overlap much more with each other (TomoFlow/ProTomo/EMAN2 Jaccard ≈ 0.48–0.54)
+  because they all fail on the same class (whichever collapses), not because they share *hard particles*.
+
+<img src="figures/FM_easy/error_overlap_jaccard.png" width="560">
+
+**Top-5 most-missed subtomos** (highest miss-count across the 9 packages; each panel = average of the 10
+central Z-slices of that subtomogram). These are dominated by heavy missing-wedge streaking / low local
+SNR — i.e. the hardest particles are degraded reconstructions, not a particular conformation (mix of GT A & C):
+
+<p>
+<img src="figures/FM_easy/missed_top1.png" width="175">
+<img src="figures/FM_easy/missed_top2.png" width="175">
+<img src="figures/FM_easy/missed_top3.png" width="175">
+<img src="figures/FM_easy/missed_top4.png" width="175">
+<img src="figures/FM_easy/missed_top5.png" width="175">
+</p>
 
 ---
 

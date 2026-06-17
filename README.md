@@ -73,8 +73,8 @@ Many packages using different classification algorithms have been developed for 
 
 - **Real dataset 1:** 672 prealigned T4P subtomograms from *Vibrio* cells with expert-validated structural classes
 - **Real dataset 2:** Type IV Secretion System (T4SS) — planned; details TBD
-- **Synthetic dataset 1:** `motor_easy` — 3-class flagellar motor assembly intermediates (694 particles, exact per-particle ground-truth labels known)
-- **Synthetic dataset 2:** Planned — likely harder, with smaller structural differences (~10 Å) between classes
+- **Synthetic dataset 1:** `FM_easy` — 2-class flagellar motor assembly intermediates (542 particles, high-contrast, exact per-particle ground-truth labels known)
+- **Synthetic dataset 2:** Planned — `FM_hard`, with smaller / nested structural differences between classes (intrinsically harder for blind STA)
 
 All packages are run with identical preprocessing on both real and synthetic data. Scores on synthetic data anchor the real-data results via ARI and related external-validity metrics.
 
@@ -118,54 +118,41 @@ We also recognize that limiting evaluation to 3D-input classifiers foregoes a la
 
 ---
 
-### Synthetic Data — Flagellar Motor Assembly Intermediates (`motor_easy`)
+### Synthetic Data — Flagellar Motor Assembly Intermediates (`FM_easy`)
 
-**694 subtomograms** simulated with ETSimulations at 13.33 Å/px, 80³ box, SNR matched to the real T4P data. Three ground-truth classes model progressive flagellar motor assembly:
+> **Redesigned 2026-06-16 as a 2-class high-contrast set.** The original 3-class production-contrast
+> set (694 particles, SNR 0.21) proved to be a *blind-failure-with-ground-truth*: **every** package
+> scored ARI ≈ 0, even though the signal is present and label-recoverable. That negative result is
+> itself a finding (see `docs/fm_easy_classification_analysis.md`); the dataset was then rebuilt as the
+> achievable "easy tier" below. Old runs archived in `outputs/FM_easy/_archive_3class_k3/`.
+
+**542 subtomograms** (271 + 271) simulated with ETSimulations → IMOD WBP at **13.329 Å/px, 96³ box**,
+**×6 model contrast** (measured SNR ≈ 0.34). Two ground-truth classes model flagellar-motor assembly:
 
 | Class | Description | N particles |
 |---|---|---|
-| **A** — `ring_complete` | Full motor: C-ring + MS-ring present | 246 |
-| **B** — `noCring` | Motor core + MS-ring; C-ring absent | 271 |
-| **C** — `Cring_only` | C-ring only (isolated cytoplasmic switch complex); MS-ring, P/L-rings, rod/hook absent | 177 |
+| **A** — full motor | Mature/extended assembly; density extends down the box | 271 |
+| **C** — base only | Early cytoplasmic base; truncated (lower assembly absent) | 271 |
 
-Class differences are ~30 Å — large enough to be detectable but realistic for assembly intermediates. The A–C boundary is the most distinct; A–B and B–C are progressively harder to separate. A smaller-difference dataset is planned as a harder benchmark track.
-
-**Input density maps** — the three ground-truth structural variants used to simulate the data:
+**Ground truth — source density maps (the two structural variants) and the GT subtomogram averages each package must recover:**
 
 <p align="center">
-  <img src="synthetic/etsimulation/figures/motor_easy_class_maps.png" width="780" alt="Orthoslice views of the three class density maps: Class A (ring_complete), Class B (noCring), Class C (Cring_only)"/>
+  <img src="packages/figures/FM_easy/header_maps_and_avgs.png" width="900" alt="FM_easy ground truth: source density maps and subtomogram averages for class A (full motor) and class C (base only)"/>
 </p>
 
-<p align="center"><em>Input density maps for the three synthetic classes (rows: A, B, C; columns: YZ side, XY top-down, XZ section, 3D render). Class A is the full motor; Class B has the C-ring removed (cut below the membrane neck); Class C retains only the C-ring (isolated cytoplasmic switch complex — everything above the membrane neck removed). These structural differences become far less obvious after noise and missing-wedge artifacts are introduced.</em></p>
+<p align="center"><em>Central slice, dark = density. Left two: input density maps (A = full motor, C = truncated base). Right two: GT-aligned subtomogram averages (271 particles each). Individual raw particles are dominated by noise / missing-wedge artifacts — the class difference only emerges after averaging, and recovering it blind is the benchmark task.</em></p>
 
-**Simulated reconstruction** — what the data actually looks like after tilt-series simulation and WBP reconstruction:
+**Classification mask** — an A-vs-C difference sphere placed over the lower region where the classes differ:
 
 <p align="center">
-  <img src="synthetic/etsimulation/figures/motor_easy_sim_tomo.png" width="720" alt="Simulated motor_easy tomogram: noiseless reconstruction (left) and noisy WBP reconstruction (right) with particle positions annotated"/>
+  <img src="packages/figures/FM_easy/mask_overlay.png" width="760" alt="FM_easy diff-sphere mask (red contour) over the global average"/>
 </p>
 
-<p align="center"><em>Simulated tomogram: noiseless reconstruction (left) alongside the realistic noisy WBP reconstruction (right) with particle positions marked. Noise, CTF, and missing-wedge artifacts from the ±60° tilt-series simulation are clearly visible. All three classes appear visually indistinguishable in individual raw particles — structural differences only emerge after alignment and averaging.</em></p>
-
-**GT-aligned class averages** — what classification packages need to recover:
-
-<table align="center">
-  <tr>
-    <td align="center">
-      <img src="synthetic/etsimulation/figures/motor_easy_classA_avg.png" width="280" alt="Class A GT-aligned average: full motor with C-ring and MS-ring"/>
-      <br><em>Class A GT-aligned average (n=246)<br>Full motor: C-ring + MS-ring present</em>
-    </td>
-    <td align="center">
-      <img src="synthetic/etsimulation/figures/motor_easy_classB_avg.png" width="280" alt="Class B GT-aligned average: motor core with MS-ring, C-ring absent"/>
-      <br><em>Class B GT-aligned average (n=271)<br>Motor core + MS-ring; C-ring absent</em>
-    </td>
-    <td align="center">
-      <img src="synthetic/etsimulation/figures/motor_easy_classC_avg.png" width="280" alt="Class C GT-aligned average: C-ring only, MS-ring and rod/hook absent"/>
-      <br><em>Class C GT-aligned average (n=177)<br>C-ring only; MS-ring, rod/hook absent</em>
-    </td>
-  </tr>
-</table>
-
-**GT separability (validated):** Template-matching on GT-aligned subtomos gives ARI = 0.289 (~68–73% per-class accuracy on individual noisy particles), confirming the classes are structurally distinct but not trivially separable. Class average CCs: A–B = 0.72, A–C = 0.66, B–C = 0.83 *(computed on old C_core definition — revalidation with new C_noRodHook pending)*. Per-particle ground-truth labels: `production/labels.csv`.
+**Reference ceilings (on this set):** a supervised 5-fold classifier reaches **ARI 0.745 / 93% acc**, and
+GT-seeded RELION reaches 0.764 — i.e. the class difference is strongly present and ~recoverable *with
+labels*. Blind voxel k-means (no labels) reaches only ≈ 0.14. The gap between these is what the blind
+benchmark measures. Per-particle ground-truth labels:
+`~/Research/synthetic_sta/motor_easy/hc_test_x6/subtomos/merged_AC_full/labels.csv`.
 
 ---
 
@@ -265,10 +252,21 @@ Aggregate by rank-based Borda count (scales are incommensurable):
   </tr>
 </table>
 
-### Synthetic motor_easy
-- Ground-truth class averages validated: Class A–B CC = 0.72, A–C CC = 0.66, B–C CC = 0.83. Classes are structurally distinct and non-trivially separable.
-- Template-matching baseline ARI = 0.289 on GT-aligned particles (~68–73% per-class accuracy on individual noisy particles). Random classifier gives ARI ≈ 0.
-- Package runs on synthetic data in progress (RELION, PEET, Dynamo first).
+### Synthetic FM_easy (2-class high-contrast, blind k=2)
+All 10 packages run **blind** (unsupervised, no class info) at k=2 on the 542-particle set:
+
+| Package | ARI | Acc | | Package | ARI | Acc |
+|---|---|---|---|---|---|---|
+| **PEET** (WMD-PCA pc1_10) | **0.450** | 0.836 | | EMAN2 | 0.025 | 0.581 |
+| **DISCA** | **0.407** | 0.819 | | RELION (blind) | 0.008 | 0.548 |
+| **Dynamo** (dpkpca) | **0.254** | 0.753 | | OPUS-TOMO | 0.008 | 0.550 |
+| TomoFlow | 0.036 | 0.596 | | STOPGAP | — | blocked (cluster) |
+| PyTom | 0.031 | 0.590 | | | | |
+| ProTomo | 0.030 | 0.589 | | | | |
+
+- **The blind field splits cleanly:** methods that find the *class axis* (PEET many-PC, DISCA, Dynamo: ARI 0.25–0.45) vs. methods that collapse onto a *nuisance / contrast axis* (the rest: ≈ 0) — against a supervised ceiling of 0.745. The old 3-class set put *every* package at ≈ 0; this 2-class high-contrast set resolves the field.
+- **Fairness:** all numbers above are blind. GT-seeded RELION (0.764, initialized from the true class averages) is reported only as a *supervised upper bound*, not in the blind ranking.
+- Per-package class-average and confusion figures: `packages/README.md` (FM_easy table).
 
 ---
 
