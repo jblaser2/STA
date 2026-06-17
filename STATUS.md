@@ -2,9 +2,26 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-17** by Claude (FM_easy REDESIGNED as 2-class ×6 hc set (542p) + ALL packages re-run at k=2, BLIND — PEET 0.45 / DISCA 0.41 / Dynamo 0.25 lead; RELION blind 0.008 (GT-seeded 0.76 = supervised ceiling, kept separate, NOT in ranking); STOPGAP blocked (cluster).).
+> Last updated: **2026-06-17** by Claude (FM_easy REDESIGNED as 2-class ×6 hc set (542p) + ALL packages re-run at k=2, BLIND — PEET 0.45 / DISCA 0.41 / Dynamo 0.25 lead; RELION blind 0.008 (GT-seeded 0.76 = supervised ceiling, kept separate, NOT in ranking); STOPGAP blocked (cluster). DISK CLEANUP 2026-06-17: synthetic_sta 556G→199G; motor_switch production_5apix erroneously deleted — regenerable, see top bullet.).
 
 ## Now / Next / Parked
+
+- **DISK CLEANUP — synthetic_sta pruned 556G → 199G (2026-06-17):** `/home` was at 100% (245M free),
+  blocking work; cleared obsolete synthetic runs to **60% used / 354G free**. **Deleted:**
+  `motor_easy/production/` (old scrapped 3-class set), `motor_easy/{run_A,run_B,run_C,test_random,
+  snr_test,subtomos_all,subtomos_proc,subtomos_aln}` (June-1 early runs), `motor_easy/{hc_test,
+  hc_test_x10,hc_test_nw}` (×3/×10/narrow-wedge experiments superseded by `hc_test_x6`),
+  `motor_easy/share_professor/` + `professor_demo/` (one-time deliveries), `nora_test/NorA_0_rec*.mrc`.
+  **Kept (canonical/active):** `motor_easy/hc_test_x6/` (FM_easy canonical), all of `motor_hard/`
+  (active), and full tomograms in canonical sets (chose not to strip ~128G of `tomo_rec*.mrc`).
+  ⚠️ **ERROR — motor_switch canonical set deleted by mistake:** I removed `motor_switch/production_5apix/`
+  (the **active 5 Å/px / 160³ set** all motor_switch package runs used) thinking 5 Å/px was off-target;
+  it was actually canonical (the 13.33 Å/px `production/` was the superseded one). The 5apix raw
+  subtomos/tomograms (incl. `all_particles_aligned/`) are **GONE, no backup**. **Recoverable by
+  regeneration** — `motor_switch/maps/5apix/` + `*_5apix.sh` ETSim scripts + `extract_subtomos_5apix.py`/
+  `align_all_5apix.py` are intact, and all derived results (scores, predictions, confusions) are committed.
+  Decided to **leave it for now** (regenerate only if motor_switch needs re-running). Old 13.33 `production/`
+  also deleted (confirmed superseded). See updated motor_switch entry under Datasets.
 
 - **FM_easy REDESIGNED → 2-class high-contrast (542p) + ALL 10 PACKAGES RE-RUN at k=2 (2026-06-16):**
   Old 3-class 694p production-contrast set (every package ARI≈0) **scrapped/archived**; replaced by the
@@ -233,8 +250,8 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 - **Real — T4P:** 672 hand-picked, prealigned 80³ subtomograms (`STA/subtomos_mrc/`, gitignored).
   Alignment QC done (`alignment_review/`, `review_alignment.py`). **Expert ground truth (Stefano):
   two distinct pili-phase classes**, recovered by Dynamo — the reference split for the benchmark.
-- **Synthetic — motor_easy (3-class flagellar motor, ~30 Å differences):** **CLASS C RE-SIMULATED + merged_all_aln REBUILT (2026-06-05/06)** — C_noRodHook = C-ring only (CUT2_C=46.5 base px). 5 runs, 177 particles. `merged_all_aln/` rebuilt (A=246, B=271, C=177=694). GT-aligned avg: `production/subtomos/avg_classC_aligned.mrc`. GT avg CCs (new C): A-B=0.539, A-C=0.339, B-C=0.027. Results so far: RELION iter1 ARI=0.475, PEET k=2 ARI=0.116, Dynamo dpkpca k=3 ARI=0.200. Mask: r=32 px, center=(48,38), 96³ box. Scoring infra: `scripts/eval/`. `~/Research/synthetic_sta/motor_easy/production/`.
-- **Synthetic — motor_switch (2-class + junk, flagellar motor CCW↔CW, semi-difficult):** **RE-SIMULATED 2026-06-09 at 5 Å/px.** Borrelia burgdorferi (EMD-21884 CCW, EMD-21886 CW). **208 CCW + 208 CW + 35 junk = 451 particles total.** 160³ box, 5 Å/px. GT-avg CC (ccw vs cw) = **0.615** (clean map CC=0.650). Signal/bkg 2.1–2.5×. Production: `~/Research/synthetic_sta/motor_switch/production_5apix/`. GT avgs: `production_5apix/subtomos/avg_ccw_aligned.mrc`, `avg_cw_aligned.mrc`. Maps: `maps/5apix/`. Old 13.33 Å/px production preserved at `production/` (ARI≈0, superseded). No package runs yet.
+- **Synthetic — motor_easy (3-class flagellar motor, ~30 Å differences):** **CLASS C RE-SIMULATED + merged_all_aln REBUILT (2026-06-05/06)** — C_noRodHook = C-ring only (CUT2_C=46.5 base px). 5 runs, 177 particles. `merged_all_aln/` rebuilt (A=246, B=271, C=177=694). GT-aligned avg: `production/subtomos/avg_classC_aligned.mrc`. GT avg CCs (new C): A-B=0.539, A-C=0.339, B-C=0.027. Results so far: RELION iter1 ARI=0.475, PEET k=2 ARI=0.116, Dynamo dpkpca k=3 ARI=0.200. Mask: r=32 px, center=(48,38), 96³ box. Scoring infra: `scripts/eval/`. ⚠️ **SUPERSEDED by the 2-class FM_easy redesign (see top bullet); the old 3-class `motor_easy/production/` set was scrapped and DELETED 2026-06-17.** Canonical FM_easy input is now `motor_easy/hc_test_x6/subtomos/merged_AC_full/`.
+- **Synthetic — motor_switch (2-class + junk, flagellar motor CCW↔CW, semi-difficult):** **RE-SIMULATED 2026-06-09 at 5 Å/px.** Borrelia burgdorferi (EMD-21884 CCW, EMD-21886 CW). **208 CCW + 208 CW + 35 junk = 451 particles total.** 160³ box, 5 Å/px. GT-avg CC (ccw vs cw) = **0.615** (clean map CC=0.650). Signal/bkg 2.1–2.5×. ⚠️ **DATA DELETED 2026-06-17 (cleanup error)** — `production_5apix/` (the canonical 5 Å/px set incl. `all_particles_aligned/`) and the superseded 13.33 `production/` are both gone; no backup. **Regenerate from** `maps/5apix/` + `motor_switch/*_5apix.sh` + `extract_subtomos_5apix.py`/`align_all_5apix.py` if re-running. Package results (RELION GT 0.379, PEET 0.007, Dynamo −0.001) committed in `results/synthetic_scores.csv` + `outputs/`/`packages/*/FM_switch/`. Maps: `maps/5apix/`.
 
 ## Open Decisions (owner)
 
