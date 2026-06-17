@@ -77,20 +77,23 @@ like the A and C panels above (one full motor, one truncated).
 |---------|-----------------|-----|---------------------------------------|-----------|-------|
 | [PEET](peet/) | **0.450** (pc1_10) | 0.836 | <img src="figures/FM_easy/peet_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/peet/confusion_peet_k2_k2_pc1_10_AC_hc_x6_542.png" width="300"> | diff sphere. WMD-PCA recovers axis with more PCs (pc1_3=0.08, pc1_5=0.12, pc1_10=0.45); cluster averages match A/C |
 | [DISCA](disca/) | **0.407** | 0.819 | <img src="figures/FM_easy/disca_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/disca/confusion_disca_k2_k2_AC_hc_x6_542.png" width="300"> | diff sphere. Locks onto structural axis at high contrast (was 0.036 at k=3); A 268/3 pure |
+| [PyTom](PyTom/) | **0.262** | 0.757 | <img src="figures/FM_easy/pytom_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/pytom/confusion_pytom_k2_k2_AC_hc_x6_542.png" width="300"> | **CYLINDER mask** (r27 h24, adopted 2026-06-17 — CC/template method prefers a tight focus mask; converged iter6). Was **0.031** on the diff sphere. |
 | [Dynamo](dynamo/) | **0.254** | 0.753 | <img src="figures/FM_easy/dynamo_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/dynamo/confusion_dynamo_k2_k2_AC_hc_x6_542.png" width="300"> | diff sphere. dpkpca band[0.05,0.45,2] 50 eig; 95%-pure C cluster |
 | [EMAN2](eman2/) | **0.146** | 0.692 | <img src="figures/FM_easy/eman2_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/eman2/confusion_eman2_k2_k2_AC_hc_x6_542.png" width="300"> | diff sphere (re-run 2026-06-17; was 0.025 with auto-tight mask). 438/104; class C 271/0 pure — partial recovery |
 | [ProTomo](protomo/) | 0.053 | 0.616 | <img src="figures/FM_easy/protomo_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/protomo/confusion_protomo_k2_k2_AC_hc_x6_542.png" width="300"> | diff sphere (re-run 2026-06-17; was 0.030 with solvent sphere). SVD+HAC; small A-enriched cluster (79: 71A/8C) |
 | [TomoFlow](tomoflow/) | 0.036 | 0.596 | <img src="figures/FM_easy/tomoflow_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/tomoflow/confusion_tomoflow_k2_k2_AC_hc_x6_542.png" width="300"> | **no mask** (OF on full volume). Landscape collapses (downsample 3 / 32³); unimodal, as on T4P |
-| [PyTom](PyTom/) | 0.031 | 0.590 | <img src="figures/FM_easy/pytom_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/pytom/confusion_pytom_k2_k2_AC_hc_x6_542.png" width="300"> | diff sphere. auto_focus_classify; does not find the class axis |
 | [RELION](relion/) | 0.008 (blind) | 0.548 | <img src="figures/FM_easy/relion_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/relion/run_k2_blind/confusion_relion_k2_k2_AC_hc_x6_542_BLIND.png" width="300"> | solvent sphere (21%, *required* for solvent flattening). Soft-EM blind: near-collapse 486/56 — SNR failure |
 | [OPUS-TOMO](opusTomo/) | 0.008 | 0.550 | <img src="figures/FM_easy/opus_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/opus/confusion_opus-tomo_k2_k2_AC_hc_x6_542.png" width="300"> | threshold mask (15%, *required* for VAE). Latent does not resolve the 2 classes |
 | [STOPGAP](STOPGAP/) | _blocked_ | | — | — | Needs `/apps/matlab/r2023b` (BYU RC cluster); SLURM-only on this node — run via Eben on the cluster |
 
 > **Mask policy:** the canonical FM_easy mask is the **A-vs-C diff sphere** (8.7% of box, shown above), used by
-> PEET, DISCA, Dynamo, PyTom, EMAN2, and ProTomo. Three packages necessarily differ: **RELION** needs a broad
-> solvent-flattening mask (21%); **OPUS-TOMO** needs a broad threshold mask for the VAE (15%, a tight mask
-> collapses it — documented on T4P); **TomoFlow** has no mask step (optical flow runs on the full volume).
-> All masks are the same 96³ box.
+> PEET, DISCA, Dynamo, EMAN2, and ProTomo. Per-package exceptions: **PyTom** uses a **cylinder** (r27 h24, 9.9%;
+> the CC/template method gains a lot from a tight focus mask — 0.031→**0.262**, while every PCA method got
+> *worse* with it); **RELION** needs a broad solvent-flattening mask (21%); **OPUS-TOMO** needs a broad
+> threshold mask for the VAE (15%, a tight mask collapses it); **TomoFlow** has no mask step (optical flow on
+> the full volume). All masks are the same 96³ box. *(Cylinder-vs-sphere sweep recorded under `*_CYL` tags in
+> `results/synthetic_scores.csv`; the cylinder helped only PyTom and hurt PCA methods — DISCA 0.41→0.005,
+> Dynamo 0.25→0.00 — because the A-vs-C signal extends axially and the cylinder crops it.)*
 
 **Supervised upper bounds (reference only — NOT blind, excluded from the ranking):**
 
@@ -100,10 +103,10 @@ like the A and C panels above (one full motor, one truncated).
 | Logreg 5-fold ceiling | 0.745 | 0.932 | Supervised classifier on masked-PCA features (`align_classify_full.py`) |
 
 **Benchmark signal:** at high contrast the BLIND field splits between methods that recover the *class axis*
-(PEET, DISCA, Dynamo: ARI 0.25–0.45; EMAN2 0.15 partial) and those that collapse onto a *nuisance/contrast
-axis* (ProTomo, TomoFlow, PyTom, RELION soft-EM, OPUS: ARI≈0–0.05) — even though the supervised ceiling
-is 0.75. The old 3-class set put *every* package at ≈0; this 2-class hc set resolves the blind field.
-(All on the canonical diff-sphere mask except RELION/OPUS/TomoFlow — see Mask policy above.)
+(PEET, DISCA, PyTom, Dynamo: ARI 0.25–0.45; EMAN2 0.15 partial) and those that collapse onto a
+*nuisance/contrast axis* (ProTomo, TomoFlow, RELION soft-EM, OPUS: ARI≈0–0.05) — even though the supervised
+ceiling is 0.75. The old 3-class set put *every* package at ≈0; this 2-class hc set resolves the blind field.
+(Masks: diff sphere for all except PyTom=cylinder, RELION/OPUS=broad, TomoFlow=none — see Mask policy above.)
 
 #### Do packages misclassify the *same* subtomos?
 
@@ -152,7 +155,50 @@ SNR — i.e. the hardest particles are degraded reconstructions, not a particula
 
 ---
 
-### FM_hard (Planned) and T4SS (Planned)
+### Synthetic Dataset — FM_hard (BUILT 2026-06-17: 813 particles, 3 classes, assembly intermediates)
+
+> **3-class flagellar-motor assembly-intermediate series** (inside-out): **base** (C-ring + MS-ring) →
+> **basal_body** (+ proximal rod + P-ring, no hook) → **mature** (full motor + hook/bulb = FM_easy's A).
+> Built from EMD-5311 at ×6 contrast through the same ETSim→WBP→extract pipeline as FM_easy; `base` ≡
+> FM_easy's C and `mature` ≡ FM_easy's A, so it nests in the same frame. "Slightly harder than FM_easy"
+> by design: inserting the real middle stage creates two harder *adjacent* pairs while base↔mature stays
+> as the recoverable anchor. 271 × 3 = 813 particles, 96³, 13.329 Å/px, SNR 0.299, GT-aligned, **no junk**.
+> Reference ceilings: blind masked-PCA k=3 ARI ≈ **0.07**; supervised 5-fold 3-way ARI **0.472 / 78% acc**.
+> **All package numbers below will be BLIND (unsupervised, no class info)** — equal footing.
+
+**Ground-truth class averages (the 3 assembly stages, WBP density):**
+
+<img src="figures/FM_hard/gt_class_avgs_hard.png" width="900">
+
+| Package | FM_hard k=3 ARI | Acc | Class Avgs | Best Confusion | Notes |
+|---|---|---|---|---|---|
+| [PEET](peet/) | ⬜ pending | — | _(pending)_ | _(pending)_ | FM_easy leader; run WMD-PCA pc1_10 first as the sanity check |
+| [DISCA](disca/) | ⬜ pending | — | _(pending)_ | _(pending)_ | FM_easy leader |
+| [Dynamo](dynamo/) | ⬜ pending | — | _(pending)_ | _(pending)_ | dpkpca |
+| [EMAN2](eman2/) | ⬜ pending | — | _(pending)_ | _(pending)_ | |
+| [ProTomo](protomo/) | ⬜ pending | — | _(pending)_ | _(pending)_ | |
+| [TomoFlow](tomoflow/) | ⬜ pending | — | _(pending)_ | _(pending)_ | |
+| [PyTom](PyTom/) | ⬜ pending | — | _(pending)_ | _(pending)_ | |
+| [RELION](relion/) | ⬜ pending | — | _(pending)_ | _(pending)_ | run blind (not GT-seeded) |
+| [OPUS-TOMO](opusTomo/) | ⬜ pending | — | _(pending)_ | _(pending)_ | |
+| [STOPGAP](STOPGAP/) | ⬜ blocked (cluster) | — | — | — | needs BYU RC cluster (Eben) |
+
+> **Run protocol:** k=3, no junk, mask = 3-class diff mask `diff_mask_hard.mrc`, no alignment step.
+> Canonical input `~/Research/synthetic_sta/motor_hard/subtomos/merged_ABC_full/` (+ `labels.csv`).
+> Reuse each package's FM_easy config pattern with k=3. Score into `results/synthetic_scores.csv`
+> (run tag `*_ABC_hard_x6_813`); confusions → `outputs/FM_hard/<pkg>/`; class-avg panels →
+> `packages/figures/FM_hard/` via `scripts/eval/gen_class_avg_panels.py`.
+
+**Supervised upper bounds (reference only — NOT blind, excluded from any ranking):**
+
+| Method | 3-way ARI | Acc | Note |
+|---|---|---|---|
+| Logreg 5-fold ceiling (25 PC) | 0.472 | 0.782 | supervised classifier on masked-PCA feats (`classify_hard.py`) |
+| — pairwise: base↔mature | 0.752 | 0.934 | = FM_easy A–C (0.745); pipeline cross-check ✓ |
+| — pairwise: base↔basal_body | 0.611 | 0.891 | the +P-ring step |
+| — pairwise: basal_body↔mature | 0.347 | 0.795 | the +bulb step — the bottleneck (wedge-sensitive) |
+
+### T4SS (Planned)
 
 No runs yet. See `docs/datasets.md` for planned parameters.
 

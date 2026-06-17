@@ -2,9 +2,28 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-17** by Claude (FM_easy REDESIGNED as 2-class ×6 hc set (542p) + ALL packages re-run at k=2, BLIND — PEET 0.45 / DISCA 0.41 / Dynamo 0.25 lead; RELION blind 0.008 (GT-seeded 0.76 = supervised ceiling, kept separate, NOT in ranking); STOPGAP blocked (cluster). DISK CLEANUP 2026-06-17: synthetic_sta 556G→199G; motor_switch production_5apix erroneously deleted — regenerable, see top bullet.).
+> Last updated: **2026-06-17** by Claude (FM_hard BUILT: new 3-class flagellar-motor assembly-intermediate set (base/basal_body/mature, 271×3=813p, ×6 contrast, SNR 0.299) — supervised 3-way ceiling 0.472, blind k=3 PCA 0.07, base↔mature 0.752 reproduces FM_easy A–C; dataset+mask+docs done, package runs pending. Note: "FM_hard" name repurposed from the old Borrelia-switch plan → that set is now **FM_switch**.).
 
 ## Now / Next / Parked
+
+- **FM_hard BUILT — 3-class flagellar-motor ASSEMBLY-INTERMEDIATE dataset (2026-06-17):** New synthetic
+  benchmark, *slightly harder than FM_easy*. **3 inside-out assembly stages from EMD-5311** (axial-truncation
+  cuts, ×6 contrast, same ETSim→WBP→extract pipeline as FM_easy): **base** (C-ring + MS-ring) → **basal_body**
+  (+ proximal rod + P-ring, no hook) → **mature** (full motor + hook/bulb). `base` ≡ FM_easy's C and `mature`
+  ≡ FM_easy's A (same maps/frame) → directly comparable; the inserted middle stage is the difficulty lever.
+  **271 × 3 = 813 particles, 96³, 13.329 Å/px, SNR 0.299, GT-aligned, no junk.** Canonical input
+  `~/Research/synthetic_sta/motor_hard/subtomos/merged_ABC_full/` (+`labels.csv`; local). Mask = data-driven
+  3-class diff mask `motor_hard/maps/diff_mask_hard.mrc` (~6% box). **Calibration (balanced):** blind
+  masked-PCA k=3 ARI **0.07**; supervised 5-fold 3-way ceiling **0.472 / 78% acc**; pairwise ceilings
+  base↔mature **0.752** (= FM_easy A–C 0.745 → pipeline cross-check ✓), base↔basal_body **0.611**,
+  basal_body↔mature **0.347** (the +bulb step is the wedge-sensitive bottleneck). Pipeline (local, not repo):
+  `motor_hard/{make_variants_hard.py,run_full.sh,classify_hard.py}` + self-contained `motor_hard/inputs/`
+  (`sim_clean.txt` = sim_13A+dose5000, `orient_pool.txt`, `coords/`). **Gotcha (durable):** do NOT reuse
+  ETSim's *consumed* `temp_0/sim.txt` as a master config — re-feeding it mis-simulates (CC 0.07 vs 0.32);
+  rebuild a clean master from `sim_13A.txt`. **NEXT:** run all 10 packages at **k=3, no junk** (reuse each
+  package's FM_easy config pattern + `diff_mask_hard.mrc`; PEET/DISCA/Dynamo first as FM_easy leaders),
+  score → `results/synthetic_scores.csv` (tag `*_ABC_hard_x6_813`), fill the `packages/README.md` FM_hard
+  table (skeleton already in place, mirrors FM_easy) + confusion/class-avg figures. STOPGAP blocked (cluster).
 
 - **DISK CLEANUP — synthetic_sta pruned 556G → 199G (2026-06-17):** `/home` was at 100% (245M free),
   blocking work; cleared obsolete synthetic runs to **60% used / 354G free**. **Deleted:**
@@ -31,14 +50,27 @@
   A-vs-C diff sphere `diff_sphere_r23_y55.mrc`. Built by extending the hc pipeline to runs 01–08/class
   (`hc_test/run_full.sh`, `align_classify_full.py`). **BLIND benchmark results (k=2, ARI / Acc) — all
   packages run unsupervised, no class info:**
-  **PEET WMD-PCA pc1_10 0.450 / 0.836** · **DISCA 0.407 / 0.819** · **Dynamo dpkpca 0.254 / 0.753** ·
-  **EMAN2 0.146** · ProTomo 0.053 · TomoFlow 0.036 · PyTom 0.031 · **RELION blind 0.008** · OPUS-TOMO 0.008.
+  **PEET WMD-PCA pc1_10 0.450 / 0.836** · **DISCA 0.407 / 0.819** · **PyTom 0.262 / 0.757 (cylinder mask)** ·
+  **Dynamo dpkpca 0.254 / 0.753** · **EMAN2 0.146** · ProTomo 0.053 · TomoFlow 0.036 · **RELION blind 0.008** ·
+  OPUS-TOMO 0.008.
   **MASK STANDARDIZATION (2026-06-17):** canonical FM_easy mask = A-vs-C diff sphere (8.7% of 96³ box) —
-  used by PEET/DISCA/Dynamo/PyTom/EMAN2/ProTomo. EMAN2 & ProTomo were **re-run** on the diff sphere
+  used by PEET/DISCA/Dynamo/EMAN2/ProTomo. EMAN2 & ProTomo were **re-run** on the diff sphere
   (EMAN2 0.025→**0.146**, ProTomo 0.030→**0.053**; the focus mask materially changes the result). RELION
   (broad solvent-flattening mask, 21%) and OPUS (broad threshold mask, 15%) *require* broad masks — kept
   as documented exceptions; TomoFlow has no mask step (OF on full volume). EMAN2 diff mask = `e2proc3d`
   hdf; ProTomo diff mask = `i3cut`-converted `mask_diff.i3i`.
+  **CYLINDER-VS-SPHERE MASK SWEEP (2026-06-17):** tested a cylinder (r=27 in X-Z, height 24 along the Y
+  motor axis, `diff_cyl_r27_h24_y52.mrc`, 9.9%) on all 6 diff-mask packages. **Cylinder helped ONLY PyTom**
+  (CC/template `auto_focus`: 0.031→**0.262**, converged iter6 — adopted as PyTom's canonical FM_easy mask)
+  and **hurt every PCA/learned-feature method** (PEET 0.450→0.309, DISCA 0.407→**0.005**, Dynamo 0.254→**−0.002**,
+  EMAN2 0.146→0.117, ProTomo 0.053→0.044). Reason: the A-vs-C signal extends *axially* (along Y); the cylinder
+  crops that height, so PCA loses the discriminative variance, while a CC method benefits from the tighter
+  focus. Sweep recorded under `*_CYL` tags in `results/synthetic_scores.csv`.
+  **ProTomo deep-dive (2026-06-17):** ProTomo's poor score is a **factor-selection** problem, not the mask —
+  its HAC clusters on `hacfactors 1-4` (the top SVD factors = the dominant *nuisance/contrast* axis); the
+  class signal lives in higher factors (sweep: 1-4→0.068, **5-20→0.161**, same as PEET pc1_3 0.08 → pc1_10 0.45).
+  T4P worked at 1-4 because its two-phase difference IS the dominant variance. Blind factor selection
+  (which factors carry class signal) is unsolved → ProTomo's honest blind score stays ~0.05.
   **Supervised upper bounds (NOT in the ranking, reference only):** RELION **GT-seeded** iter1 0.764 /
   0.937 (initialized from the true A & C class averages — effectively supervised; collapses to 0.435 by
   iter2) ≈ the independent **logreg 5-fold ceiling 0.745** — i.e. GT-seeded RELION measures recoverability
