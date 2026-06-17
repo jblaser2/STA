@@ -166,9 +166,13 @@ SNR — i.e. the hardest particles are degraded reconstructions, not a particula
 > Reference ceilings: blind masked-PCA k=3 ARI ≈ **0.07**; supervised 5-fold 3-way ARI **0.472 / 78% acc**.
 > **All package numbers below will be BLIND (unsupervised, no class info)** — equal footing.
 
-**Ground-truth class averages (the 3 assembly stages, WBP density):**
+**Ground truth — source class maps (top) and subtomogram averages of each stage (bottom):**
 
-<img src="figures/FM_hard/gt_class_avgs_hard.png" width="900">
+<img src="figures/FM_hard/header_maps_and_avgs.png" width="900">
+
+*(Central slice, dark = density. Top = the 3 clean source maps; bottom = the GT subtomo averages each
+blind package is trying to recover. Inside-out progression: base = one band (C/MS-ring), basal_body
+adds the P-ring tier, mature adds the L-ring/bulb cap.)*
 
 | Package | FM_hard k=3 ARI | Acc | Class Avgs | Best Confusion | Notes |
 |---|---|---|---|---|---|

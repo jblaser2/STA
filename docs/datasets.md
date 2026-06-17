@@ -59,6 +59,12 @@ file first. Do not infer protocol from individual package READMEs — those may 
 
 ### FM_hard (Synthetic) — BUILT 2026-06-17 (3-class assembly intermediates)
 
+<img src="../packages/figures/FM_hard/header_maps_and_avgs.png" width="780">
+
+*Top = the 3 clean source class maps; bottom = the GT subtomo averages (central slice, dark = density).
+The inside-out assembly progression: base = one band (C/MS-ring) → basal_body adds the P-ring tier →
+mature adds the L-ring/bulb cap.*
+
 - **Particles:** 813 (271 base + 271 basal_body + 271 mature), 96³ box, 13.329 Å/px
 - **Source:** ETSimulations → IMOD WBP → extraction at GT orientation, **×6 model contrast**
   (same imaging as FM_easy; built from EMD-5311 via axial-truncation cuts).

@@ -74,7 +74,7 @@ Many packages using different classification algorithms have been developed for 
 - **Real dataset 1:** 672 prealigned T4P subtomograms from *Vibrio* cells with expert-validated structural classes
 - **Real dataset 2:** Type IV Secretion System (T4SS) — planned; details TBD
 - **Synthetic dataset 1:** `FM_easy` — 2-class flagellar motor assembly intermediates (542 particles, high-contrast, exact per-particle ground-truth labels known)
-- **Synthetic dataset 2:** Planned — `FM_hard`, with smaller / nested structural differences between classes (intrinsically harder for blind STA)
+- **Synthetic dataset 2:** `FM_hard` — 3-class flagellar motor assembly intermediates (813 particles, nested base/basal_body/mature stages; harder than FM_easy by design, exact ground-truth labels known)
 
 All packages are run with identical preprocessing on both real and synthetic data. Scores on synthetic data anchor the real-data results via ARI and related external-validity metrics.
 
@@ -153,6 +153,39 @@ GT-seeded RELION reaches 0.764 — i.e. the class difference is strongly present
 labels*. Blind voxel k-means (no labels) reaches only ≈ 0.14. The gap between these is what the blind
 benchmark measures. Per-particle ground-truth labels:
 `~/Research/synthetic_sta/motor_easy/hc_test_x6/subtomos/merged_AC_full/labels.csv`.
+
+### Synthetic Data — Assembly Intermediates, 3-class harder tier (`FM_hard`)
+
+> **Built 2026-06-17.** A *slightly harder* sibling of FM_easy: the same flagellar-motor assembly axis,
+> but **3 nested stages** instead of the two extremes. FM_easy is base-vs-mature (the grossest, most
+> separable pair); FM_hard inserts the real middle stage, creating two *adjacent subtle-addition* pairs
+> that are genuinely harder for blind STA — while base↔mature stays as the recoverable anchor.
+
+**813 subtomograms** (271 × 3) simulated through the same ETSimulations → IMOD WBP pipeline at
+**13.329 Å/px, 96³ box, ×6 contrast** (measured SNR ≈ 0.30). Three ground-truth inside-out assembly stages:
+
+| Class | Description | N |
+|---|---|---|
+| **base** | C-ring + MS-ring (cytoplasmic inner-membrane sub-complex) | 271 |
+| **basal_body** | base + proximal rod + P-ring (periplasmic, no hook) | 271 |
+| **mature** | full motor + hook + periplasmic bulb (= FM_easy's A) | 271 |
+
+`base` ≡ FM_easy's C and `mature` ≡ FM_easy's A (same maps/frame), so the two synthetic tiers are
+directly comparable. Built from EMD-5311 by monotonic axial-truncation cuts.
+
+**Ground truth — source class maps (top) and the GT subtomogram averages each package must recover (bottom):**
+
+<p align="center">
+  <img src="packages/figures/FM_hard/header_maps_and_avgs.png" width="860" alt="FM_hard ground truth: source density maps (top) and GT subtomogram averages (bottom) for the three assembly stages base, basal_body, mature"/>
+</p>
+
+<p align="center"><em>Central slice, dark = density. Top: the 3 clean source maps. Bottom: GT-aligned subtomogram averages (271 each) — the inside-out progression is visible: base = one band (C/MS-ring), basal_body adds the P-ring tier, mature adds the L-ring/bulb cap.</em></p>
+
+**Reference ceilings (on this set):** supervised 5-fold 3-way **ARI 0.472 / 78% acc**; blind masked-PCA
+k=3 ≈ **0.07**. Pairwise supervised ceilings: base↔mature **0.752** (≈ FM_easy's A–C 0.745, a pipeline
+cross-check), base↔basal_body **0.611**, basal_body↔mature **0.347** (the wedge-sensitive bottleneck).
+Per-particle labels: `~/Research/synthetic_sta/motor_hard/subtomos/merged_ABC_full/labels.csv`.
+Package runs (k=3, no junk) are pending; see `packages/README.md`.
 
 ---
 
