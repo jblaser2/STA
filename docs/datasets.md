@@ -41,7 +41,12 @@ file first. Do not infer protocol from individual package READMEs — those may 
 - **Missing wedge:** ±60°/3°/41 tilts. See §Missing Wedge below. No correction needed.
 - **Junk class:** None (all 542 particles are valid class members).
 - **Mask:** A-vs-C difference sphere `diff_sphere_r23_y55.mrc`
-  (in `packages/dynamo/dynamo_outputs/easy_pair_AC_hc/`).
+  (in `packages/dynamo/dynamo_outputs/easy_pair_AC_hc/`; 8.7% of the 96³ box).
+  **Per-package exceptions:** used by PEET, DISCA, Dynamo, PyTom, EMAN2, ProTomo. RELION uses a broad
+  solvent-flattening mask (`solvent_mask.mrc`, 21%) — `--solvent_mask` must enclose the whole particle,
+  so the tight diff sphere can't be used there. OPUS-TOMO uses a broad threshold mask (15%) — a tight
+  mask collapses the VAE. TomoFlow applies no mask (optical flow runs on the full volume). All masks are
+  the 96³ box.
 - **Why the redesign:** the original 3-class 694-particle set at production contrast (SNR 0.21) was a
   documented *blind-failure-with-ground-truth* (every package ARI ≈ 0; analysis in
   `docs/fm_easy_classification_analysis.md`). The wall is representational, not signal absence —

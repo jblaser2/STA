@@ -11,7 +11,7 @@
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
 | **T4P** | ✅ | k=3 / k=2 | auto-tight (density) | — (no GT) | 270 / 317 (+85 junk) | Canonical no-align k=3 run; class 3 (85p, 152Å FSC) = junk; does not separate two pili phases |
-| **FM_easy** (2-class hc, 542p) | ✅ | k=2 / k=2 | auto-tight (density) | **0.025** | 388/154 | No-align PCA split, no `--clean`, NBASIS=12, MAXRES=40 Å. Splits on contrast axis even at high contrast. Confusion: `outputs/FM_easy/eman2/`. Project `~/Research/eman2_motor_easy_hc/` |
+| **FM_easy** (2-class hc, 542p) | ✅ | k=2 / k=2 | **diff sphere** (canonical) | **0.146** | 438/104 | No-align PCA split, no `--clean`, NBASIS=12, MAXRES=40 Å. Partial recovery: class C 271/0 pure. **Re-run 2026-06-17 with the canonical diff sphere (was 0.025 with the package auto-tight mask)** — the focus mask matters. Confusion: `outputs/FM_easy/eman2/`. Project `~/Research/eman2_motor_easy_hc/` |
 | FM_easy (old 3-class, 694p) | 🗄️ archived | k=3 | auto-tight | −0.002 | 81/94/519 | Superseded; archived |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |

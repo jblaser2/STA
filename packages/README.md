@@ -75,16 +75,22 @@ like the A and C panels above (one full motor, one truncated).
 
 | Package | k=2 ARI (blind) | Acc | Class averages (2 predicted clusters) | Confusion | Notes |
 |---------|-----------------|-----|---------------------------------------|-----------|-------|
-| [PEET](peet/) | **0.450** (pc1_10) | 0.836 | <img src="figures/FM_easy/peet_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/peet/confusion_peet_k2_k2_pc1_10_AC_hc_x6_542.png" width="300"> | WMD-PCA recovers axis with more PCs (pc1_3=0.08, pc1_5=0.12, pc1_10=0.45); cluster averages match A/C |
-| [DISCA](disca/) | **0.407** | 0.819 | <img src="figures/FM_easy/disca_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/disca/confusion_disca_k2_k2_AC_hc_x6_542.png" width="300"> | Locks onto structural axis at high contrast (was 0.036 at k=3); A 268/3 pure |
-| [Dynamo](dynamo/) | **0.254** | 0.753 | <img src="figures/FM_easy/dynamo_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/dynamo/confusion_dynamo_k2_k2_AC_hc_x6_542.png" width="300"> | dpkpca band[0.05,0.45,2] 50 eig; 95%-pure C cluster |
-| [TomoFlow](tomoflow/) | 0.036 | 0.596 | <img src="figures/FM_easy/tomoflow_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/tomoflow/confusion_tomoflow_k2_k2_AC_hc_x6_542.png" width="300"> | OF landscape collapses (downsample 3 / 32³); unimodal, as on T4P |
-| [PyTom](PyTom/) | 0.031 | 0.590 | <img src="figures/FM_easy/pytom_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/pytom/confusion_pytom_k2_k2_AC_hc_x6_542.png" width="300"> | auto_focus_classify; does not find the class axis |
-| [ProTomo](protomo/) | 0.030 | 0.589 | <img src="figures/FM_easy/protomo_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/protomo/confusion_protomo_k2_k2_AC_hc_x6_542.png" width="300"> | SVD+HAC collapse to dominant cluster (382/160) |
-| [EMAN2](eman2/) | 0.025 | 0.581 | <img src="figures/FM_easy/eman2_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/eman2/confusion_eman2_k2_k2_AC_hc_x6_542.png" width="300"> | PCA splits on contrast axis (388/154) |
-| [RELION](relion/) | 0.008 (blind) | 0.548 | <img src="figures/FM_easy/relion_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/relion/run_k2_blind/confusion_relion_k2_k2_AC_hc_x6_542_BLIND.png" width="300"> | Soft-EM blind (global-avg init, no GT): near-collapse 486/56 — SNR failure |
-| [OPUS-TOMO](opusTomo/) | 0.008 | 0.550 | <img src="figures/FM_easy/opus_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/opus/confusion_opus-tomo_k2_k2_AC_hc_x6_542.png" width="300"> | VAE latent does not resolve the 2 classes |
+| [PEET](peet/) | **0.450** (pc1_10) | 0.836 | <img src="figures/FM_easy/peet_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/peet/confusion_peet_k2_k2_pc1_10_AC_hc_x6_542.png" width="300"> | diff sphere. WMD-PCA recovers axis with more PCs (pc1_3=0.08, pc1_5=0.12, pc1_10=0.45); cluster averages match A/C |
+| [DISCA](disca/) | **0.407** | 0.819 | <img src="figures/FM_easy/disca_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/disca/confusion_disca_k2_k2_AC_hc_x6_542.png" width="300"> | diff sphere. Locks onto structural axis at high contrast (was 0.036 at k=3); A 268/3 pure |
+| [Dynamo](dynamo/) | **0.254** | 0.753 | <img src="figures/FM_easy/dynamo_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/dynamo/confusion_dynamo_k2_k2_AC_hc_x6_542.png" width="300"> | diff sphere. dpkpca band[0.05,0.45,2] 50 eig; 95%-pure C cluster |
+| [EMAN2](eman2/) | **0.146** | 0.692 | <img src="figures/FM_easy/eman2_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/eman2/confusion_eman2_k2_k2_AC_hc_x6_542.png" width="300"> | diff sphere (re-run 2026-06-17; was 0.025 with auto-tight mask). 438/104; class C 271/0 pure — partial recovery |
+| [ProTomo](protomo/) | 0.053 | 0.616 | <img src="figures/FM_easy/protomo_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/protomo/confusion_protomo_k2_k2_AC_hc_x6_542.png" width="300"> | diff sphere (re-run 2026-06-17; was 0.030 with solvent sphere). SVD+HAC; small A-enriched cluster (79: 71A/8C) |
+| [TomoFlow](tomoflow/) | 0.036 | 0.596 | <img src="figures/FM_easy/tomoflow_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/tomoflow/confusion_tomoflow_k2_k2_AC_hc_x6_542.png" width="300"> | **no mask** (OF on full volume). Landscape collapses (downsample 3 / 32³); unimodal, as on T4P |
+| [PyTom](PyTom/) | 0.031 | 0.590 | <img src="figures/FM_easy/pytom_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/pytom/confusion_pytom_k2_k2_AC_hc_x6_542.png" width="300"> | diff sphere. auto_focus_classify; does not find the class axis |
+| [RELION](relion/) | 0.008 (blind) | 0.548 | <img src="figures/FM_easy/relion_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/relion/run_k2_blind/confusion_relion_k2_k2_AC_hc_x6_542_BLIND.png" width="300"> | solvent sphere (21%, *required* for solvent flattening). Soft-EM blind: near-collapse 486/56 — SNR failure |
+| [OPUS-TOMO](opusTomo/) | 0.008 | 0.550 | <img src="figures/FM_easy/opus_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/opus/confusion_opus-tomo_k2_k2_AC_hc_x6_542.png" width="300"> | threshold mask (15%, *required* for VAE). Latent does not resolve the 2 classes |
 | [STOPGAP](STOPGAP/) | _blocked_ | | — | — | Needs `/apps/matlab/r2023b` (BYU RC cluster); SLURM-only on this node — run via Eben on the cluster |
+
+> **Mask policy:** the canonical FM_easy mask is the **A-vs-C diff sphere** (8.7% of box, shown above), used by
+> PEET, DISCA, Dynamo, PyTom, EMAN2, and ProTomo. Three packages necessarily differ: **RELION** needs a broad
+> solvent-flattening mask (21%); **OPUS-TOMO** needs a broad threshold mask for the VAE (15%, a tight mask
+> collapses it — documented on T4P); **TomoFlow** has no mask step (optical flow runs on the full volume).
+> All masks are the same 96³ box.
 
 **Supervised upper bounds (reference only — NOT blind, excluded from the ranking):**
 
@@ -93,10 +99,11 @@ like the A and C panels above (one full motor, one truncated).
 | RELION **GT-seeded** (iter1) | 0.764 | 0.937 | Initialized from the true A & C class averages (`--firstiter_cc`) — effectively supervised; collapses to 0.435 by iter2 |
 | Logreg 5-fold ceiling | 0.745 | 0.932 | Supervised classifier on masked-PCA features (`align_classify_full.py`) |
 
-**Benchmark signal:** at high contrast the BLIND field splits between methods that find the *class axis*
-(PEET many-PC, DISCA, Dynamo: ARI 0.25–0.45) and those that collapse onto a *nuisance/contrast axis*
-(TomoFlow, PyTom, ProTomo, EMAN2, RELION soft-EM, OPUS: ARI≈0) — even though the supervised ceiling
+**Benchmark signal:** at high contrast the BLIND field splits between methods that recover the *class axis*
+(PEET, DISCA, Dynamo: ARI 0.25–0.45; EMAN2 0.15 partial) and those that collapse onto a *nuisance/contrast
+axis* (ProTomo, TomoFlow, PyTom, RELION soft-EM, OPUS: ARI≈0–0.05) — even though the supervised ceiling
 is 0.75. The old 3-class set put *every* package at ≈0; this 2-class hc set resolves the blind field.
+(All on the canonical diff-sphere mask except RELION/OPUS/TomoFlow — see Mask policy above.)
 
 #### Do packages misclassify the *same* subtomos?
 

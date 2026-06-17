@@ -15,7 +15,13 @@
   (`hc_test/run_full.sh`, `align_classify_full.py`). **BLIND benchmark results (k=2, ARI / Acc) — all
   packages run unsupervised, no class info:**
   **PEET WMD-PCA pc1_10 0.450 / 0.836** · **DISCA 0.407 / 0.819** · **Dynamo dpkpca 0.254 / 0.753** ·
-  TomoFlow 0.036 · PyTom 0.031 · ProTomo 0.030 · EMAN2 0.025 · **RELION blind 0.008** · OPUS-TOMO 0.008.
+  **EMAN2 0.146** · ProTomo 0.053 · TomoFlow 0.036 · PyTom 0.031 · **RELION blind 0.008** · OPUS-TOMO 0.008.
+  **MASK STANDARDIZATION (2026-06-17):** canonical FM_easy mask = A-vs-C diff sphere (8.7% of 96³ box) —
+  used by PEET/DISCA/Dynamo/PyTom/EMAN2/ProTomo. EMAN2 & ProTomo were **re-run** on the diff sphere
+  (EMAN2 0.025→**0.146**, ProTomo 0.030→**0.053**; the focus mask materially changes the result). RELION
+  (broad solvent-flattening mask, 21%) and OPUS (broad threshold mask, 15%) *require* broad masks — kept
+  as documented exceptions; TomoFlow has no mask step (OF on full volume). EMAN2 diff mask = `e2proc3d`
+  hdf; ProTomo diff mask = `i3cut`-converted `mask_diff.i3i`.
   **Supervised upper bounds (NOT in the ranking, reference only):** RELION **GT-seeded** iter1 0.764 /
   0.937 (initialized from the true A & C class averages — effectively supervised; collapses to 0.435 by
   iter2) ≈ the independent **logreg 5-fold ceiling 0.745** — i.e. GT-seeded RELION measures recoverability

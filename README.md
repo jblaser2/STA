@@ -257,16 +257,17 @@ All 10 packages run **blind** (unsupervised, no class info) at k=2 on the 542-pa
 
 | Package | ARI | Acc | | Package | ARI | Acc |
 |---|---|---|---|---|---|---|
-| **PEET** (WMD-PCA pc1_10) | **0.450** | 0.836 | | EMAN2 | 0.025 | 0.581 |
+| **PEET** (WMD-PCA pc1_10) | **0.450** | 0.836 | | PyTom | 0.031 | 0.590 |
 | **DISCA** | **0.407** | 0.819 | | RELION (blind) | 0.008 | 0.548 |
 | **Dynamo** (dpkpca) | **0.254** | 0.753 | | OPUS-TOMO | 0.008 | 0.550 |
-| TomoFlow | 0.036 | 0.596 | | STOPGAP | — | blocked (cluster) |
-| PyTom | 0.031 | 0.590 | | | | |
-| ProTomo | 0.030 | 0.589 | | | | |
+| EMAN2 | 0.146 | 0.692 | | STOPGAP | — | blocked (cluster) |
+| ProTomo | 0.053 | 0.616 | | | | |
+| TomoFlow | 0.036 | 0.596 | | | | |
 
-- **The blind field splits cleanly:** methods that find the *class axis* (PEET many-PC, DISCA, Dynamo: ARI 0.25–0.45) vs. methods that collapse onto a *nuisance / contrast axis* (the rest: ≈ 0) — against a supervised ceiling of 0.745. The old 3-class set put *every* package at ≈ 0; this 2-class high-contrast set resolves the field.
+- **The blind field splits cleanly:** methods that recover the *class axis* (PEET, DISCA, Dynamo: ARI 0.25–0.45; EMAN2 0.15 partial) vs. methods that collapse onto a *nuisance / contrast axis* (the rest: ≈ 0–0.05) — against a supervised ceiling of 0.745. The old 3-class set put *every* package at ≈ 0; this 2-class high-contrast set resolves the field.
+- **Standardized mask:** all packages use the canonical A-vs-C diff-sphere mask (8.7% of box) except RELION (broad solvent-flattening mask, required), OPUS-TOMO (broad threshold mask, required for the VAE), and TomoFlow (no mask step). EMAN2 and ProTomo were re-run on the diff sphere (2026-06-17) for consistency.
 - **Fairness:** all numbers above are blind. GT-seeded RELION (0.764, initialized from the true class averages) is reported only as a *supervised upper bound*, not in the blind ranking.
-- Per-package class-average and confusion figures: `packages/README.md` (FM_easy table).
+- **Errors are complementary:** the recovering packages (PEET/DISCA/Dynamo) misclassify nearly *disjoint* particle sets (PEET–DISCA error overlap Jaccard 0.00; 0 particles missed by all three) — a consensus would correct almost everything. Per-package class-average, confusion, and error-overlap figures: `packages/README.md` (FM_easy table).
 
 ---
 
