@@ -23,20 +23,20 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 
 **Reference class averages (Stefano — ring_complete / ring_altered / junk, 509/95/68):**
 
-<img src="figures/T4P/reference_class_avgs.png" width="420">
+<img src="figures/T4P/reference_class_avgs.png" width="640">
 
 | Package | T4P Status | Result (signal classes) | Mask | Converged? | Class Avgs | Notes |
 |---------|-----------|------------------------|------|------------|------------|-------|
-| [Dynamo](dynamo/) | 🟡 | 447/225 (junk pending) | cyl v2 (pending re-run) | **Yes** | <img src="dynamo/T4P/results/dynamo_final_results/class_comparison.png" width="150"> | HAC; reference result; re-run needed with k=3+junk |
-| [PEET](peet/) | ✅ | **374/230** (+68 junk) | cyl v2 | **Yes** | <img src="figures/T4P/peet_v2_class_avgs.png" width="150"> | Cyl mask v2 critical; junk class = bottom 68 by CCC |
-| [PyTom](PyTom/) | 🟡 | 440/232 (junk pending) | cyl v2 | **Yes** | <img src="figures/T4P/pytom_k2_class_avgs.png" width="150"> | `-a` flag + v2 mask both required; re-run needed with k=3+junk |
+| [Dynamo](dynamo/) | 🟡 | 447/225 (junk pending) | cyl v2 (pending re-run) | **Yes** | <img src="dynamo/T4P/results/dynamo_final_results/class_comparison.png" width="320"> | HAC; reference result; re-run needed with k=3+junk |
+| [PEET](peet/) | ✅ | **374/230** (+68 junk) | cyl v2 | **Yes** | <img src="figures/T4P/peet_v2_class_avgs.png" width="320"> | Cyl mask v2 critical; junk class = bottom 68 by CCC |
+| [PyTom](PyTom/) | 🟡 | 440/232 (junk pending) | cyl v2 | **Yes** | <img src="figures/T4P/pytom_k2_class_avgs.png" width="320"> | `-a` flag + v2 mask both required; re-run needed with k=3+junk |
 | [OPUS-TOMO](opusTomo/) | 🟡 | 447/225 (junk pending) | threshold (31.2%) | **Partial** | _(pending)_ | Threshold mask required for VAE; junk pending; ARI vs GT pending |
 | [RELION](relion/) | ✅ (exhausted) | 672/0 | cyl v2 | **No** | — | Algorithm-level SNR failure; all configs collapse |
-| [EMAN2](eman2/) | ✅ | 270/317 (+85 junk) | none | **No** | <img src="eman2/T4P/results/eman2_T4P_k3_none_r01_classavg.png" width="150"> | Canonical k=3 complete; does not separate two phases; PCA axis = contrast, not conformation |
-| [DISCA](disca/) | ✅ | **398/274** (cyl v2) | cyl v2 | **No** | <img src="disca/T4P/results/disca_k2_classes.png" width="150"> | Masked: balanced split but ARI≈0 vs converging pkgs; splits on contrast axis. Agrees w/ OPUS-TOMO (ARI=0.678). Misses the two phases |
-| [TomoFlow](tomoflow/) | 🟡 | — (old run) | none | **No** | <img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="150"> | Unimodal; k=3 canonical run needed |
-| [ProTomo](protomo/) | ✅ | 334/212/126 junk (all 672) | none | **Yes** | <img src="protomo/T4P/results/class_averages_slices.png" width="150"> | Separates the two phases (visual). CC=0.943. MRAPKR=0 bug fixed (shifting 437 particles +22px); alignment bypassed. |
-| [STOPGAP](STOPGAP/) | ✅ | PCA 336/336 · MRA **70/602** (k=2) | cyl (tight r=8/h=26) | **No** | <img src="STOPGAP/T4P/results/meta/class_pca_class_avg_k2.png" width="150"> | Owned by Eben; k=2/3/4 done (job 12114811). PCA k-means vs MRA disagree at chance (ARI≈0.001–0.003); does not separate the two phases |
+| [EMAN2](eman2/) | ✅ | 270/317 (+85 junk) | none | **No** | <img src="eman2/T4P/results/eman2_T4P_k3_none_r01_classavg.png" width="320"> | Canonical k=3 complete; does not separate two phases; PCA axis = contrast, not conformation |
+| [DISCA](disca/) | ✅ | **398/274** (cyl v2) | cyl v2 | **No** | <img src="disca/T4P/results/disca_k2_classes.png" width="320"> | Masked: balanced split but ARI≈0 vs converging pkgs; splits on contrast axis. Agrees w/ OPUS-TOMO (ARI=0.678). Misses the two phases |
+| [TomoFlow](tomoflow/) | 🟡 | — (old run) | none | **No** | <img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="320"> | Unimodal; k=3 canonical run needed |
+| [ProTomo](protomo/) | ✅ | 334/212/126 junk (all 672) | none | **Yes** | <img src="protomo/T4P/results/class_averages_slices.png" width="320"> | Separates the two phases (visual). CC=0.943. MRAPKR=0 bug fixed (shifting 437 particles +22px); alignment bypassed. |
+| [STOPGAP](STOPGAP/) | ✅ | PCA 336/336 · MRA **70/602** (k=2) | cyl (tight r=8/h=26) | **No** | <img src="STOPGAP/T4P/results/meta/class_pca_class_avg_k2.png" width="320"> | Owned by Eben; k=2/3/4 done (job 12114811). PCA k-means vs MRA disagree at chance (ARI≈0.001–0.003); does not separate the two phases |
 
 ---
 
@@ -49,17 +49,30 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 > Reference ceilings on this set: blind masked-PCA ARI≈0.14; supervised 5-fold ARI≈0.75 / 93% acc.
 > **All package numbers below are BLIND (unsupervised, no class info)** — equal footing.
 
-| Package | FM_easy Status | k=2 ARI (blind) | Acc | Confusion | Notes |
-|---------|---------------|-----------------|-----|-----------|-------|
-| [PEET](peet/) | ✅ | **0.450** (pc1_10) | 0.836 | <img src="../outputs/FM_easy/peet/confusion_peet_k2_k2_pc1_10_AC_hc_x6_542.png" width="180"> | WMD-PCA recovers axis with more PCs (pc1_3=0.08, pc1_5=0.12, pc1_10=0.45) |
-| [DISCA](disca/) | ✅ | **0.407** | 0.819 | <img src="../outputs/FM_easy/disca/confusion_disca_k2_k2_AC_hc_x6_542.png" width="180"> | Locks onto structural axis at high contrast (was 0.036 at k=3); A 268/3 pure |
-| [Dynamo](dynamo/) | ✅ | **0.254** | 0.753 | <img src="../outputs/FM_easy/dynamo/confusion_dynamo_k2_k2_AC_hc_x6_542.png" width="180"> | dpkpca band[0.05,0.45,2] 50 eig; 95%-pure C cluster |
-| [TomoFlow](tomoflow/) | ✅ | 0.036 | 0.596 | <img src="../outputs/FM_easy/tomoflow/confusion_tomoflow_k2_k2_AC_hc_x6_542.png" width="180"> | OF landscape collapses (downsample 3 / 32³); unimodal, as on T4P |
-| [PyTom](PyTom/) | ✅ | 0.031 | 0.590 | <img src="../outputs/FM_easy/pytom/confusion_pytom_k2_k2_AC_hc_x6_542.png" width="180"> | auto_focus_classify; does not find the class axis |
-| [ProTomo](protomo/) | ✅ | 0.030 | 0.589 | <img src="../outputs/FM_easy/protomo/confusion_protomo_k2_k2_AC_hc_x6_542.png" width="180"> | SVD+HAC collapse to dominant cluster (382/160) |
-| [EMAN2](eman2/) | ✅ | 0.025 | 0.581 | <img src="../outputs/FM_easy/eman2/confusion_eman2_k2_k2_AC_hc_x6_542.png" width="180"> | PCA splits on contrast axis (388/154) |
-| [RELION](relion/) | ✅ | 0.008 (blind) | 0.548 | <img src="../outputs/FM_easy/relion/run_k2_blind/confusion_relion_k2_k2_AC_hc_x6_542_BLIND.png" width="180"> | Soft-EM blind (global-avg init, no GT): near-collapse 56/486 — SNR failure |
-| [STOPGAP](STOPGAP/) | ⛔ | _blocked_ | | — | Needs `/apps/matlab/r2023b` (BYU RC cluster); SLURM-only on this node — run via Eben on the cluster |
+**Ground truth — source density maps (input) and subtomogram averages of each class:**
+
+<img src="figures/FM_easy/header_maps_and_avgs.png" width="900">
+
+*(Central slice, dark = density. Class A = mature full motor, density extends down the box;
+Class C = early cytoplasmic base, truncated. The two subtomo averages are what each blind package
+is trying to recover.)*
+
+The **Class averages** column shows each package's two predicted clusters (mean of the subtomos it
+assigned to each), same central slice — a package "finds the class axis" when its two averages look
+like the A and C panels above (one full motor, one truncated).
+
+| Package | k=2 ARI (blind) | Acc | Class averages (2 predicted clusters) | Confusion | Notes |
+|---------|-----------------|-----|---------------------------------------|-----------|-------|
+| [PEET](peet/) | **0.450** (pc1_10) | 0.836 | <img src="figures/FM_easy/peet_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/peet/confusion_peet_k2_k2_pc1_10_AC_hc_x6_542.png" width="300"> | WMD-PCA recovers axis with more PCs (pc1_3=0.08, pc1_5=0.12, pc1_10=0.45); cluster averages match A/C |
+| [DISCA](disca/) | **0.407** | 0.819 | <img src="figures/FM_easy/disca_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/disca/confusion_disca_k2_k2_AC_hc_x6_542.png" width="300"> | Locks onto structural axis at high contrast (was 0.036 at k=3); A 268/3 pure |
+| [Dynamo](dynamo/) | **0.254** | 0.753 | <img src="figures/FM_easy/dynamo_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/dynamo/confusion_dynamo_k2_k2_AC_hc_x6_542.png" width="300"> | dpkpca band[0.05,0.45,2] 50 eig; 95%-pure C cluster |
+| [TomoFlow](tomoflow/) | 0.036 | 0.596 | <img src="figures/FM_easy/tomoflow_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/tomoflow/confusion_tomoflow_k2_k2_AC_hc_x6_542.png" width="300"> | OF landscape collapses (downsample 3 / 32³); unimodal, as on T4P |
+| [PyTom](PyTom/) | 0.031 | 0.590 | <img src="figures/FM_easy/pytom_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/pytom/confusion_pytom_k2_k2_AC_hc_x6_542.png" width="300"> | auto_focus_classify; does not find the class axis |
+| [ProTomo](protomo/) | 0.030 | 0.589 | <img src="figures/FM_easy/protomo_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/protomo/confusion_protomo_k2_k2_AC_hc_x6_542.png" width="300"> | SVD+HAC collapse to dominant cluster (382/160) |
+| [EMAN2](eman2/) | 0.025 | 0.581 | <img src="figures/FM_easy/eman2_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/eman2/confusion_eman2_k2_k2_AC_hc_x6_542.png" width="300"> | PCA splits on contrast axis (388/154) |
+| [RELION](relion/) | 0.008 (blind) | 0.548 | <img src="figures/FM_easy/relion_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/relion/run_k2_blind/confusion_relion_k2_k2_AC_hc_x6_542_BLIND.png" width="300"> | Soft-EM blind (global-avg init, no GT): near-collapse 486/56 — SNR failure |
+| [OPUS-TOMO](opusTomo/) | 0.008 | 0.550 | <img src="figures/FM_easy/opus_class_avgs.png" width="340"> | <img src="../outputs/FM_easy/opus/confusion_opus-tomo_k2_k2_AC_hc_x6_542.png" width="300"> | VAE latent does not resolve the 2 classes |
+| [STOPGAP](STOPGAP/) | _blocked_ | | — | — | Needs `/apps/matlab/r2023b` (BYU RC cluster); SLURM-only on this node — run via Eben on the cluster |
 
 **Supervised upper bounds (reference only — NOT blind, excluded from the ranking):**
 
