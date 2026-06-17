@@ -27,6 +27,18 @@
   0.25–0.45) and methods that collapse onto a *nuisance/contrast axis* (TomoFlow, PyTom, ProTomo SVD+HAC,
   EMAN2 PCA, RELION soft-EM, OPUS VAE: ≈0) — even though the supervised ceiling is 0.75. The redesign
   separates "method finds class axis" from "method finds nuisance axis," which is the benchmark signal.
+  **ERROR-OVERLAP ANALYSIS (2026-06-17, `scripts/eval/fm_easy_error_overlap.py`):** do the blind packages
+  miss the *same* subtomos? Mostly **NO** — best-permutation per-particle errors across all 9: **no particle
+  missed by all 9** (max 7/9, only 4 particles; modal miss-count 3–4/9, errors spread not concentrated).
+  The 3 recovering packages miss **nearly disjoint** sets — PEET–DISCA error Jaccard **0.00**, PEET–Dynamo
+  0.02 (*below* the chance level 0.09–0.11 expected if independent), and **0 particles missed by all three**
+  → PEET/DISCA/Dynamo are complementary, a consensus would correct almost everything (publishable: argues
+  for ensemble/consensus classification). Collapsed packages overlap more (TomoFlow/ProTomo/EMAN2 Jaccard
+  ≈0.48–0.54) only because they fail the *same class*, not because they share hard particles. Top-5
+  most-missed subtomos = heavily missing-wedge-streaked / low-SNR reconstructions (mix of GT A & C), i.e.
+  the hardest particles are degraded reconstructions, not one conformation. Figures: `packages/figures/FM_easy/
+  error_overlap_jaccard.png`, `missed_top{1..5}.png`; also added mask-overlay + 2-class perfect-confusion
+  figures and rewrote the main `README.md` synthetic section for the 2-class design.
   **STOPGAP: BLOCKED on this node** — its runtime/binaries need `/apps/matlab/r2023b` (BYU RC cluster
   path, absent here) and it ships only SLURM wrappers; ran on the RC cluster via Eben. Needs cluster (Eben).
   Old k=3 outputs → `outputs/FM_easy/_archive_3class_k3/`; old scores → `results/_archive_motor_easy_3class_scores.csv`.
