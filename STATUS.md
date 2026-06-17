@@ -2,9 +2,43 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-16** by Claude (FM_easy: HIGH-CONTRAST regeneration test — contrast doubles the supervised ceiling and takes Dynamo from chance to near-usable; the wall is REPRESENTATIONAL, not signal absence).
+> Last updated: **2026-06-17** by Claude (FM_easy REDESIGNED as 2-class ×6 hc set (542p) + ALL packages re-run at k=2, BLIND — PEET 0.45 / DISCA 0.41 / Dynamo 0.25 lead; RELION blind 0.008 (GT-seeded 0.76 = supervised ceiling, kept separate, NOT in ranking); STOPGAP blocked (cluster).).
 
 ## Now / Next / Parked
+
+- **FM_easy REDESIGNED → 2-class high-contrast (542p) + ALL 10 PACKAGES RE-RUN at k=2 (2026-06-16):**
+  Old 3-class 694p production-contrast set (every package ARI≈0) **scrapped/archived**; replaced by the
+  achievable "easy tier" = **2-class A (mature full motor) vs C (early cytoplasmic base), 271+271=542
+  particles, ×6 model contrast (SNR 0.340), 96³, 13.329 Å/px**, GT-aligned. Canonical input
+  `~/Research/synthetic_sta/motor_easy/hc_test_x6/subtomos/merged_AC_full/` (+`labels.csv`); mask =
+  A-vs-C diff sphere `diff_sphere_r23_y55.mrc`. Built by extending the hc pipeline to runs 01–08/class
+  (`hc_test/run_full.sh`, `align_classify_full.py`). **BLIND benchmark results (k=2, ARI / Acc) — all
+  packages run unsupervised, no class info:**
+  **PEET WMD-PCA pc1_10 0.450 / 0.836** · **DISCA 0.407 / 0.819** · **Dynamo dpkpca 0.254 / 0.753** ·
+  TomoFlow 0.036 · PyTom 0.031 · ProTomo 0.030 · EMAN2 0.025 · **RELION blind 0.008** · OPUS-TOMO 0.008.
+  **Supervised upper bounds (NOT in the ranking, reference only):** RELION **GT-seeded** iter1 0.764 /
+  0.937 (initialized from the true A & C class averages — effectively supervised; collapses to 0.435 by
+  iter2) ≈ the independent **logreg 5-fold ceiling 0.745** — i.e. GT-seeded RELION measures recoverability
+  with labels, not blind ability. ⚠️ **Fairness correction (2026-06-17):** earlier draft ranked RELION at
+  top via GT-seeding — that gave RELION the answer (the GT density maps) the other packages never got.
+  Re-ran RELION **blind** (global-avg init, no `--firstiter_cc`, no GT refs): ARI 0.008 (split 56/486,
+  near-collapse) — consistent with the documented blind-RELION SNR failure. **Pattern at high contrast:**
+  the BLIND field splits between methods that find the *class axis* (PEET many-PC, DISCA, Dynamo:
+  0.25–0.45) and methods that collapse onto a *nuisance/contrast axis* (TomoFlow, PyTom, ProTomo SVD+HAC,
+  EMAN2 PCA, RELION soft-EM, OPUS VAE: ≈0) — even though the supervised ceiling is 0.75. The redesign
+  separates "method finds class axis" from "method finds nuisance axis," which is the benchmark signal.
+  **STOPGAP: BLOCKED on this node** — its runtime/binaries need `/apps/matlab/r2023b` (BYU RC cluster
+  path, absent here) and it ships only SLURM wrappers; ran on the RC cluster via Eben. Needs cluster (Eben).
+  Old k=3 outputs → `outputs/FM_easy/_archive_3class_k3/`; old scores → `results/_archive_motor_easy_3class_scores.csv`.
+  New per-package preds/confusions in `outputs/FM_easy/<pkg>/`; scores in `results/synthetic_scores.csv`
+  (`*_AC_hc_x6_542`). Scripts: `scripts/data_prep/setup_relion_motor_easy_hc.py` +
+  `scripts/run_relion_motor_easy_hc.sh`, `scripts/data_prep/run_disca_fm_easy_hc.sh`,
+  `~/Research/eman2_motor_easy_hc/run_pipeline.sh`, `packages/PyTom/FM_easy/scripts/*_hc_*`,
+  `packages/peet/FM_easy/scripts/*_hc*`, `packages/opusTomo/FM_easy/scripts/*_hc_*`,
+  `~/Research/protomo/motor_easy_hc/`, `packages/dynamo/FM_easy/scripts/setup_hc_pair_pca.py`.
+  Scripts: `scripts/run_relion_motor_easy_hc_blind.sh` (blind, fair) + `scripts/run_relion_motor_easy_hc.sh`
+  (GT-seeded reference); blind preds `outputs/FM_easy/relion/run_k2_blind/`. **NEXT:** run STOPGAP on the
+  RC cluster (Eben); update figures gallery + per-package READMEs; consider nc-sweep Dynamo toward ceiling.
 
 - **FM_easy — HIGH-CONTRAST REGENERATION TEST COMPLETE (2026-06-16, decisive):** Regenerated A/C through
   the real ETSim→WBP→extract pipeline at higher model contrast (×3/×6/×10 of base vs production ×0.1) and

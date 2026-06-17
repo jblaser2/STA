@@ -1,46 +1,18 @@
 package,dataset,k,run,n_particles,ARI,AMI,V_measure,accuracy,pred_csv,notes
-relion,motor_easy,2,k2_wedge,634,0.004571,0.001093,0.002966,0.378549,outputs/relion_motor_easy/Class3D/k2_wedge/predictions.csv,
-relion,motor_easy,3,k3_wedge,634,0.006375,0.008425,0.011527,0.384858,outputs/relion_motor_easy/Class3D/k3_wedge/predictions.csv,
-relion,motor_easy,3,k3_wedge_v3_GTseeded,634,0.254623,0.228929,0.231193,0.673502,outputs/relion_motor_easy/Class3D/k3_wedge_v3/predictions.csv,GT-seeded+firstiter_cc: best RELION result; blind result is k3_wedge ARI=0.005
-relion,motor_easy,3,k3_wedge_v3_694_iter1,694,0.379643,0.324007,0.325830,0.743516,outputs/relion_motor_easy/Class3D/k3_wedge_v3_694/predictions_iter1.csv,694-particle rebuild; GT-seeded+firstiter_cc
-relion,motor_easy,3,k3_wedge_v3_694_iter2,694,0.099192,0.096564,0.099072,0.548991,outputs/relion_motor_easy/Class3D/k3_wedge_v3_694/predictions_iter2.csv,694-particle rebuild; GT-seeded+firstiter_cc
-peet,motor_easy,2,k2_pc1_3_694,694,-0.005123,0.007791,0.009517,0.373199,outputs/peet_motor_easy/predictions_k2_pc1_3.csv,694-particle rebuild; correct mask r=32px Y-10
-peet,motor_easy,2,k2_pc1_5_694,694,-0.005940,0.005777,0.007532,0.377522,outputs/peet_motor_easy/predictions_k2_pc1_5.csv,694-particle rebuild; correct mask r=32px Y-10
-peet,motor_easy,2,k2_pc1_10_694,694,-0.003938,0.005440,0.007252,0.400576,outputs/peet_motor_easy/predictions_k2_pc1_10.csv,694-particle rebuild; correct mask r=32px Y-10
-peet,motor_easy,3,k3_pc1_3_694,694,0.003492,0.023935,0.026785,0.389049,outputs/peet_motor_easy/predictions_k3_pc1_3.csv,694-particle rebuild; correct mask r=32px Y-10
-peet,motor_easy,3,k3_pc1_5_694,694,0.023855,0.102612,0.105384,0.400576,outputs/peet_motor_easy/predictions_k3_pc1_5.csv,694-particle rebuild; correct mask r=32px Y-10
-peet,motor_easy,3,k3_pc1_10_694,694,0.026292,0.111066,0.113740,0.423631,outputs/peet_motor_easy/predictions_k3_pc1_10.csv,694-particle rebuild; correct mask r=32px Y-10
-peet,motor_easy,2,k2_pc1_3_cnew,694,-0.001451,0.080134,0.081846,0.394813,outputs/peet_motor_easy/predictions_k2_pc1_3.csv,
-peet,motor_easy,2,k2_pc1_5_cnew,694,0.115647,0.163956,0.165452,0.512968,outputs/peet_motor_easy/predictions_k2_pc1_5.csv,
-peet,motor_easy,2,k2_pc1_10_cnew,694,0.111275,0.159794,0.161307,0.505764,outputs/peet_motor_easy/predictions_k2_pc1_10.csv,
-peet,motor_easy,3,k3_pc1_3_cnew,694,0.049987,0.145230,0.147763,0.427954,outputs/peet_motor_easy/predictions_k3_pc1_3.csv,
-peet,motor_easy,3,k3_pc1_5_cnew,694,0.025251,0.123344,0.126034,0.400576,outputs/peet_motor_easy/predictions_k3_pc1_5.csv,
-peet,motor_easy,3,k3_pc1_10_cnew,694,0.027048,0.126876,0.129560,0.407781,outputs/peet_motor_easy/predictions_k3_pc1_10.csv,
-relion,motor_easy,3,k3_wedge_v4_iter001,694,0.475264,0.438005,0.439502,0.795389,/tmp/relion_v4_iter001.csv,
-relion,motor_easy,3,k3_wedge_v4_iter002,694,0.254842,0.223281,0.225354,0.664265,/tmp/relion_v4_iter002.csv,
-relion,motor_easy,3,k3_wedge_v4_iter003,694,0.162703,0.150339,0.152626,0.561960,/tmp/relion_v4_iter003.csv,
-relion,motor_easy,3,k3_wedge_v4_iter004,694,0.161249,0.148180,0.150490,0.544669,/tmp/relion_v4_iter004.csv,
-relion,motor_easy,3,k3_wedge_v4_iter005,694,0.166328,0.151255,0.153574,0.534582,/tmp/relion_v4_iter005.csv,
-relion,motor_easy,3,k3_wedge_v4_iter1_cnew,694,0.475264,0.438005,0.439502,0.795389,/tmp/relion_v4_iter001.csv,
-peet,motor_easy,2,k2_pc1_5_cnew,694,0.115647,0.163956,0.165452,0.512968,outputs/peet_motor_easy/predictions_k2_pc1_5.csv,
-dynamo,motor_easy,2,hac_k2_cnew,694,0.005294,0.091450,0.093105,0.403458,/home/jblaser2/Research/STA/dynamo/dynamo_outputs/motor_easy_hac/predictions_k2.csv,
-dynamo,motor_easy,3,hac_k3_cnew,694,-0.008888,0.082435,0.085519,0.358790,/home/jblaser2/Research/STA/dynamo/dynamo_outputs/motor_easy_hac/predictions_k3.csv,
-dynamo,motor_easy,2,k2_pca_cnew,694,-0.002153,-0.001498,0.000149,0.374640,packages/dynamo/dynamo_outputs/motor_easy_pca/predictions_k2.csv,
-dynamo,motor_easy,3,k3_pca_cnew,694,0.040318,0.137006,0.139549,0.427954,packages/dynamo/dynamo_outputs/motor_easy_pca/predictions_k3.csv,
-dynamo,motor_easy,2,k2_pca_nc_best_cnew,694,0.143055,0.176265,0.177724,0.523055,packages/dynamo/dynamo_outputs/motor_easy_pca/predictions_k2_best.csv,
-dynamo,motor_easy,3,k3_pca_nc_best_cnew,694,0.200247,0.204259,0.206618,0.563401,packages/dynamo/dynamo_outputs/motor_easy_pca/predictions_k3_best.csv,
-dynamo,motor_easy,2,k2_pca_nc_best_cnew,694,0.143055,0.176265,0.177724,0.523055,packages/dynamo/dynamo_outputs/motor_easy_pca/predictions_k2_best.csv,
-dynamo,motor_easy,3,k3_pca_nc_best_cnew,694,0.200247,0.204259,0.206618,0.563401,packages/dynamo/dynamo_outputs/motor_easy_pca/predictions_k3_best.csv,
-peet,motor_easy,3,k3_nc20_best_cnew,694,0.086890,0.161526,0.163932,0.479827,/home/jblaser2/Research/STA/outputs/peet_motor_easy/predictions_k3_nc_best.csv,
-pytom,motor_easy,2,motor_easy_k2_v2mask,694,0.089961,0.082516,0.084010,0.474063,outputs/relion_motor_easy/pytom_motor_easy_k2.csv,
-pytom,motor_easy,3,motor_easy_k3_v2mask,694,0.027334,0.032741,0.035325,0.397695,outputs/relion_motor_easy/pytom_motor_easy_k3.csv,
-pytom,motor_easy,3,motor_easy_k3_v2mask,694,0.134116,0.118826,0.121229,0.521614,outputs/relion_motor_easy/pytom_motor_easy_k3.csv,
-opus-tomo,motor_easy,3,threshold_mask,694,0.021115,0.123923,0.126586,0.436599,/home/jblaser2/Research/STA/outputs/opus_tomo_motor_easy_k3.csv,
 peet,motor_switch,2,k2_pc1_3,451,0.005410,0.060021,0.062918,0.552106,outputs/FM_switch/peet/predictions_k2_pc1_3.csv,
 peet,motor_switch,2,k2_pc1_5,451,0.000439,0.057766,0.060410,0.492239,outputs/FM_switch/peet/predictions_k2_pc1_5.csv,
 peet,motor_switch,2,k2_pc1_10,451,0.006830,0.062224,0.064852,0.507761,outputs/FM_switch/peet/predictions_k2_pc1_10.csv,
 relion,motor_switch,2,k2_v3_GT_seeded_iter1,451,0.378898,0.279452,0.281461,0.769401,outputs/FM_switch/relion/run_r02/relion_motor_switch_k2_v3_it1.csv,GT-seeded+firstiter_cc+skip_align; iter1 best; collapses by iter5
 dynamo,motor_switch,2,k2_pca_motor_switch,451,-0.000957,-0.001708,0.001085,0.481153,packages/dynamo/dynamo_outputs/motor_switch_pca/predictions_k2.csv,
-disca,motor_easy,3,motor_easy_k3,694,0.036325,0.036197,0.038762,0.426513,outputs/FM_easy/disca/disca_motor_easy_k3.csv,cyl solvent mask r=32 Y-10 96^3; Fourier-crop 96->32; 80 EM iter; native sm_120
-protomo,motor_easy,3,motor_easy_k3,694,-0.002735,0.076947,0.079888,0.381844,outputs/FM_easy/protomo/protomo_motor_easy_k3.csv,I3/ProTomo 3.1.0; 96^3 series via tomoprepare; alignment bypassed (raw->mra); SVD masked by FM_easy solvent mask (MSAIMGSIZE 96^3); HAC 3 classes no junk (CLSHVO/HVM empty)
-eman2,motor_easy,3,motor_easy_k3,694,-0.001501,0.096084,0.098967,0.394813,outputs/FM_easy/eman2/eman2_motor_easy_k3.csv,EMAN2 no-align PCA split (e2spt_pcasplit); k=3 no junk (no --clean); NBASIS=12 MAXRES=40A; auto-tight mask; identity parms
+dynamo,motor_easy,2,k2_AC_hc_x6_542,542,0.254458,0.288626,0.289651,0.752768,outputs/FM_easy/dynamo/dynamo_motor_easy_k2.csv,"dpkpca band[0.05,0.45,2] 50 eig; 2-class A/C x6 hc 542p; diff_sphere_r23_y55 mask"
+disca,motor_easy,2,k2_AC_hc_x6_542,542,0.406554,0.421089,0.421897,0.819188,outputs/FM_easy/disca/disca_motor_easy_k2.csv,template-free DISCA; diff_sphere mask; Fourier-crop 96->32; 80 EM iter; 2-class A/C x6 542p
+eman2,motor_easy,2,k2_AC_hc_x6_542,542,0.024895,0.023985,0.025386,0.581181,outputs/FM_easy/eman2/eman2_motor_easy_k2.csv,e2spt_pcasplit no-align k=2 no-clean NBASIS=12 MAXRES=40 auto-tight mask; 2-class A/C x6 542p
+pytom,motor_easy,2,k2_AC_hc_x6_542,542,0.030916,0.022666,0.023974,0.590406,outputs/FM_easy/pytom/pytom_motor_easy_k2.csv,auto_focus_classify -a; diff_sphere mask; 2-class A/C x6 542p
+opus-tomo,motor_easy,2,k2_AC_hc_x6_542,542,0.008333,0.007289,0.008682,0.549815,outputs/FM_easy/opus/opus_motor_easy_k2.csv,VAE zdim8 20ep threshold mask; 2-class A/C x6 542p
+relion,motor_easy,2,k2_AC_hc_x6_542_iter001,542,0.764384,0.673464,0.673901,0.937269,outputs/FM_easy/relion/run_k2/pred_iter001.csv,GT-seeded firstiter_cc K=2; 2-class A/C x6 542p; iter001
+relion,motor_easy,2,k2_AC_hc_x6_542_iter002,542,0.435246,0.347469,0.348342,0.830258,outputs/FM_easy/relion/run_k2/pred_iter002.csv,GT-seeded firstiter_cc K=2; 2-class A/C x6 542p; iter002
+peet,motor_easy,2,k2_pc1_3_AC_hc_x6_542,542,0.082006,0.201174,0.202517,0.643911,outputs/FM_easy/peet/predictions_k2_pc1_3.csv,WMD-PCA k-means pc1_3; 2-class A/C x6 542p
+peet,motor_easy,2,k2_pc1_5_AC_hc_x6_542,542,0.124545,0.243559,0.244769,0.677122,outputs/FM_easy/peet/predictions_k2_pc1_5.csv,WMD-PCA k-means pc1_5; 2-class A/C x6 542p
+peet,motor_easy,2,k2_pc1_10_AC_hc_x6_542,542,0.450122,0.482520,0.483239,0.835793,outputs/FM_easy/peet/predictions_k2_pc1_10.csv,WMD-PCA k-means pc1_10; 2-class A/C x6 542p
+protomo,motor_easy,2,k2_AC_hc_x6_542,542,0.029880,0.027956,0.029340,0.588561,outputs/FM_easy/protomo/protomo_motor_easy_k2.csv,I3/ProTomo SVD+HAC k=2 no junk; tomoprepare series; 2-class A/C x6 542p
+relion,motor_easy,2,k2_AC_hc_x6_542_BLIND,542,0.008526,0.023306,0.025079,0.547970,outputs/FM_easy/relion/run_k2_blind/pred_blind.csv,"BLIND global-avg init, no GT refs, no firstiter_cc; fair unsupervised; 2-class A/C x6 542p"

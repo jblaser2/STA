@@ -2,7 +2,7 @@
 
 **Algorithm:** Soft EM (3D maximum-likelihood classification with gold-standard FSC regularization)  
 **Environment:** `relion-5.0` conda env  
-**Status:** ✅ T4P exhausted (algorithm-level failure at all configurations) · ✅ FM_easy GT-seeded run complete
+**Status:** ✅ T4P exhausted (algorithm-level failure) · ✅ FM_easy 2-class hc: blind ARI=0.008 (GT-seeded 0.764 = supervised upper bound, not blind)
 
 ---
 
@@ -11,7 +11,8 @@
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
 | **T4P** | ✅ (exhausted) | k=3 / k=2 | cyl v2 | ≈ 0 | 672/0 | Algorithm-level SNR failure; all 6 configurations collapse to global average |
-| **FM_easy** | ✅ | k=3 / k=3 | sphere | **0.475** (iter 1 GT) / 0.006 (blind) | — | GT-seeded upper bound only; collapses to ~0.16 by iter 2 |
+| **FM_easy** (2-class hc, 542p) | ✅ | k=2 / k=2 | diff sphere | **0.008 (blind)** | 56/486 | Blind soft-EM near-collapse (global-avg init, no GT). GT-seeded iter1=**0.764**/acc 0.937 is a *supervised upper bound* (≈logreg 0.745), NOT blind — excluded from ranking. Confusion: `outputs/FM_easy/relion/run_k2_blind/` |
+| FM_easy (old 3-class, 694p) | 🗄️ archived | k=3 | sphere | 0.475 (GT) / 0.006 (blind) | — | Superseded by 2-class hc set; archived in `outputs/FM_easy/_archive_3class_k3/` |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 

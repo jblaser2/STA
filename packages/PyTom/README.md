@@ -11,7 +11,8 @@
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
 | **T4P** | ✅ | k=3 / k=2 | cyl v2 | — (no GT) | **440 / 232** (+junk pending) | Converged; requires `-a` flag AND v2 mask — both critical |
-| **FM_easy** | ✅ | k=3 / k=3 | cyl v2 | **0.134** | — | k=3 best; k=2=0.090 |
+| **FM_easy** (2-class hc, 542p) | ✅ | k=2 / k=2 | diff sphere | **0.031** | 369/173 | auto_focus_classify `-a`; does not find the class axis on the hc set. Confusion: `outputs/FM_easy/pytom/` |
+| FM_easy (old 3-class, 694p) | 🗄️ archived | k=3 | cyl v2 | 0.134 | — | Superseded; archived |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 

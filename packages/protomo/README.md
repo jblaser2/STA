@@ -11,7 +11,8 @@
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
 | **T4P** | ✅ | k=2 / k=2 | none | — (no per-particle GT) | 334/212/126 junk (all 672) | CC=0.943. **Separates the two phases** (visual). Alignment step bypassed (MRAPKR bug). See notes below. |
-| **FM_easy** | ✅ | k=3 / k=3 | FM_easy solvent sphere r=32 Y-10 (96³), applied as `MSAMASK` | **−0.003** | 517/103/74 (no junk) | SVD+HAC collapse to dominant cluster 0 (≈75%); class C 174/0/3 → almost all in cluster 0. Misses 3-class structure (unlike T4P). |
+| **FM_easy** (2-class hc, 542p) | ✅ | k=2 / k=2 | solvent sphere (mask96.i3i) | **0.030** | 382/160 | SVD+HAC collapse to dominant cluster again. Workspace `~/Research/protomo/motor_easy_hc/`; series via `tomoprepare`. Confusion: `outputs/FM_easy/protomo/` |
+| FM_easy (old 3-class, 694p) | 🗄️ archived | k=3 | solvent sphere | −0.003 | 517/103/74 | Superseded; archived |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 

@@ -11,7 +11,8 @@
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
 | **T4P** | ✅ | k=3 / k=2 | cyl v2 | — (no GT) | **447 / 225** (+junk pending) | Reference result; both pili phases recovered; validated with Stefano |
-| **FM_easy** | ✅ | k=3 / k=3 | sphere (r=32, Y-10) | **0.200** | — | dpkpca nc=17; class B 96–99% pure; A/C mixed |
+| **FM_easy** (2-class hc, 542p) | ✅ | k=2 / k=2 | diff sphere | **0.254** | 391/151 | dpkpca band[0.05,0.45,2] 50 eig; 95%-pure C cluster (144 C/7 A). 3rd-best blind. Confusion: `outputs/FM_easy/dynamo/` |
+| FM_easy (old 3-class, 694p) | 🗄️ archived | k=3 | sphere | 0.200 | — | dpkpca nc=17; superseded; archived |
 | **FM_switch** | ✅ | k=2 / k=2 | RELION ellipsoid (r_xz=38, r_y=65) | **−0.001** | 229 / 222 | dpkpca 50 eigs; CCW/CW split ~50/50 across both clusters; unsupervised failure (cf. PEET 0.007); only GT-seeded RELION found signal (0.379) |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |

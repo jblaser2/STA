@@ -11,7 +11,8 @@
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
 | **T4P** | ✅ | k=3 / k=2 | cyl v2 | — (no GT) | **374 / 230** (+68 junk) | Converged; junk class matches Stefano's bottom-68-by-CCC exactly |
-| **FM_easy** | ✅ | k=3 / k=3 | — | **0.050** (k=3); 0.116 (k=2) | — | WMD-PCA broken on uniform-wedge stacks; set WMD=off |
+| **FM_easy** (2-class hc, 542p) | ✅ | k=2 / k=2 | diff sphere | **0.450** (pc1_10) | 360/182 | WMD-PCA recovers the class axis with more PCs (pc1_3=0.08, pc1_5=0.12, pc1_10=0.45). **Best blind package** on this set. Confusion: `outputs/FM_easy/peet/` |
+| FM_easy (old 3-class, 694p) | 🗄️ archived | k=3 | sphere | 0.050 / 0.116 (k=2) | — | Superseded; archived in `outputs/FM_easy/_archive_3class_k3/` |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 

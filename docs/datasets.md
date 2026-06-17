@@ -21,21 +21,33 @@ file first. Do not infer protocol from individual package READMEs — those may 
 - **Missing wedge:** Real data; standard tilt-series correction was applied upstream. No
   additional wedge correction is needed at the classification step.
 
-### FM_easy (Synthetic)
+### FM_easy (Synthetic) — REDESIGNED 2026-06-16 (2-class, high-contrast)
 
-- **Particles:** 694 particles, 80³ box, 13.33 Å/px
-- **Source:** ETSimulations → IMOD WBP reconstruction → particle extraction at GT orientation
-- **Biology:** Flagellar motor assembly intermediates, 3 classes:
-  - Class A (`ring_complete`): full motor, C-ring + MS-ring present (246 particles)
-  - Class B (`noCring`): motor core + MS-ring, C-ring absent (271 particles)
-  - Class C (`Cring_only`, new 2026-06-05): C-ring only, MS-ring/rod/hook absent (177 particles)
-- **Ground truth:** Known per-particle labels in `production/labels.csv` (local, not in repo).
-  Use ARI / AMI / V-measure for quantitative evaluation.
-- **Structural differences:** ~30 Å — large, but realistic for assembly intermediates.
+- **Particles:** 542 particles (271 A + 271 C), 96³ box, 13.329 Å/px
+- **Source:** ETSimulations → IMOD WBP reconstruction → particle extraction at GT orientation,
+  at **×6 model contrast** (base ×0.6 vs production ×0.1)
+- **Biology:** Flagellar motor assembly intermediates, **2 classes**:
+  - Class A (`full motor`): mature/extended assembly, density extends down the box (271 particles)
+  - Class C (`base only`): early cytoplasmic base, truncated to the top of the box (271 particles)
+- **Canonical input:** `~/Research/synthetic_sta/motor_easy/hc_test_x6/subtomos/merged_AC_full/`
+  (542 GT-aligned MRCs + `labels.csv`; local, not in repo).
+- **Contrast / SNR:** ×6 → measured SNR **0.340** (production was 0.21). ×6 is the sweet spot:
+  ×10 *dropped* SNR to 0.30 (strong-phase nonlinearity caps achievable SNR ~0.4).
+- **Reference ceilings (on this set):** blind masked-PCA k=2 ARI ≈ 0.14; supervised 5-fold ceiling
+  ARI ≈ 0.75 / 93% acc — the class difference is strongly present and recoverable with labels.
+- **Ground truth:** Known per-particle labels in `merged_AC_full/labels.csv`. Use ARI / AMI / V-measure.
 - **Alignment:** Particles extracted at ground-truth orientation (identity pose). No alignment
   step in classification.
-- **Missing wedge:** See §Missing Wedge below. No correction needed.
-- **Junk class:** None (all 694 particles are valid class members).
+- **Missing wedge:** ±60°/3°/41 tilts. See §Missing Wedge below. No correction needed.
+- **Junk class:** None (all 542 particles are valid class members).
+- **Mask:** A-vs-C difference sphere `diff_sphere_r23_y55.mrc`
+  (in `packages/dynamo/dynamo_outputs/easy_pair_AC_hc/`).
+- **Why the redesign:** the original 3-class 694-particle set at production contrast (SNR 0.21) was a
+  documented *blind-failure-with-ground-truth* (every package ARI ≈ 0; analysis in
+  `docs/fm_easy_classification_analysis.md`). The wall is representational, not signal absence —
+  raising contrast lifts the supervised ceiling to ~0.80. This 2-class ×6 set is the achievable
+  "easy tier." Old 3-class results archived in `outputs/FM_easy/_archive_3class_k3/` and
+  `results/_archive_motor_easy_3class_scores.csv`.
 
 ### FM_hard (Synthetic, Planned)
 
@@ -68,9 +80,9 @@ file first. Do not infer protocol from individual package READMEs — those may 
 
 | Parameter | T4P | FM_easy | FM_hard | T4SS |
 |-----------|-----|---------|---------|------|
-| **k (reported)** | 2 | 3 | 2 | TBD |
-| **k (total in run)** | 3 (2 signal + 1 junk) | 3 (no junk) | 3 (2 signal + 1 junk) | TBD |
-| **Mask** | Cylindrical v2 (see below) | TBD | TBD | TBD |
+| **k (reported)** | 2 | 2 | 2 | TBD |
+| **k (total in run)** | 3 (2 signal + 1 junk) | 2 (no junk) | 3 (2 signal + 1 junk) | TBD |
+| **Mask** | Cylindrical v2 (see below) | A-vs-C diff sphere `diff_sphere_r23_y55.mrc` | TBD | TBD |
 | **Alignment** | None | None | None | None |
 | **Missing wedge correction** | No | No | No | No |
 | **Junk class** | Yes | No | Yes | TBD |

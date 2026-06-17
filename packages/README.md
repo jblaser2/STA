@@ -40,27 +40,38 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 
 ---
 
-### Synthetic Dataset — FM_easy (694 particles, 3 classes, 30 Å differences)
+### Synthetic Dataset — FM_easy (REDESIGNED 2026-06-16: 542 particles, 2 classes, high-contrast)
 
-> Class C redesigned 2026-06-05 (C_noRodHook = C-ring only). A=246, B=271, C=177.
-> All scores use new C_noRodHook definition.
-> **Protocol:** k=3, no junk class. Mask: TBD (see `docs/datasets.md`).
+> **Redesigned 2026-06-16.** Old 3-class 694p production-contrast set (every package ARI≈0) archived
+> in `outputs/FM_easy/_archive_3class_k3/`. New = **2-class A (mature full motor) vs C (early
+> cytoplasmic base), 271+271=542 particles, ×6 contrast (SNR 0.340), 96³, 13.329 Å/px**, GT-aligned.
+> **Protocol:** k=2, no junk. Mask: A-vs-C diff sphere `diff_sphere_r23_y55.mrc`.
+> Reference ceilings on this set: blind masked-PCA ARI≈0.14; supervised 5-fold ARI≈0.75 / 93% acc.
+> **All package numbers below are BLIND (unsupervised, no class info)** — equal footing.
 
-**Perfect confusion matrix (ARI = 1.0):**
+| Package | FM_easy Status | k=2 ARI (blind) | Acc | Confusion | Notes |
+|---------|---------------|-----------------|-----|-----------|-------|
+| [PEET](peet/) | ✅ | **0.450** (pc1_10) | 0.836 | <img src="../outputs/FM_easy/peet/confusion_peet_k2_k2_pc1_10_AC_hc_x6_542.png" width="180"> | WMD-PCA recovers axis with more PCs (pc1_3=0.08, pc1_5=0.12, pc1_10=0.45) |
+| [DISCA](disca/) | ✅ | **0.407** | 0.819 | <img src="../outputs/FM_easy/disca/confusion_disca_k2_k2_AC_hc_x6_542.png" width="180"> | Locks onto structural axis at high contrast (was 0.036 at k=3); A 268/3 pure |
+| [Dynamo](dynamo/) | ✅ | **0.254** | 0.753 | <img src="../outputs/FM_easy/dynamo/confusion_dynamo_k2_k2_AC_hc_x6_542.png" width="180"> | dpkpca band[0.05,0.45,2] 50 eig; 95%-pure C cluster |
+| [TomoFlow](tomoflow/) | ✅ | 0.036 | 0.596 | <img src="../outputs/FM_easy/tomoflow/confusion_tomoflow_k2_k2_AC_hc_x6_542.png" width="180"> | OF landscape collapses (downsample 3 / 32³); unimodal, as on T4P |
+| [PyTom](PyTom/) | ✅ | 0.031 | 0.590 | <img src="../outputs/FM_easy/pytom/confusion_pytom_k2_k2_AC_hc_x6_542.png" width="180"> | auto_focus_classify; does not find the class axis |
+| [ProTomo](protomo/) | ✅ | 0.030 | 0.589 | <img src="../outputs/FM_easy/protomo/confusion_protomo_k2_k2_AC_hc_x6_542.png" width="180"> | SVD+HAC collapse to dominant cluster (382/160) |
+| [EMAN2](eman2/) | ✅ | 0.025 | 0.581 | <img src="../outputs/FM_easy/eman2/confusion_eman2_k2_k2_AC_hc_x6_542.png" width="180"> | PCA splits on contrast axis (388/154) |
+| [RELION](relion/) | ✅ | 0.008 (blind) | 0.548 | <img src="../outputs/FM_easy/relion/run_k2_blind/confusion_relion_k2_k2_AC_hc_x6_542_BLIND.png" width="180"> | Soft-EM blind (global-avg init, no GT): near-collapse 56/486 — SNR failure |
+| [STOPGAP](STOPGAP/) | ⛔ | _blocked_ | | — | Needs `/apps/matlab/r2023b` (BYU RC cluster); SLURM-only on this node — run via Eben on the cluster |
 
-<img src="figures/motor_easy/perfect_confusion.png" width="300">
+**Supervised upper bounds (reference only — NOT blind, excluded from the ranking):**
 
-| Package | FM_easy Status | k=3 ARI | Best Confusion | Notes |
-|---------|---------------|---------|----------------|-------|
-| [RELION](relion/) | ✅ | **0.475** (iter 1 GT) / 0.006 (blind) | <img src="../outputs/FM_easy/relion/run_r01/Class3D/k3_wedge_v3_694/confusion_relion_k3_k3_wedge_v3_694_iter1.png" width="200"> | GT-seeded upper bound only; collapses by iter 2 |
-| [PEET](peet/) | ✅ | 0.050 (k=3); **0.116** (k=2 best) | <img src="../outputs/FM_easy/peet/peet_motor_easy/confusion_peet_k2_k2_pc1_5_cnew.png" width="200"> | WMD-PCA limitation on uniform-wedge stacks |
-| [Dynamo](dynamo/) | ✅ | **0.200** (k=3 dpkpca) | <img src="dynamo/FM_easy/results/motor_easy_pca/confusion_dynamo_k3_k3_pca_nc_best_cnew.png" width="200"> | dpkpca nc=17; class B 96–99% pure |
-| [OPUS-TOMO](opusTomo/) | ✅ | 0.021 | <img src="../outputs/FM_easy/opus/confusion_opus-tomo_k3_threshold_mask.png" width="200"> | Class C isolated; A/B unseparated |
-| [PyTom](PyTom/) | ✅ | **0.134** (k=3) | <img src="../outputs/FM_easy/pytom/confusion_pytom_k3_motor_easy_k3_v2mask.png" width="200"> | v2 cyl mask |
-| [DISCA](disca/) | ✅ | 0.036 | <img src="../outputs/FM_easy/disca/confusion_disca_k3_motor_easy_k3.png" width="200"> | Balanced 269/227/198 but each GT class smeared across all 3 clusters; contrast axis, not conformational (same as T4P) |
-| [ProTomo](protomo/) | ✅ | −0.003 | <img src="../outputs/FM_easy/protomo/confusion_protomo_k3_motor_easy_k3.png" width="200"> | SVD+HAC collapse to dominant cluster (517/103/74); class C 174/0/3 in cluster 0; misses 3-class structure (unlike T4P) |
-| [EMAN2](eman2/) | ✅ | −0.002 | <img src="../outputs/FM_easy/eman2/confusion_eman2_k3_motor_easy_k3.png" width="200"> | PCA split collapses to dominant cluster (81/94/519); class C 0/0/177; contrast-axis, misses structure (same as T4P) |
-| All others | ⬜ | — | ⬜ | TomoFlow, STOPGAP not yet run |
+| Reference | ARI | Acc | Notes |
+|-----------|-----|-----|-------|
+| RELION **GT-seeded** (iter1) | 0.764 | 0.937 | Initialized from the true A & C class averages (`--firstiter_cc`) — effectively supervised; collapses to 0.435 by iter2 |
+| Logreg 5-fold ceiling | 0.745 | 0.932 | Supervised classifier on masked-PCA features (`align_classify_full.py`) |
+
+**Benchmark signal:** at high contrast the BLIND field splits between methods that find the *class axis*
+(PEET many-PC, DISCA, Dynamo: ARI 0.25–0.45) and those that collapse onto a *nuisance/contrast axis*
+(TomoFlow, PyTom, ProTomo, EMAN2, RELION soft-EM, OPUS: ARI≈0) — even though the supervised ceiling
+is 0.75. The old 3-class set put *every* package at ≈0; this 2-class hc set resolves the blind field.
 
 ---
 
@@ -95,7 +106,7 @@ No runs yet. See `docs/datasets.md` for planned parameters.
 | **PEET** | PCA + k-means with cylindrical masks; WMD weighting | IMOD | Best result with cyl v2 mask; built-in CCC-based junk class |
 | **PyTom** | FRM-based rotational alignment + k-means with cylindrical focus mask | `pytom_env` | Requires `-a` flag and v2 mask; both critical |
 | **OPUS-TOMO** | Variational autoencoder (VAE) continuous latent-space clustering | `opuset` (cu128 PyTorch) | 4 bugs patched; threshold mask required (cyl too restrictive for VAE) |
-| **RELION** | Soft EM (3D maximum-likelihood classification) | `relion-5.0` | Algorithm-level failure on low-SNR T4P; FM_easy GT-seeded ARI=0.475 |
+| **RELION** | Soft EM (3D maximum-likelihood classification) | `relion-5.0` | Algorithm-level failure on low-SNR T4P; FM_easy (2-class hc) **blind ARI=0.008** (GT-seeded 0.764 = supervised upper bound, not a blind score) |
 | **EMAN2** | PCA split on subtomogram stack | `eman2` (Josh + Eben) | T4P k=3 canonical done; PCA captures contrast axis, not conformation |
 | **DISCA** | Template-free deep unsupervised clustering (pytorch) | `disca` | Unmasked: ~94% dominant class. Masked (cyl v2): balanced 398/274 but ARI≈0 vs converging pkgs — clusters on contrast axis, agrees w/ OPUS-TOMO (0.678) |
 | **TomoFlow** | ContinuousFlex optical-flow conformational classification | `tomoflow` | Unimodal landscape; CUDA texture-ref porting for sm_120 |

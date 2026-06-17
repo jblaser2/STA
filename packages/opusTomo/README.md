@@ -11,7 +11,8 @@
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
 | **T4P** | ✅ | K=8 / K=2 | cylindrical r=12, Y-axis (6.0%) | — (no GT) | **438 / 234** | Cylindrical mask + skip-align (orientation search OFF); reproduces the earlier ~2-population split. Val SNR²≈3.7. See `HANDOFF.md` + `T4P/research.md` |
-| **FM_easy** | ✅ | K=3 / K=3 | threshold (28.3%) | **0.021** | 479/130/85 | Class C 100% isolated; A/B unseparated |
+| **FM_easy** (2-class hc, 542p) | ✅ | K=2 / K=2 | threshold | **0.008** | 173/369 | VAE latent does not resolve the 2 classes even at high contrast. Confusion: `outputs/FM_easy/opus/` |
+| FM_easy (old 3-class, 694p) | 🗄️ archived | K=3 | threshold (28.3%) | 0.021 | 479/130/85 | Superseded; archived |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 

@@ -14,7 +14,8 @@
 | **T4P** | ✅ | k=2 | cyl v2 (r=13, h_neg=25) | ≈0 (PEET −0.002, Dynamo −0.001, PyTom −0.003) | **398/274** | Balanced split, but uncorrelated with the conformational axis |
 | **T4P** | ✅ | k=3 | cyl v2 | ≈0 | 315/90/267 | — |
 | **T4P** | ✅ | k=4 | cyl v2 | ≈0 | 94/311/212/55 | — |
-| **FM_easy** | ✅ | k=3 | solvent sphere r=32 Y-10 (96³) | — | **269/227/198**, ARI=0.036 | Balanced but each GT class (A/B/C) smeared across all 3 clusters — contrast axis, not conformational (same as T4P) |
+| **FM_easy** (2-class hc, 542p) | ✅ | k=2 | diff sphere | **ARI=0.407** | 361/181 | High-contrast 2-class: DISCA now **locks onto the structural axis** (A 268/3 pure) — was 0.036 at k=3. 2nd-best blind. Confusion: `outputs/FM_easy/disca/` |
+| FM_easy (old 3-class, 694p) | 🗄️ archived | k=3 | sphere | ARI=0.036 | 269/227/198 | Superseded; contrast-axis smear; archived |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 

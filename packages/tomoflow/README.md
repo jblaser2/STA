@@ -2,7 +2,7 @@
 
 **Algorithm:** ContinuousFlex optical-flow-based conformational classification  
 **Environment:** `tomoflow` conda env  
-**Status:** ✅ T4P k=2 complete (unimodal landscape) — lower priority for remaining datasets
+**Status:** ✅ T4P k=2 complete (unimodal landscape) · ✅ FM_easy 2-class hc k=2 (ARI=0.036, collapses)
 
 ---
 
@@ -11,7 +11,7 @@
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
 | **T4P** | ✅ | k=3 / k=2 | none | — (no GT) | — | Unimodal landscape; k=3 two large classes CC=0.956; did not separate phases |
-| **FM_easy** | ⬜ | k=3 / k=3 | none | — | — | Lower priority given T4P result |
+| **FM_easy** (2-class hc, 542p) | ✅ | k=2 / k=2 | diff sphere (input) | **0.036** | 462/80 | OF landscape collapses (unimodal), as on T4P. Run at downsample 3 (32³) — native 96³ ≈7 hrs and result is collapse regardless. Confusion: `outputs/FM_easy/tomoflow/` |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 
