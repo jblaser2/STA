@@ -16,3 +16,5 @@ peet,motor_easy,2,k2_pc1_5_AC_hc_x6_542,542,0.124545,0.243559,0.244769,0.677122,
 peet,motor_easy,2,k2_pc1_10_AC_hc_x6_542,542,0.450122,0.482520,0.483239,0.835793,outputs/FM_easy/peet/predictions_k2_pc1_10.csv,WMD-PCA k-means pc1_10; 2-class A/C x6 542p
 protomo,motor_easy,2,k2_AC_hc_x6_542,542,0.053172,0.108891,0.110384,0.616236,outputs/FM_easy/protomo/protomo_motor_easy_k2.csv,"I3/ProTomo SVD+HAC k=2 no junk; DIFF-SPHERE mask (canonical, i3cut-converted); 2-class A/C x6 542p"
 relion,motor_easy,2,k2_AC_hc_x6_542_BLIND,542,0.008526,0.023306,0.025079,0.547970,outputs/FM_easy/relion/run_k2_blind/pred_blind.csv,"BLIND global-avg init, no GT refs, no firstiter_cc; fair unsupervised; 2-class A/C x6 542p"
+protomo_CYL,motor_easy,2,cyl_test,542,0.067729,0.130375,0.131807,0.630996,/tmp/protomo_cyl_pred.csv,
+eman2,motor_easy,2,k2_AC_hc_x6_542_CYL,542,0.116840,0.236424,0.237654,0.671587,outputs/FM_easy/eman2/eman2_motor_easy_k2_cyl.csv,cylinder mask r27 h24
