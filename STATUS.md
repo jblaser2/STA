@@ -2,9 +2,34 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-17** by Claude (FM_hard BUILT: new 3-class flagellar-motor assembly-intermediate set (base/basal_body/mature, 271×3=813p, ×6 contrast, SNR 0.299) — supervised 3-way ceiling 0.472, blind k=3 PCA 0.07, base↔mature 0.752 reproduces FM_easy A–C; dataset+mask+docs done, package runs pending. Note: "FM_hard" name repurposed from the old Borrelia-switch plan → that set is now **FM_switch**.).
+> Last updated: **2026-06-19** by Claude (DIAGNOSIS: the FM_easy blind-classification gap vs real T4P is REGISTRATION, not class size/imaging/noise/membrane — all ruled out; GT-pose particles mis-register the WBP reconstructions, refining doubles blind ARI 0.14→0.32. The "GT-poses/no-align" protocol handicaps synthetic vs alignment-refined T4P. NEXT: re-run packages from genuinely aligned synthetic particles.).
 
 ## Now / Next / Parked
+
+- **DIAGNOSIS — the synthetic-vs-real classification gap is REGISTRATION (2026-06-19):** Chased why real
+  T4P's early PCs separate the two classes but synthetic FM_easy's don't, despite "the same" nuisances.
+  **Ruled out (all measured):** (1) "real is pre-cleaned" — WRONG, T4P is *messier* (contrast CoV 0.59 vs
+  synthetic 0.02); (2) "synthetic difference too small" — WRONG, between-class variance ≈ **2% in BOTH**
+  (T4P 2.0–2.6%, FM_easy 1.7%), and the synthetic A–C voxel difference is the *larger* one; (3) "synthetic
+  noise whiter/higher-rank" — WRONG, eigenspectra similar (participation ratio 160 vs 229); (4)
+  "representation/preprocessing" — WRONG, bandpass + common-mode wedge mask + per-particle z-norm all fail
+  to help (0.06–0.12 vs 0.14). **THE CAUSE = registration:** synthetic particles sit at **ground-truth
+  poses** (correct for the clean map, NOT for co-registering the noisy/wedge-distorted WBP reconstructions).
+  Reference-based refinement: blind masked-PCA ARI **0.14 (GT poses) → 0.26 (translational) → 0.32 (+coarse
+  rotational)**; supervised ceiling on the refined set ~0.53. The PC diagnostic (PC1 = class r0.55 entangled
+  with noise r0.42 + contrast r0.33; PC2/PC3 = orientation) reflects this mis-registration, not the wedge.
+  **Why T4P differs:** its particles came from a real STA **alignment-refinement** pipeline (+CTF/dose/wedge
+  weighting); the synthetic set never got that. **PROTOCOL IMPLICATION:** the "GT-poses / no-alignment" rule
+  (meant to isolate classification) actually **handicaps the synthetic data** vs how real T4P was prepared.
+  **Fix = classify the synthetic set from genuinely ALIGNED particles** (run a real subtomogram alignment,
+  or let each package align). Bigger class difference / adding a membrane / switching simulator do NOT
+  address it. Side finding: current FM_easy orient pool is constrained (x≤30°) → **common-mode wedge**
+  (mean-power azimuthal ratio 0.00; PEET WMD has nothing to weight); a uniform-SO(3) batch makes the wedge
+  **per-particle varying** (ratio 0.56) and collapses ARI 0.09→0.00 (so wedge variance IS devastating, but
+  absent by design here). Memory [[fm-easy-registration-is-the-gap]]; orient workspace
+  `~/Research/synthetic_sta/motor_orient_test/`; diagnostic figs `packages/figures/FM_easy/{pc_factor_diagnostic,
+  orient_wedge_test,eigenspectrum_t4p_vs_synth}.png`. **NEXT: (1) bake a real alignment into the FM_easy
+  pipeline + re-run packages from aligned particles; this likely lifts every package's blind score.**
 
 - **FM_hard BUILT — 3-class flagellar-motor ASSEMBLY-INTERMEDIATE dataset (2026-06-17):** New synthetic
   benchmark, *slightly harder than FM_easy*. **3 inside-out assembly stages from EMD-5311** (axial-truncation

@@ -119,6 +119,14 @@ mature adds the L-ring/bulb cap.*
 1. **No alignment step.** All particles are pre-aligned. Every package must be configured to
    skip any alignment/angular search step. Use `dPhi/dTheta/dPsi = [0]`, `searchRadius = [0]`,
    `--no_orient_search`, `--skip_align`, or equivalent per package.
+   > ⚠️ **CAVEAT — under review (2026-06-19).** This rule is *not* apples-to-apples between real and
+   > synthetic. Real T4P was pre-aligned by an actual STA **refinement** pipeline (registration optimized
+   > on the real densities); the synthetic sets are extracted at **ground-truth poses** — correct for the
+   > clean map but NOT optimal for co-registering the noisy, wedge-distorted WBP reconstructions. Measured
+   > impact: refining the synthetic registration lifts blind masked-PCA ARI on FM_easy from **0.14 → 0.32**.
+   > So "GT poses / no alignment" *handicaps* the synthetic data. Likely protocol revision: classify the
+   > synthetic sets from **genuinely aligned** particles (real subtomogram alignment, or each package's own),
+   > matching how the real data was prepared. See STATUS [[fm-easy-registration-is-the-gap]].
 2. **Standardized mask.** Use the dataset-specific mask defined in the table below. Do not use
    a package's default mask. Documented exceptions are listed per package.
 3. **Run k = total classes** (including junk where applicable). The junk class is discarded
