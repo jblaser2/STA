@@ -23,3 +23,10 @@ protomo,motor_easy,2,k2_AC_hc_x6_542_CYL,542,0.043454,0.104526,0.106076,0.605166
 dynamo,motor_easy,2,k2_AC_hc_x6_542_CYL,542,-0.001462,-0.001094,0.000255,0.509225,outputs/FM_easy/dynamo/dynamo_motor_easy_k2_cyl.csv,cylinder mask r27 h24
 pytom,motor_easy,2,k2_AC_hc_x6_542_CYL,542,0.261772,0.212064,0.213131,0.756458,outputs/FM_easy/pytom/pytom_motor_easy_k2_cyl.csv,cylinder mask r27 h24
 peet,motor_easy,2,k2_pc1_10_AC_hc_x6_542_CYL,542,0.309441,0.385688,0.386573,0.778598,outputs/FM_easy/peet/predictions_k2_pc1_10_cyl.csv,"cylinder mask r27 h24, pc1_10"
+disca,motor_easy,2,k2_AC_hc_x6_542_ALIGNED,542,0.455088,0.462962,0.463705,0.837638,outputs/FM_easy/disca/disca_motor_easy_k2_aligned.csv,aligned particles (real align step)
+dynamo,motor_easy,2,k2_AC_hc_x6_542_ALIGNED,542,0.475266,0.477064,0.477785,0.845018,outputs/FM_easy/dynamo/dynamo_motor_easy_k2_aligned.csv,aligned particles
+peet,motor_easy,2,k2_AC_hc_x6_542_ALIGNED,542,0.330330,0.368194,0.369092,0.787823,outputs/FM_easy/peet_aligned/predictions_k2_pc1_10.csv,aligned particles
+pytom,motor_easy,2,k2_AC_hc_x6_542_ALIGNED,542,0.634630,0.579660,0.580228,0.898524,outputs/FM_easy/pytom/pytom_motor_easy_k2_aligned.csv,"aligned, cylinder mask"
+protomo,motor_easy,2,k2_AC_hc_x6_542_ALIGNED,542,0.383265,0.356881,0.357767,0.809963,outputs/FM_easy/protomo/protomo_motor_easy_k2_aligned.csv,"aligned particles, diff mask"
+eman2,motor_easy,2,k2_AC_hc_x6_542_ALIGNED,542,0.326116,0.397280,0.398144,0.785978,outputs/FM_easy/eman2/eman2_motor_easy_k2_aligned.csv,"aligned particles, diff mask"
+relion,motor_easy,2,k2_AC_hc_x6_542_ALIGNED,542,0.004543,0.027114,0.029141,0.535055,outputs/FM_easy/relion_aligned/pred_blind.csv,"blind global-avg init, aligned particles"

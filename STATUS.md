@@ -6,6 +6,24 @@
 
 ## Now / Next / Parked
 
+- **ALIGNED RE-RUN — registration fix re-runs all packages (2026-06-19):** Built a blind reference-based
+  alignment of the FM_easy particles (`scripts/data_prep/align_fm_easy.py` — iterative translational FFT
+  + rotational search to the masked global average; saved set `…/hc_test_x6/subtomos/merged_AC_aligned/`)
+  and re-ran the packages on it. **Blind ARI, GT-pose → aligned:** PyTom (cyl) 0.262→**0.635** · Dynamo
+  0.254→**0.475** · ProTomo 0.053→**0.383** · EMAN2 0.146→**0.326** · DISCA 0.407→**0.455** · PEET
+  0.450→**0.330 (DOWN)** · RELION-blind 0.009→0.005 (**still collapses**). **Takeaways:** alignment
+  *rescues the collapse cases* (ProTomo +0.33, PyTom +0.37, Dynamo +0.22, EMAN2 +0.18) → their failures
+  were registration, not algorithm. **PEET drops** (its many-PC WMD already compensated; single-global-ref
+  alignment adds a mild reference bias). **RELION soft-EM still collapses even aligned → genuinely
+  algorithmic** (consistent with T4P). Class averages visibly sharpen after alignment
+  (`packages/figures/FM_easy/align_old_vs_new.png`); comparison bar `aligned_vs_gtpose.png`. Scores under
+  `*_ALIGNED` run tag. **⚠️ FOLLOW-UP (firm up magnitudes):** this used a *hand-rolled* blind
+  reference-based alignment (single global reference). Swap in a **production aligner (e.g. Dynamo
+  `dalign`, RELION/STOPGAP refine, or multi-reference)** to get unbiased magnitudes and confirm the
+  PEET-drop is a single-ref-bias artifact. Also: reduce the jitter at the SOURCE in the simulator
+  (`tilt_err`, WBP→SIRT). **NEXT: decide whether the benchmark protocol switches to aligned inputs
+  (apples-to-apples with real T4P) and, if so, re-run with a production aligner.**
+
 - **DIAGNOSIS — the synthetic-vs-real classification gap is REGISTRATION (2026-06-19):** Chased why real
   T4P's early PCs separate the two classes but synthetic FM_easy's don't, despite "the same" nuisances.
   **Ruled out (all measured):** (1) "real is pre-cleaned" — WRONG, T4P is *messier* (contrast CoV 0.59 vs
