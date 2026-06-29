@@ -12,12 +12,20 @@ The particle filename list is built by listing the stacks/ directory
 (sorted alphabetically — same order ProTomo uses).
 
 Usage (run from repo root or anywhere):
+  # Exclude junk (default — signal classes only):
   python3 scripts/eval/extract_protomo_classes.py \
       --i3i   ~/Research/protomo/process/cycle-000/t4p-000-class.i3i \
       --stacks ~/Research/protomo/prepare/stacks \
       --out   results/protomo_T4P_k2.csv
 
-Junk class (default 2) is excluded from the output CSV.
+  # Include junk particles (all 672, junk class written as original label):
+  python3 scripts/eval/extract_protomo_classes.py \
+      --i3i   ~/Research/protomo/process/cycle-000/t4p-000-class.i3i \
+      --stacks ~/Research/protomo/prepare/stacks \
+      --out   results/protomo_T4P_k3.csv \
+      --include-junk
+
+Junk class (default 2) is excluded from the output CSV unless --include-junk is set.
 """
 import argparse
 import os
@@ -62,7 +70,10 @@ def main():
                     help="Directory containing particle .mrc files (sorted = ProTomo index order)")
     ap.add_argument("--out", required=True, help="Output predictions CSV (file, pred_label)")
     ap.add_argument("--junk-class", type=int, default=2,
-                    help="Class label to exclude as junk (default: 2)")
+                    help="Class label treated as junk (default: 2)")
+    ap.add_argument("--include-junk", action="store_true",
+                    help="Write junk particles to the CSV (with their original class label) "
+                         "instead of excluding them. Use this to get all 672 rows.")
     args = ap.parse_args()
 
     i3i_path = Path(args.i3i)
@@ -73,7 +84,7 @@ def main():
 
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
 
-    written = junk_skipped = missing = 0
+    written = junk_written = junk_skipped = missing = 0
     with open(args.out, "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["file", "pred_label"])
@@ -82,14 +93,19 @@ def main():
             if cls is None:
                 missing += 1
                 continue
-            if cls == args.junk_class:
+            if cls == args.junk_class and not args.include_junk:
                 junk_skipped += 1
                 continue
             w.writerow([fname, cls])
             written += 1
+            if cls == args.junk_class:
+                junk_written += 1
 
     print(f"Wrote {written} particles -> {args.out}")
-    print(f"  Junk excluded (class {args.junk_class}): {junk_skipped}")
+    if args.include_junk:
+        print(f"  Junk included (class {args.junk_class}): {junk_written}")
+    else:
+        print(f"  Junk excluded (class {args.junk_class}): {junk_skipped}")
     if missing:
         print(f"  WARNING: {missing} particles had no assignment in .i3i")
 

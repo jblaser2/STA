@@ -153,6 +153,43 @@ mature adds the L-ring/bulb cap.*
   With this mask, PC1 captures structural signal (include it). Sphere masks cause PC1 to
   capture noise instead (exclude).
 
+**Per-package mask exceptions:**
+
+| Package | Mask used | Reason |
+|---------|-----------|--------|
+| RELION | Cyl v2 | — |
+| PEET | Cyl v2 | — |
+| Dynamo | Cyl v2 (pending re-run) | k=2 re-run needed anyway |
+| PyTom | Cyl v2 | — |
+| DISCA | Cyl v2 | — |
+| EMAN2 | Auto-tight (from EMAN2 average) | No external mask path in e2spt_pcasplit; auto-mask preserves molecule |
+| ProTomo | None (full box for SVD) | ProTomo's SVD doesn't use an explicit mask in the same sense |
+| OPUS-TOMO | Threshold 31.2% | Tight mask collapses VAE (documented exception) |
+| TomoFlow | None (full volume) | Optical flow acts on the full subvolume |
+| STOPGAP | Tight cyl r=8/h=26 | **Undocumented deviation** — Eben used a tighter cylinder than v2; results may differ from other packages |
+
+---
+
+## Standard Result CSV Format
+
+All per-package T4P result CSVs are normalised by `scripts/eval/standardize_t4p_results.py`
+to a common format and stored in `results/T4P/<pkg>_k<k>_std.csv`:
+
+| Column | Type | Values |
+|--------|------|--------|
+| `particle` | str | MRC filename (`aligned_tom*.mrc`) |
+| `class_int` | int | 1=signal_a, 2=signal_b, [3=junk] |
+| `class_name` | str | Converging pkgs: `ring_complete` / `ring_altered` / `junk`; non-converging: `class_a` / `class_b` / `junk` |
+
+Label assignment: converging packages (Dynamo/PEET/PyTom/ProTomo) have their labels
+Hungarian-aligned to PEET as the reference, so `class_int=1` always maps to the larger
+ring_complete class across all of them. Non-converging packages sort by class size.
+
+**EMAN2 special case:** raw CSV uses `particle_index` (0-based integer) not filename.
+The mapping is `idx → sorted(glob("aligned_tom*.mrc"))[idx]` — verified from `make_project.py`.
+
+**To regenerate:** `conda run -n eman2 python3 scripts/eval/standardize_t4p_results.py`
+
 ---
 
 ## Junk Class Protocol
@@ -164,16 +201,22 @@ For T4P: one class is designated junk and excluded from all downstream scoring
 edge-affected, or structurally ambiguous particles. (FM_easy and FM_hard have **no** junk class —
 all particles are valid; a junk variant may be added to both later.)
 
-### Packages with built-in junk filtering
+### Per-package junk status (T4P)
 
-| Package | Built-in mechanism |
-|---------|--------------------|
-| **PEET** | CCC-based filter: rank all particles by cross-correlation to class average; the lowest-CCC cluster becomes the junk class. Set `numClasses=3`. Junk = the class with lowest mean CCC, consistently the smallest (~68 particles on T4P). |
-| **ProTomo** | Centering/edge filter removes outlier particles before classification. Filtered particles (~438 of 672 on T4P) are effectively the junk. Not a classification-step junk class — effectively pre-classification filtering. |
+| Package | Junk class | Count | How | Status |
+|---------|-----------|-------|-----|--------|
+| **PEET** | class 3 | 68 | CCC-ranked: lowest-CCC cluster at k=3 | ✅ done |
+| **EMAN2** | class 3 | 85 | PCA outlier removal (`--clean` flag) at k=3 | ✅ done |
+| **ProTomo** | extracted separately | 126 | `tomoinfo -cls` returns junk as class 2; `extract_protomo_classes.py --include-junk` writes all 672 rows | ✅ done (class 2 → junk) |
+| **PyTom** | class 2 (k=3) | 100 | Smallest class in k=3 run assumed junk — **verify by FSC** | 🟡 assumed |
+| **Dynamo** | none | — | Currently k=2 only — **needs k=3 re-run** | ❌ pending |
+| **DISCA** | none | — | Currently k=2 only — **needs k=3 re-run** | ❌ pending |
+| **OPUS-TOMO** | none | — | Currently k=2 only — **needs k=3 re-run** | ❌ pending |
+| **STOPGAP** | — | — | No per-particle CSV exists (only PCA eigenfactors) — Eben's | ❌ no CSV |
+| **RELION** | n/a | — | Collapses to 672/0 regardless of k | n/a |
+| **TomoFlow** | n/a | — | No per-particle class CSV | n/a |
 
-### Packages using k+1 convention
-
-For all other packages (Dynamo, PyTom, RELION, OPUS-TOMO, EMAN2, DISCA, TomoFlow, STOPGAP):
+### k+1 convention for packages without built-in junk
 
 - Run with total k = (signal classes + 1)
 - After classification: the **smallest class by particle count** is labeled junk

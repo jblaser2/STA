@@ -2,9 +2,35 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-19** by Claude (DIAGNOSIS: the FM_easy blind-classification gap vs real T4P is REGISTRATION, not class size/imaging/noise/membrane — all ruled out; GT-pose particles mis-register the WBP reconstructions, refining doubles blind ARI 0.14→0.32. The "GT-poses/no-align" protocol handicaps synthetic vs alignment-refined T4P. NEXT: re-run packages from genuinely aligned synthetic particles.).
+> Last updated: **2026-06-29** by Claude (T4P evaluation framework audit + CSV standardisation: (1) all T4P result CSVs normalised to `results/T4P/<pkg>_k<k>_std.csv` (columns: particle, class_int, class_name) via `standardize_t4p_results.py`; EMAN2 index→filename mapping applied; labels Hungarian-aligned to PEET for converging packages. (2) ProTomo extractor updated with `--include-junk` flag; `protomo_T4P_k3.csv` now has all 672 rows. (3) Consensus core updated: **309/672 = 46%** (was 357/53% — corrected by using k=3 PyTom with 100 junk excluded). (4) Junk audit: PEET ✅ / EMAN2 ✅ / ProTomo ✅ / PyTom 🟡 (assumed smallest class) / Dynamo ❌ pending / DISCA ❌ pending / OPUS ❌ pending / STOPGAP no CSV. (5) Mask audit: STOPGAP uses undocumented tight cyl r=8/h=26 (not v2 r=13). All documented in `docs/datasets.md`. `gen_cross_pkg_correlation.py` + `build_labels_matrix.py` updated to use standardised CSVs.).
 
 ## Now / Next / Parked
+
+- **T4P EVAL FRAMEWORK — STANDARDISED (2026-06-29):** All T4P result CSVs normalised to
+  `results/T4P/<pkg>_k<k>_std.csv` (columns: `particle`, `class_int`, `class_name`) by
+  `scripts/eval/standardize_t4p_results.py`. Labels Hungarian-aligned to PEET reference for
+  converging packages (class_int 1=ring_complete, 2=ring_altered, 3=junk). EMAN2 index→filename
+  mapping applied. ProTomo extractor updated with `--include-junk` flag; `protomo_T4P_k3.csv` now
+  covers all 672 rows. Consensus core corrected: **309/672 = 46%** (was 357/53% — k=3 PyTom now
+  excludes 100 junk particles). Cross-pkg figure re-generated with updated numbers.
+  **Junk audit:** PEET ✅ 68 / EMAN2 ✅ 85 / ProTomo ✅ 126 / PyTom 🟡 100 (assumed smallest
+  class — verify by FSC) / Dynamo ❌ k=2 pending / DISCA ❌ k=2 pending / OPUS ❌ k=2 pending /
+  STOPGAP ❌ no per-particle CSV.
+  **Mask audit:** canonical cyl v2 (r=13, h_neg=25) used by PEET/PyTom/RELION/DISCA.
+  STOPGAP used tighter cyl r=8/h=26 (undocumented deviation — Eben's). EMAN2/ProTomo use no
+  external mask (package constraints). OPUS uses threshold mask (VAE constraint).
+  All documented in `docs/datasets.md §Junk Class Protocol` and §Mask Exceptions.
+  `gen_cross_pkg_correlation.py` + `build_labels_matrix.py` updated to use standardised CSVs.
+  **Key numbers:**
+  - Pairwise ARI (all 6 pairs): 0.40–0.65 (updated: Dynamo–PyTom 0.510)
+  - High-consensus core (all 4 agree with Dynamo): **309/672 = 46%** (corrected)
+  - Dynamo UMAP Jaccard stability (Hennig, 20 draws 80%): 0.63 ± 0.01 (moderate)
+  - Noise robustness: ARI decays 0.54→0.07 as σ 0→2.0 (gradual = real structure)
+  **NEXT:**
+  - Verify PyTom junk class identity (check FSC of the 100-particle class in k=3 run)
+  - Re-run Dynamo/DISCA/OPUS at k=3 with junk class for T4P
+  - Compute FSC gain vs unsplit T4P baseline (E7 in §12 evidence chain)
+  - Run FM_hard on all 10 packages (k=3, `diff_mask_hard.mrc`, start PEET/DISCA/Dynamo)
 
 - **ALIGNED RE-RUN — registration fix re-runs all packages (2026-06-19):** Built a blind reference-based
   alignment of the FM_easy particles (`scripts/data_prep/align_fm_easy.py` — iterative translational FFT
@@ -343,6 +369,9 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
    - (1d) Half-set FSC strategy: pose-locked feasible across packages, true gold-standard is not. OK with that?
    - (1e) Worth commit to "consensus minus soft-GT" analysis to surface cross-package consensus structures?
    (See `benchmarkIdeas.md` §11 for context.)
+7. **FSC gain vs unsplit T4P baseline (NEW, 2026-06-29):** Dynamo has per-class FSC (class1/class2:
+   both 26.7 Å at FSC 0.143) but not the unsplit all-particle FSC. Need unsplit baseline to report
+   Δres for evidence point E7 in `benchmarkIdeas.md §12`. (Josh)
 
 ## People
 
