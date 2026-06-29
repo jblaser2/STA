@@ -1,0 +1,7 @@
+group,n_particles,res_ang_fsc0143,res_ang_fsc05
+Unsplit (672p),672,26.7,26.7
+Dynamo ring_complete,447,26.7,63.3
+Dynamo ring_altered,225,26.7,98.3
+"PyTom class1 (ring_complete, 422p)",422,26.7,64.9
+"PyTom class2 (ring_altered, 150p)",150,26.7,98.9
+"PyTom class3 (junk?, 100p)",100,63.2,100.7

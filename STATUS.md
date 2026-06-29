@@ -2,7 +2,7 @@
 
 > **Single source of truth.** Every session starts by reading this (run `/status`) and ends by
 > updating it (run `/handoff`). If reality and this file disagree, fix this file.
-> Last updated: **2026-06-29** by Claude (T4P evaluation framework audit + CSV standardisation: (1) all T4P result CSVs normalised to `results/T4P/<pkg>_k<k>_std.csv` (columns: particle, class_int, class_name) via `standardize_t4p_results.py`; EMAN2 index→filename mapping applied; labels Hungarian-aligned to PEET for converging packages. (2) ProTomo extractor updated with `--include-junk` flag; `protomo_T4P_k3.csv` now has all 672 rows. (3) Consensus core updated: **309/672 = 46%** (was 357/53% — corrected by using k=3 PyTom with 100 junk excluded). (4) Junk audit: PEET ✅ / EMAN2 ✅ / ProTomo ✅ / PyTom 🟡 (assumed smallest class) / Dynamo ❌ pending / DISCA ❌ pending / OPUS ❌ pending / STOPGAP no CSV. (5) Mask audit: STOPGAP uses undocumented tight cyl r=8/h=26 (not v2 r=13). All documented in `docs/datasets.md`. `gen_cross_pkg_correlation.py` + `build_labels_matrix.py` updated to use standardised CSVs.).
+> Last updated: **2026-06-29** by Claude (T4P class avg panels + FSC: (1) standardised class-average figures generated for all 7 packages via `scripts/eval/gen_t4p_class_avg_panels.py` (XY central slice, particle counts, ring_complete/ring_altered/junk panels → `packages/figures/T4P/<pkg>_class_avgs_std.png`). (2) FSC computed for unsplit 672p baseline + Dynamo k=2 classes + PyTom k=3 classes via `scripts/eval/compute_t4p_fsc.py`; all-class FSC summary in `results/T4P/fsc_summary.csv`; figure at `packages/figures/T4P/fsc_comparison.png`. (3) **PyTom junk CONFIRMED by FSC:** class 3 (100p) resolves at 63.2 Å (FSC=0.143) vs Nyquist 26.7 Å for signal classes → clear junk verdict. PyTom junk status updated ✅. (4) E7 FSC gain evidence point addressed — unsplit FSC stays above FSC=0.5 to Nyquist (shared gross structure); class-specific FSC=0.5: ring_complete 63 Å, ring_altered 98 Å. `packages/README.md` updated with new figures + FSC block.).
 
 ## Now / Next / Parked
 
@@ -27,9 +27,7 @@
   - Dynamo UMAP Jaccard stability (Hennig, 20 draws 80%): 0.63 ± 0.01 (moderate)
   - Noise robustness: ARI decays 0.54→0.07 as σ 0→2.0 (gradual = real structure)
   **NEXT:**
-  - Verify PyTom junk class identity (check FSC of the 100-particle class in k=3 run)
   - Re-run Dynamo/DISCA/OPUS at k=3 with junk class for T4P
-  - Compute FSC gain vs unsplit T4P baseline (E7 in §12 evidence chain)
   - Run FM_hard on all 10 packages (k=3, `diff_mask_hard.mrc`, start PEET/DISCA/Dynamo)
 
 - **ALIGNED RE-RUN — registration fix re-runs all packages (2026-06-19):** Built a blind reference-based

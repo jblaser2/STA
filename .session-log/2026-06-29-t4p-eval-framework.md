@@ -55,11 +55,44 @@ embedded in both READMEs and renders directly on GitHub.
 **Modified:** `scripts/eval/gen_cross_pkg_correlation.py`, `packages/figures/T4P/cross_pkg_correlation.png`,
 `docs/benchmarkIdeas.md`, `README.md`, `packages/README.md`, `STATUS.md`
 
+---
+
+## Session continuation (2026-06-29 — class avg panels + FSC)
+
+### Standardised class-average figures (all 7 T4P packages)
+- New script: `scripts/eval/gen_t4p_class_avg_panels.py`
+  - For each package: 3-panel figure (ring_complete | ring_altered | junk), XY central slice only,
+    particle counts labeled, dark background, consistent display
+  - For packages without a pre-computed junk MRC (PEET junk, PyTom all classes, DISCA, OPUS),
+    averages computed on-the-fly from raw particles via standardised CSVs
+  - Output: `packages/figures/T4P/<pkg>_class_avgs_std.png` for all 7 packages
+- `packages/README.md` updated: all Class Avgs cells now point to `figures/T4P/*_class_avgs_std.png`
+  (old per-package result-dir paths replaced)
+
+### FSC computation (E7 filled)
+- New script: `scripts/eval/compute_t4p_fsc.py`
+  - Computes half-set FSC (even/odd particle split) for unsplit 672p, Dynamo k=2 classes, PyTom k=3 classes
+  - Outputs: `packages/figures/T4P/fsc_comparison.png`, `results/T4P/fsc_summary.csv`
+- Key results:
+  - Unsplit (672p): FSC=0.143 at Nyquist (26.7 Å); FSC=0.5 also at Nyquist — classes share gross structure
+  - Dynamo ring_complete (447p): FSC=0.5 at 63.3 Å; ring_altered (225p): FSC=0.5 at 98.3 Å
+  - **PyTom class 3 (100p): FSC=0.143 at 63.2 Å → CONFIRMED JUNK** (signal classes both at Nyquist)
+- PyTom junk status updated: 🟡 → ✅ in STATUS.md, packages/README.md, memory
+
+### Files changed
+- **New:** `scripts/eval/gen_t4p_class_avg_panels.py`
+- **New:** `scripts/eval/compute_t4p_fsc.py`
+- **New:** `packages/figures/T4P/*_class_avgs_std.png` (7 files)
+- **New:** `packages/figures/T4P/fsc_comparison.png`
+- **New:** `results/T4P/fsc_summary.csv`
+- **Modified:** `packages/README.md` (class avg cells + FSC block + PyTom junk ✅)
+- **Modified:** `docs/benchmarkIdeas.md` (E7 filled, files generated list updated)
+- **Modified:** `STATUS.md` (last-updated block, NEXT list trimmed)
+
 ## Where I stopped
-All scripts written and tested, figures generated, committed and pushed. The no-GT evidence
-chain (§12) is complete through E6. E7 (FSC gain vs unsplit baseline) is the one remaining
-data point — Dynamo has per-class FSC but the unsplit average FSC hasn't been computed.
+Evidence chain E1–E7 complete. PyTom junk confirmed. All 7 T4P packages have standardised
+class-average figures in packages/README.md.
 
 ## Next step
-1. Compute unsplit T4P FSC (Dynamo half-set reconstruction on all 672 particles) → fill E7
+1. Re-run Dynamo/DISCA/OPUS at k=3 with junk class for T4P
 2. Begin FM_hard package runs (k=3, start PEET/DISCA/Dynamo, use `diff_mask_hard.mrc`)
