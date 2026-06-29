@@ -26,8 +26,12 @@
   - High-consensus core (all 4 agree with Dynamo): **309/672 = 46%** (corrected)
   - Dynamo UMAP Jaccard stability (Hennig, 20 draws 80%): 0.63 ± 0.01 (moderate)
   - Noise robustness: ARI decays 0.54→0.07 as σ 0→2.0 (gradual = real structure)
+  **Junk class k=3 COMPLETE (2026-06-29):** All 9 packages with per-particle CSVs now have k=3 junk class:
+  - **Dynamo k=3**: Ward HAC re-cut from existing CC matrix → 447/157/68junk; `dynamo_k3_std.csv`
+  - **DISCA k=3**: existing `disca_cyl_v2_k3.csv` standardized → 315/267/90junk; `disca_k3_std.csv`
+  - **OPUS k=3**: retrained 20 epochs (RTX 5080, ~2 min), analyzed at k=3 → 368/221/83junk; `opus_k3_std.csv`
+  - Class-avg panels generated for all three; packages/README.md updated
   **NEXT:**
-  - Re-run Dynamo/DISCA/OPUS at k=3 with junk class for T4P
   - Run FM_hard on all 10 packages (k=3, `diff_mask_hard.mrc`, start PEET/DISCA/Dynamo)
 
 - **ALIGNED RE-RUN — registration fix re-runs all packages (2026-06-19):** Built a blind reference-based

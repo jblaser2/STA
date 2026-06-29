@@ -33,7 +33,7 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 
 <img src="figures/T4P/cross_pkg_correlation.png" width="860">
 
-**Junk class status:** ✅ PEET (68), EMAN2 (85), ProTomo (126), **PyTom (100, FSC-confirmed)** ← class 3 resolves at 63.2 Å vs 26.7 Å (Nyquist) for signal classes; ❌ Dynamo/DISCA/OPUS (k=2 only, junk pending re-run); ❌ STOPGAP (no per-particle CSV). See `docs/datasets.md §Junk Class Protocol`.
+**Junk class status:** ✅ PEET (68), EMAN2 (85), ProTomo (126), **PyTom (100, FSC-confirmed)**; ✅ **Dynamo (68)**, ✅ **DISCA (90)**, ✅ **OPUS (83)**; ❌ STOPGAP (no per-particle CSV). All 9 packages with per-particle CSVs now have k=3 junk class. See `docs/datasets.md §Junk Class Protocol`.
 
 **FSC comparison (unsplit baseline vs Dynamo classes vs PyTom junk verification):**
 
@@ -45,13 +45,13 @@ Class-average panels below use XY central slice only; particle counts labeled. A
 
 | Package | T4P Status | Result (signal + junk) | Mask | Converged? | Class Avgs | Notes |
 |---------|-----------|------------------------|------|------------|------------|-------|
-| [Dynamo](dynamo/) | 🟡 | 447/225 **(junk ❌ pending)** | cyl v2 | **Yes** | <img src="figures/T4P/dynamo_class_avgs_std.png" width="340"> | HAC; reference result; **needs k=3 re-run for junk class** |
+| [Dynamo](dynamo/) | ✅ | **447/157** (+68 junk ✅) | cyl v2 | **Yes** | <img src="figures/T4P/dynamo_k3_class_avgs_std.png" width="340"> | Ward HAC; k=3 re-cut from existing CC matrix (no recompute); junk=68p split from ring_altered; k=2 signal split was 447/225 (157+68); std CSVs: `dynamo_k2_std.csv` (signal), `dynamo_k3_std.csv` (k=3+junk) |
 | [PEET](peet/) | ✅ | **374/230** (+68 junk ✅) | cyl v2 | **Yes** | <img src="figures/T4P/peet_class_avgs_std.png" width="340"> | Cyl mask v2 critical; junk = bottom 68 by CCC (computed from particles); std CSV: `peet_k3_std.csv` |
 | [PyTom](PyTom/) | ✅ | 422/150 (+100 junk ✅) | cyl v2 | **Yes** | <img src="figures/T4P/pytom_class_avgs_std.png" width="340"> | k=3; class 3 (100p) **FSC-confirmed junk** (63.2 Å vs 26.7 Å for signal); std CSV: `pytom_k3_std.csv` |
-| [OPUS-TOMO](opusTomo/) | 🟡 | 447/225 **(junk ❌ pending)** | threshold (31.2%) | **Partial** | <img src="figures/T4P/opus_class_avgs_std.png" width="340"> | Threshold mask required for VAE; **junk needs k=3 re-run**; class avgs from particles |
+| [OPUS-TOMO](opusTomo/) | ✅ | **368/221** (+83 junk ✅) | threshold (31.2%) | **Partial** | <img src="figures/T4P/opus_k3_class_avgs_std.png" width="340"> | k=3 retrained (20 epochs, RTX 5080); junk=83p; threshold mask required for VAE; contrast-axis split; std CSV: `opus_k3_std.csv` |
 | [RELION](relion/) | ✅ (exhausted) | 672/0 | cyl v2 | **No** | — | Algorithm-level SNR failure; all configs collapse |
 | [EMAN2](eman2/) | ✅ | 270/317 (+85 junk ✅) | auto-tight | **No** | <img src="figures/T4P/eman2_class_avgs_std.png" width="340"> | k=3 + `--clean`; junk = PCA outliers. Does not separate phases. std CSV: `eman2_k3_std.csv` (index→filename mapping applied) |
-| [DISCA](disca/) | 🟡 | **398/274** **(junk ❌ pending)** | cyl v2 | **No** | <img src="figures/T4P/disca_class_avgs_std.png" width="340"> | k=2 only; **needs k=3 re-run**; splits on contrast axis, ARI≈0 vs converging pkgs; class avgs from particles |
+| [DISCA](disca/) | ✅ | **315/267** (+90 junk ✅) | cyl v2 | **No** | <img src="figures/T4P/disca_k3_class_avgs_std.png" width="340"> | k=3 cyl v2; junk=90p; contrast-axis split (ARI≈0 vs converging pkgs); std CSV: `disca_k3_std.csv` |
 | [TomoFlow](tomoflow/) | 🟡 | — (old run) | none | **No** | <img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="340"> | Unimodal; k=3 canonical run needed |
 | [ProTomo](protomo/) | ✅ | 334/212 (+126 junk ✅) | none | **Yes** | <img src="figures/T4P/protomo_class_avgs_std.png" width="340"> | CC=0.943; junk extracted via `--include-junk` flag; std CSV: `protomo_k3_std.csv` |
 | [STOPGAP](STOPGAP/) | 🟡 | PCA 336/336 · MRA **70/602** (k=2) | cyl **r=8/h=26** (≠ v2) | **No** | <img src="STOPGAP/T4P/results/meta/class_pca_class_avg_k2.png" width="340"> | Eben's; **mask differs from canonical v2** (r=8 vs r=13); **no per-particle class CSV** — only PCA eigenfactors |
