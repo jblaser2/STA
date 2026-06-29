@@ -29,6 +29,10 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 
 <img src="figures/T4P/reference_class_avgs.png" width="420">
 
+**Cross-package consensus** — 4 packages converge (Dynamo/PEET/PyTom/ProTomo), 5 do not. Pairwise ARI 0.40–0.65; 357/672 (53%) in full 4-way consensus. See `docs/benchmarkIdeas.md §12` for the no-GT evidence chain.
+
+<img src="figures/T4P/cross_pkg_correlation.png" width="860">
+
 | Package | T4P Status | Result (signal classes) | Mask | Converged? | Class Avgs | Notes |
 |---------|-----------|------------------------|------|------------|------------|-------|
 | [Dynamo](dynamo/) | 🟡 | 447/225 (junk pending) | cyl v2 (pending re-run) | **Yes** | <img src="dynamo/T4P/results/dynamo_final_results/class_comparison.png" width="340"> | HAC; reference result; re-run needed with k=3+junk |

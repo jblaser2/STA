@@ -116,6 +116,14 @@ We also recognize that limiting evaluation to 3D-input classifiers foregoes a la
 
 <p align="center"><em>UMAP of Dynamo's cross-correlation embedding (672 particles). The two classes show partial separation in embedding space, but the overlap is substantial — the UMAP is consistent with two structural populations but is not conclusive on its own.</em></p>
 
+**Cross-package consensus evaluation** — Because T4P has no per-particle ground truth, package agreement is used as the primary validity signal. Four independent packages (Dynamo, PEET, PyTom, ProTomo) all converge on the same two-class split. Pairwise ARI 0.40–0.65 across all six package pairs; 357/672 particles (53%) are in full four-way consensus. Five remaining packages split on a contrast axis (OPUS-TOMO, DISCA, EMAN2) or collapse to a single class (RELION, TomoFlow).
+
+<p align="center">
+  <img src="packages/figures/T4P/cross_pkg_correlation.png" width="860" alt="T4P cross-package particle agreement: 6 pairwise co-tabulation heatmaps (Dynamo/PEET/PyTom/ProTomo) with ARI annotations and consensus histogram"/>
+</p>
+
+<p align="center"><em>Cross-package particle agreement for the four converging packages. Each panel shows the row-normalized co-tabulation (recall) between a pair of packages with ARI annotated. Bottom-right histogram: per-particle consensus score — how many packages assign each particle to the same cluster after label alignment to Dynamo. 357/672 particles (53%) reach full 4/4 consensus. Scripts: <code>scripts/eval/gen_cross_pkg_correlation.py</code>, <code>scripts/analysis/build_labels_matrix.py</code>.</em></p>
+
 ---
 
 ### Synthetic Data — Flagellar Motor Assembly Intermediates (`FM_easy`)
