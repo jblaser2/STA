@@ -259,7 +259,7 @@ adds the P-ring tier, mature adds the L-ring/bulb cap.)*
 | [PyTom](PyTom/) | ✅ **0.017** | — | _(pending)_ | _(pending)_ | FRM iter14; split 175/318/320; registration wall |
 | [RELION](relion/) | ✅ **0.000** | — | _(pending)_ | _(pending)_ | soft-EM collapsed (all class 2) |
 | [OPUS-TOMO](opusTomo/) | ✅ **0.017** | — | _(pending)_ | _(pending)_ | VAE collapsed |
-| [STOPGAP](STOPGAP/) | 🟡 running | — | — | — | ccmatrix computation, ~1.5h remaining |
+| [STOPGAP](STOPGAP/) | ✅ **0.013** | — | — | — | eigenfac PCA k-means; 240/260/313; collapsed |
 
 > **Run protocol:** k=3, no junk, mask = 3-class diff mask `diff_mask_hard.mrc`, no alignment step.
 > Canonical input `~/Research/synthetic_sta/motor_hard/subtomos/merged_ABC_full/` (+ `labels.csv`).

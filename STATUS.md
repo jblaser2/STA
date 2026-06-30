@@ -6,8 +6,8 @@
 
 ## Now / Next / Parked
 
-- **FM_hard PACKAGE RUNS — 8/10 COMPLETE (2026-06-30):** 813p assembly-intermediate dataset
-  (base/basal_body/mature, 96³, k=3, no junk, `diff_mask_hard.mrc`). **8 done, 2 still running:**
+- **FM_hard PACKAGE RUNS — 9/10 COMPLETE (2026-06-30):** 813p assembly-intermediate dataset
+  (base/basal_body/mature, 96³, k=3, no junk, `diff_mask_hard.mrc`). **9 done, 1 still running:**
   | Package | k=3 ARI | Notes |
   |---|---|---|
   | PEET | **0.078** | pc1_5; near blind baseline (0.07); best among completed |
@@ -18,7 +18,7 @@
   | RELION | **0.000** | soft-EM collapsed (all class 2) |
   | ProTomo | **-0.001** | SVD+HAC collapsed (1/710/102) |
   | PyTom | **0.017** | FRM iter14; 175/318/320; near baseline |
-  | STOPGAP | 🟡 RUNNING | ccmatrix ~1.4h remaining (calc_ccmat 5158/20629 pairs) |
+  | STOPGAP | **0.013** | eigenfac PCA k-means; 240/260/313; collapsed |
   | TomoFlow | 🟡 RUNNING | optical flow 150/813 vols, ~128 min remaining |
   **Key finding:** Registration wall confirmed on ALL 8 completed packages — no package recovers
   structure above chance. Even DISCA fails (subtle inter-stage differences ~15-20Å too fine for
