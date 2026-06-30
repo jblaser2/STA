@@ -276,6 +276,39 @@ adds the P-ring tier, mature adds the L-ring/bulb cap.)*
 | — pairwise: base↔basal_body | 0.611 | 0.891 | the +P-ring step |
 | — pairwise: basal_body↔mature | 0.347 | 0.795 | the +bulb step — the bottleneck (wedge-sensitive) |
 
+### Synthetic Dataset — T3SS Injectisome (415 particles, 2 signal classes + junk, 2026-06-30)
+
+> **T3SS injectisome sorting-platform presence/absence** (EMD-8544, Hu et al. 2017 Cell).
+> ETSim-simulated at 13.33 Å/px, 48³ box, AMP=1.5.
+> **class_B** (215p): IM ring + sorting platform present. **class_C** (120p): IM ring absent.
+> **junk** (80p): background-noise particles (no structure). Total = 415.
+> **Protocol:** k=2 (blind B vs C, junk=noise) and k=3 (junk may isolate as third class).
+> ARI scored on signal particles only (B vs C, excluding junk).
+> Classification mask: cylinder R=20, ZC=24, XC=24, Y=[2,27] in 48³ box.
+> **DISCA alone shows non-trivial ARI — all PCA/OF methods collapse (registration wall).**
+
+| Package | Status | k=2 ARI | k=3 ARI | Notes |
+|---------|--------|---------|---------|-------|
+| [DISCA](disca/) | ✅ | **0.720** | **0.812** | CNN detects gross IM-ring presence/absence; immune to registration wall |
+| [PEET](peet/) | ✅ | **0.069** | **0.083** | pc1_10; best PCA method — marginal separation |
+| [STOPGAP](STOPGAP/) | ✅ | **0.020** | **0.025** | eigenfac k-means from compiled PCA binary |
+| [PyTom](PyTom/) | ✅ | **0.005** | **0.009** | FRM with `-a` flag + cylinder mask |
+| [OPUS-TOMO](opusTomo/) | ✅ | −0.013 | **0.041** | VAE latent; k=3 slight improvement |
+| [ProTomo](protomo/) | ✅ | −0.032 | N/A | SVD+HAC k=2 only; 348/67 split, near-chance |
+| [Dynamo](dynamo/) | ✅ | 0.000 | 0.000 | dpkpca collapsed; unimodal PCA landscape |
+| [EMAN2](eman2/) | ✅ | N/A | 0.000 | k=3 only (junk protocol); all-one-class collapse |
+| [TomoFlow](tomoflow/) | ✅ | 0.000 | 0.000 | OF features collapse at 24³ (downsample=2 limit) |
+| [RELION](relion/) | ✅ | 0.000 | 0.014 | soft-EM near-total collapse; consistent with FM_easy/T4P |
+
+> **Registration wall confirmed on T3SS:** GT-pose synthetic particles mis-register WBP reconstructions,
+> collapsing PCA axes. Only DISCA (CNN, no registration step) escapes the wall. Matches FM_easy finding.
+> See memory `fm-easy-registration-is-the-gap.md` for full diagnosis.
+>
+> **Run protocol:** GT labels at `~/Research/synthetic_sta/injectisome/subtomos/merged_BC_t3ss/labels.csv`.
+> Prediction CSVs → `outputs/T3SS/<pkg>/`; mask → `~/Research/synthetic_sta/injectisome/maps/mask_t3ss.mrc`.
+
+---
+
 ### T4SS (Planned)
 
 No runs yet. See `docs/datasets.md` for planned parameters.

@@ -6,27 +6,13 @@
 
 ## Now / Next / Parked
 
-- **INJECTISOME (T3SS) DATASET — FINALIZED AS 2-CLASS (2026-06-30):** Sorting-platform class
-  boundary (A–B, six-pod C6-star, 14 px) is unlearnable even via GT-aligned template matching
-  (ARI=0.034, holds at AMP=4.0). IM-ring boundary (B–C, 19 px, continuous ring) gives ceiling
-  ARI=0.558 — a solid hard-tier signal. **Final design: class_B (IM ring + outer ring, n=215) vs.
-  class_C (outer ring only, n=120) + 80 junk.**
-  **Why not push for 3 classes:** Literature review confirms the field treats "unknown/large K" as
-  an open challenge, not a solved problem; SPA classification quality (higher-SNR regime than cryoET)
-  is documented to degrade as K grows; real in-situ multi-state studies (flagellar assembly
-  intermediates) rely on manual curation across many tomograms, not blind single-pass k≥3 clustering;
-  even sophisticated 2025 in-cell work (TRiC, Beck/Frydman) resolved a 2-way split despite richer
-  underlying conformational space. Our own T4P real-data benchmark shows most packages fail even a
-  2-class problem at ~650 particles — a 3rd diffuse class would likely flatten all packages to a
-  uniform failure floor, killing discriminative power.
-  **Kept finding:** motor_easy (3-class, large discrete differences, ARI=0.289 baseline) vs.
-  injectisome sorting platform (diffuse multi-pod, unlearnable) together map the feasibility
-  boundary: large discrete structural removal is learnable at k=3; small diffuse multi-component
-  signal is not. Worth stating as a design finding in the manuscript, not just a limitation.
-  Full citation-backed writeup: `REPORT.md §"Design Decision: Two-Class Injectisome Benchmark"`.
-  **NEXT:** Resolve symmetry policy for injectisome (sorting platform ~C6 vs needle complex
-  treatment) before dataset generation; verify EMD-8544 pixel size/box dims from EMDB directly
-  (network was unreachable in prior session — first task in `injectisome_dataset_instructions.md`).
+- **T3SS PACKAGE RUNS COMPLETE (2026-06-30):** All 10 packages classified on T3SS injectisome
+  (415p, 48³, class_B=IM ring present vs class_C=absent, +80 junk). ARI(B/C): DISCA **0.720/0.812**
+  (best — CNN detects gross ring); PEET 0.069/0.083; STOPGAP 0.020/0.025; PyTom 0.005/0.009;
+  OPUS-TOMO −0.013/0.041; ProTomo −0.032/—; Dynamo/EMAN2/TomoFlow/RELION ≈0. Key finding matches
+  FM_easy: registration wall — GT-pose particles mis-register WBP, collapsing PCA axes; only
+  CNN-based DISCA is immune. Output CSVs: `outputs/T3SS/<pkg>/`. Scripts: `packages/<pkg>/T3SS/scripts/`.
+  **NEXT:** Run FM_hard on all 10 packages (k=3, `diff_mask_hard.mrc`); start with PEET/DISCA/Dynamo.
 
 - **T4P EVAL FRAMEWORK — STANDARDISED (2026-06-29):** All T4P result CSVs normalised to
   `results/T4P/<pkg>_k<k>_std.csv` (columns: `particle`, `class_int`, `class_name`) by
@@ -381,11 +367,26 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
 - **Synthetic — motor_easy (3-class flagellar motor, ~30 Å differences):** **CLASS C RE-SIMULATED + merged_all_aln REBUILT (2026-06-05/06)** — C_noRodHook = C-ring only (CUT2_C=46.5 base px). 5 runs, 177 particles. `merged_all_aln/` rebuilt (A=246, B=271, C=177=694). GT-aligned avg: `production/subtomos/avg_classC_aligned.mrc`. GT avg CCs (new C): A-B=0.539, A-C=0.339, B-C=0.027. Results so far: RELION iter1 ARI=0.475, PEET k=2 ARI=0.116, Dynamo dpkpca k=3 ARI=0.200. Mask: r=32 px, center=(48,38), 96³ box. Scoring infra: `scripts/eval/`. ⚠️ **SUPERSEDED by the 2-class FM_easy redesign (see top bullet); the old 3-class `motor_easy/production/` set was scrapped and DELETED 2026-06-17.** Canonical FM_easy input is now `motor_easy/hc_test_x6/subtomos/merged_AC_full/`.
 - **Synthetic — injectisome (T3SS, 2-class hard tier):** EMD-8544. **Finalized 2-class design
   (2026-06-30):** class_B (IM ring + outer ring, n=215) vs. class_C (outer ring only, n=120) +
-  80 junk. Template-matching ceiling ARI=0.558 (B–C, 19 px continuous ring). Sorting-platform
-  3rd class (A–B, 14 px six-pod C6-star) was unlearnable at ARI=0.034 even at AMP=4.0 —
-  dropped. **PENDING:** symmetry policy for sorting platform (~C6) and needle complex; verify
-  EMD-8544 pixel size / box dims from EMDB. Dataset generation not yet started.
-  Rationale: `REPORT.md §"Design Decision: Two-Class Injectisome Benchmark"`.
+  80 junk. 415 particles total, 48³, 13.33 Å/px. Template-matching ceiling ARI=0.558 (B–C,
+  19 px continuous ring). Mask: cylinder R=20, Y=[2,27] in 48³ box.
+  **ALL 10 PACKAGES RUN (2026-06-30)** — ARI scored on B/C signal only (junk counted as noise):
+  | Package  | k=2 ARI | k=3 ARI | Notes |
+  |----------|---------|---------|-------|
+  | DISCA    | 0.720   | 0.812   | Best — CNN detects gross ring presence/absence |
+  | PEET     | 0.069   | 0.083   | pc1_10; low but non-zero |
+  | STOPGAP  | 0.020   | 0.025   | PCA k-means on eigenfac |
+  | PyTom    | 0.005   | 0.009   | FRM -a flag; near-zero |
+  | OPUS-TOMO| -0.013  | 0.041   | VAE k=3 slightly better |
+  | ProTomo  | -0.032  | —       | SVD+HAC 348/67 split |
+  | Dynamo   | 0.000   | 0.000   | dpkpca collapsed |
+  | EMAN2    | —       | 0.000   | k=3 PCA split, all noise |
+  | TomoFlow | 0.000   | 0.000   | OF features collapsed at 24³ |
+  | RELION   | 0.000   | 0.014   | Soft-EM collapses (class bias) |
+  **Key finding:** Only DISCA (CNN-based, no registration needed) recovers the gross IM-ring
+  signal. All PCA/OF methods collapse — consistent with the registration wall identified on
+  FM_easy: GT-pose synthetic particles mis-register WBP reconstructions, collapsing PCA axes.
+  Supervised ceiling ARI≈0.558; DISCA k=3 (0.812) approaches ceiling in a CNN shortcut sense.
+  Output CSVs: `outputs/T3SS/<pkg>/`; scripts: `packages/<pkg>/T3SS/scripts/`.
 
 - **Synthetic — motor_switch (2-class + junk, flagellar motor CCW↔CW, semi-difficult):** **RE-SIMULATED 2026-06-09 at 5 Å/px.** Borrelia burgdorferi (EMD-21884 CCW, EMD-21886 CW). **208 CCW + 208 CW + 35 junk = 451 particles total.** 160³ box, 5 Å/px. GT-avg CC (ccw vs cw) = **0.615** (clean map CC=0.650). Signal/bkg 2.1–2.5×. ⚠️ **DATA DELETED 2026-06-17 (cleanup error)** — `production_5apix/` (the canonical 5 Å/px set incl. `all_particles_aligned/`) and the superseded 13.33 `production/` are both gone; no backup. **Regenerate from** `maps/5apix/` + `motor_switch/*_5apix.sh` + `extract_subtomos_5apix.py`/`align_all_5apix.py` if re-running. Package results (RELION GT 0.379, PEET 0.007, Dynamo −0.001) committed in `results/synthetic_scores.csv` + `outputs/`/`packages/*/FM_switch/`. Maps: `maps/5apix/`.
 
