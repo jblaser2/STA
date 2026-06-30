@@ -256,7 +256,7 @@ adds the P-ring tier, mature adds the L-ring/bulb cap.)*
 | [EMAN2](eman2/) | ✅ **0.008** | — | _(pending)_ | _(pending)_ | PCA split collapsed |
 | [ProTomo](protomo/) | ✅ **-0.001** | — | _(pending)_ | _(pending)_ | SVD+HAC collapsed 1/710/102 |
 | [TomoFlow](tomoflow/) | 🟡 running | — | _(pending)_ | _(pending)_ | ~2h optical flow computation |
-| [PyTom](PyTom/) | 🟡 running | — | _(pending)_ | _(pending)_ | FRM iter 9/15 |
+| [PyTom](PyTom/) | ✅ **0.017** | — | _(pending)_ | _(pending)_ | FRM iter14; split 175/318/320; registration wall |
 | [RELION](relion/) | ✅ **0.000** | — | _(pending)_ | _(pending)_ | soft-EM collapsed (all class 2) |
 | [OPUS-TOMO](opusTomo/) | ✅ **0.017** | — | _(pending)_ | _(pending)_ | VAE collapsed |
 | [STOPGAP](STOPGAP/) | 🟡 running | — | — | — | ccmatrix computation, ~1.5h remaining |

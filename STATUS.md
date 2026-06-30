@@ -6,18 +6,26 @@
 
 ## Now / Next / Parked
 
-- **FM_hard PACKAGE RUNS IN PROGRESS (2026-06-30):** All 10 packages running on 813p assembly-intermediate
-  dataset (base/basal_body/mature, 96³, k=3, no junk, `diff_mask_hard.mrc`). 6 done, 4 running:
-  **PEET 0.078** (pc1_5; blind baseline) · **DISCA 0.014** (32³ CNN too coarse for ~15-20Å differences) ·
-  **Dynamo −0.000** (dpkpca collapsed) · **EMAN2 0.008** (PCA split collapsed) ·
-  **OPUS-TOMO 0.017** (VAE collapsed) · **RELION 0.000** (soft-EM collapsed, all-class2) ·
-  PyTom RUNNING · ProTomo RUNNING · STOPGAP RUNNING · TomoFlow RUNNING.
-  All PCA/alignment-based methods collapse (ARI≈0, blind baseline). DISCA also collapses (subtle inter-
-  mediate differences ~15Å too fine for 32³ CNN). PEET near blind baseline (0.078 vs 0.07 chance). 
-  Supervised ceiling 0.472. Registration wall confirmed across all 6 completed packages.
-  Scripts: `packages/<pkg>/FM_hard/scripts/`. Output CSVs: `outputs/FM_hard/<pkg>/`.
-  **NEXT:** Wait for PyTom/ProTomo/STOPGAP/TomoFlow to finish; collect all 10 ARI scores; update
-  packages/README.md FM_hard table; commit FM_hard scripts + prediction CSVs; write handoff log.
+- **FM_hard PACKAGE RUNS — 8/10 COMPLETE (2026-06-30):** 813p assembly-intermediate dataset
+  (base/basal_body/mature, 96³, k=3, no junk, `diff_mask_hard.mrc`). **8 done, 2 still running:**
+  | Package | k=3 ARI | Notes |
+  |---|---|---|
+  | PEET | **0.078** | pc1_5; near blind baseline (0.07); best among completed |
+  | DISCA | **0.014** | 32³ CNN too coarse for ~15-20Å assembly differences |
+  | Dynamo | **-0.000** | dpkpca collapsed |
+  | EMAN2 | **0.008** | PCA split collapsed |
+  | OPUS-TOMO | **0.017** | VAE collapsed |
+  | RELION | **0.000** | soft-EM collapsed (all class 2) |
+  | ProTomo | **-0.001** | SVD+HAC collapsed (1/710/102) |
+  | PyTom | **0.017** | FRM iter14; 175/318/320; near baseline |
+  | STOPGAP | 🟡 RUNNING | ccmatrix ~1.4h remaining (calc_ccmat 5158/20629 pairs) |
+  | TomoFlow | 🟡 RUNNING | optical flow 150/813 vols, ~128 min remaining |
+  **Key finding:** Registration wall confirmed on ALL 8 completed packages — no package recovers
+  structure above chance. Even DISCA fails (subtle inter-stage differences ~15-20Å too fine for
+  32³ CNN). Supervised ceiling 0.472 >> best blind 0.078. Scripts: `packages/<pkg>/FM_hard/scripts/`.
+  Output CSVs: `outputs/FM_hard/<pkg>/`. 8 packages committed to git (commit 8ac4a60 onward).
+  **NEXT:** Wait for STOPGAP/TomoFlow to finish (both running in background); score and commit
+  their CSVs; update packages/README.md final table; write complete FM_hard handoff.
 
 - **T3SS PACKAGE RUNS COMPLETE (2026-06-30):** All 10 packages classified on T3SS injectisome
   (415p, 48³, class_B=IM ring present vs class_C=absent, +80 junk). ARI(B/C): DISCA **0.720/0.812**
