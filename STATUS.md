@@ -6,13 +6,25 @@
 
 ## Now / Next / Parked
 
+- **FM_hard PACKAGE RUNS IN PROGRESS (2026-06-30):** All 10 packages running on 813p assembly-intermediate
+  dataset (base/basal_body/mature, 96³, k=3, no junk, `diff_mask_hard.mrc`). 6 done, 4 running:
+  **PEET 0.078** (pc1_5; blind baseline) · **DISCA 0.014** (32³ CNN too coarse for ~15-20Å differences) ·
+  **Dynamo −0.000** (dpkpca collapsed) · **EMAN2 0.008** (PCA split collapsed) ·
+  **OPUS-TOMO 0.017** (VAE collapsed) · **RELION 0.000** (soft-EM collapsed, all-class2) ·
+  PyTom RUNNING · ProTomo RUNNING · STOPGAP RUNNING · TomoFlow RUNNING.
+  All PCA/alignment-based methods collapse (ARI≈0, blind baseline). DISCA also collapses (subtle inter-
+  mediate differences ~15Å too fine for 32³ CNN). PEET near blind baseline (0.078 vs 0.07 chance). 
+  Supervised ceiling 0.472. Registration wall confirmed across all 6 completed packages.
+  Scripts: `packages/<pkg>/FM_hard/scripts/`. Output CSVs: `outputs/FM_hard/<pkg>/`.
+  **NEXT:** Wait for PyTom/ProTomo/STOPGAP/TomoFlow to finish; collect all 10 ARI scores; update
+  packages/README.md FM_hard table; commit FM_hard scripts + prediction CSVs; write handoff log.
+
 - **T3SS PACKAGE RUNS COMPLETE (2026-06-30):** All 10 packages classified on T3SS injectisome
   (415p, 48³, class_B=IM ring present vs class_C=absent, +80 junk). ARI(B/C): DISCA **0.720/0.812**
   (best — CNN detects gross ring); PEET 0.069/0.083; STOPGAP 0.020/0.025; PyTom 0.005/0.009;
   OPUS-TOMO −0.013/0.041; ProTomo −0.032/—; Dynamo/EMAN2/TomoFlow/RELION ≈0. Key finding matches
   FM_easy: registration wall — GT-pose particles mis-register WBP, collapsing PCA axes; only
   CNN-based DISCA is immune. Output CSVs: `outputs/T3SS/<pkg>/`. Scripts: `packages/<pkg>/T3SS/scripts/`.
-  **NEXT:** Run FM_hard on all 10 packages (k=3, `diff_mask_hard.mrc`); start with PEET/DISCA/Dynamo.
 
 - **T4P EVAL FRAMEWORK — STANDARDISED (2026-06-29):** All T4P result CSVs normalised to
   `results/T4P/<pkg>_k<k>_std.csv` (columns: `particle`, `class_int`, `class_name`) by
