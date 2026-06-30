@@ -44,6 +44,9 @@ export MSAFACT="20"
 export MSAVAR="0.0"
 
 export CLASSES="3"
+export CLSMIN="3"
+export CLSMAX="3"
+export CLSINC="1"
 export CLSHACONN="ward"
 export CLSHVO=
 export CLSHVM=
