@@ -250,16 +250,16 @@ adds the P-ring tier, mature adds the L-ring/bulb cap.)*
 
 | Package | FM_hard k=3 ARI | Acc | Class Avgs | Best Confusion | Notes |
 |---|---|---|---|---|---|
-| [PEET](peet/) | ⬜ pending | — | _(pending)_ | _(pending)_ | FM_easy leader; run WMD-PCA pc1_10 first as the sanity check |
-| [DISCA](disca/) | ⬜ pending | — | _(pending)_ | _(pending)_ | FM_easy leader |
-| [Dynamo](dynamo/) | ⬜ pending | — | _(pending)_ | _(pending)_ | dpkpca |
-| [EMAN2](eman2/) | ⬜ pending | — | _(pending)_ | _(pending)_ | |
-| [ProTomo](protomo/) | ⬜ pending | — | _(pending)_ | _(pending)_ | |
-| [TomoFlow](tomoflow/) | ⬜ pending | — | _(pending)_ | _(pending)_ | |
-| [PyTom](PyTom/) | ⬜ pending | — | _(pending)_ | _(pending)_ | |
-| [RELION](relion/) | ⬜ pending | — | _(pending)_ | _(pending)_ | run blind (not GT-seeded) |
-| [OPUS-TOMO](opusTomo/) | ⬜ pending | — | _(pending)_ | _(pending)_ | |
-| [STOPGAP](STOPGAP/) | ⬜ blocked (cluster) | — | — | — | needs BYU RC cluster (Eben) |
+| [PEET](peet/) | ✅ **0.078** | — | _(pending)_ | _(pending)_ | pc1_5; near blind baseline (0.07); WMD-PCA |
+| [DISCA](disca/) | ✅ **0.014** | — | _(pending)_ | _(pending)_ | 32³ CNN too coarse for ~15-20Å assembly differences |
+| [Dynamo](dynamo/) | ✅ **-0.000** | — | _(pending)_ | _(pending)_ | dpkpca collapsed; registration wall |
+| [EMAN2](eman2/) | ✅ **0.008** | — | _(pending)_ | _(pending)_ | PCA split collapsed |
+| [ProTomo](protomo/) | ✅ **-0.001** | — | _(pending)_ | _(pending)_ | SVD+HAC collapsed 1/710/102 |
+| [TomoFlow](tomoflow/) | 🟡 running | — | _(pending)_ | _(pending)_ | ~2h optical flow computation |
+| [PyTom](PyTom/) | 🟡 running | — | _(pending)_ | _(pending)_ | FRM iter 9/15 |
+| [RELION](relion/) | ✅ **0.000** | — | _(pending)_ | _(pending)_ | soft-EM collapsed (all class 2) |
+| [OPUS-TOMO](opusTomo/) | ✅ **0.017** | — | _(pending)_ | _(pending)_ | VAE collapsed |
+| [STOPGAP](STOPGAP/) | 🟡 running | — | — | — | ccmatrix computation, ~1.5h remaining |
 
 > **Run protocol:** k=3, no junk, mask = 3-class diff mask `diff_mask_hard.mrc`, no alignment step.
 > Canonical input `~/Research/synthetic_sta/motor_hard/subtomos/merged_ABC_full/` (+ `labels.csv`).
