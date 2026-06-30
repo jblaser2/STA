@@ -5,7 +5,7 @@
 #
 # WW 06-2019 | updated for r2023b 2025
 
-matlabRoot="/apps/matlab/r2023b/"
+matlabRoot="/home/jblaser2/Applications/matlab/"
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}":$matlabRoot/runtime/glnxa64/"
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}":$matlabRoot/bin/glnxa64/"
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}":$matlabRoot/sys/os/glnxa64/"

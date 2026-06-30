@@ -426,28 +426,36 @@ or noise-fitting result.
 
 | Label | Evidence | Value | Script |
 |---|---|---|---|
-| E1 | Cross-package consensus ARI (all 6 pairs) | 0.40–0.65 | `gen_cross_pkg_correlation.py` |
-| E2 | High-consensus core (all 4 packages agree per particle) | **309/672 = 46%** (k=3 PyTom/ProTomo with junk excluded; was 357/53% with k=2 PyTom) | `build_labels_matrix.py` |
-| E3 | Dynamo UMAP bootstrap Jaccard (Hennig 2007, 20 draws) | 0.63 ± 0.01 (weighted) | `clusterboot_t4p.py` |
-| E4 | Dynamo embedding noise robustness (σ=0.25 vs σ=0 baseline) | ARI 0.51 vs 0.54 (–6%) | `noise_perturb_t4p.py` |
+| E1 | Cross-package consensus ARI (all 6 pairs) | **0.40–0.65** (min: PEET×ProTomo=0.405; max: PEET×PyTom=0.653) | `gen_cross_pkg_correlation.py` |
+| E2 | High-consensus core (all 4 packages agree per particle) | **309/672 = 46%** (vs Dynamo reference, junk excluded; Dynamo k2 + PEET/PyTom/ProTomo k3) | `build_labels_matrix.py` |
+| E3 | Dynamo UMAP bootstrap Jaccard (Hennig 2007, 20 draws, 80% resample) | UMAP **0.562** weighted (class_1: 0.587±0.044; class_2: 0.513±0.040) [MODERATE]; tSNE 0.523 | `clusterboot_t4p.py` |
+| E4 | Dynamo UMAP noise robustness (k-means ARI vs σ level) | σ=0: ARI=0.351; σ=0.25: ARI=0.318; σ=0.5: ARI=0.244; σ=1.0: ARI=0.146; σ=2.0: ARI=0.050 — gradual decay | `noise_perturb_t4p.py` |
 | E5 | Synthetic anchor: same 4 packages score ARI 0.26–0.64 on FM_easy (known GT) | — | `score_synthetic.py` |
 | E6 | Non-converging packages score ≈0 on BOTH T4P and FM_easy | RELION, TomoFlow ≈0 on both | — |
 | E7 | FSC resolution gain: class-specific vs unsplit baseline | Unsplit FSC=0.5 at **Nyquist (26.7 Å)** (all 672p; shared gross structure). Dynamo class-specific FSC=0.5: ring_complete 63.3 Å, ring_altered 98.3 Å. Both classes resolve to Nyquist at FSC=0.143. PyTom junk confirmed: class 3 (100p) FSC=0.143 at 63.2 Å vs Nyquist for signal classes. | `scripts/eval/compute_t4p_fsc.py`; `results/T4P/fsc_summary.csv` |
 
-### Interpretation of E4 (noise robustness)
-At σ=0, k-means in UMAP space gives ARI=0.54 vs Dynamo's HAC clustering (method gap:
-HAC on full CC matrix vs k-means on 2D UMAP projection). As σ increases from 0→2.0,
-ARI decays from 0.54→0.07 — a gradual structural decay, not an immediate collapse.
-This shows the clusters persist under substantial embedding perturbation.  For
-comparison, a random k=2 labeling gives E[ARI]≈0; the persistent non-zero ARI across
-all σ levels confirms the clusters are not artifacts of a single noise realization.
+### Interpretation of E3–E4 (stability tests)
 
-### Limitation: PEET/PyTom/ProTomo stability
-Saved embedding coordinates exist only for Dynamo (UMAP/t-SNE in
-`embedding_coords.csv`). Clusterboot and noise perturbation for the other three
-packages would require full pipeline re-runs from raw .mrc subtomograms.  The
-cross-package consensus (E1–E2) serves as the multi-method stability proxy for the
-full set.
+**E3 (clusterboot):** Dynamo's clusters are *moderately* stable under 80% bootstrap resampling
+in UMAP space (weighted Jaccard 0.56). This is a lower bound — the test re-clusters with k-means
+in 2D UMAP space, not via the original HAC on the full CC matrix; any algorithm mismatch suppresses
+Jaccard below the true pipeline stability.
+
+**E4 (noise):** At σ=0 (no noise), k-means on UMAP gives ARI=0.351 vs Dynamo's HAC labels.
+This non-unity baseline reflects the method gap (HAC on CC matrix vs k-means on 2D projection).
+As σ increases, ARI decays gradually (0.351→0.244 at σ=0.5→0.050 at σ=2.0), not abruptly —
+consistent with real structural signal. A random k=2 labeling baseline gives E[ARI]≈0.
+
+**PEET caveat:** Re-running k-means on PEET's raw PCA coefficients gives ARI≈0 at all noise
+levels, because PEET's original clustering used wedge-modified distance (WMD) weighting in
+MATLAB — raw k-means cannot reproduce it from saved coefficients. The PEET noise test is
+therefore invalid; cross-package consensus (E1–E2) serves as the stability proxy for PEET.
+
+### Limitation: PyTom/ProTomo stability
+Saved embedding coordinates exist only for Dynamo (UMAP/t-SNE) and PEET (PCA coefficients,
+but with WMD caveat above).  PyTom and ProTomo lack accessible intermediate embedding spaces.
+The cross-package consensus (E1–E2) — pairwise ARI 0.40–0.65 across 4 independent algorithms
+— serves as the primary multi-method stability proxy for the full package set.
 
 ### Files generated
 - `results/protomo_T4P_k2.csv` — ProTomo T4P assignments (signal only, junk excluded)
@@ -458,7 +466,9 @@ full set.
 - `packages/figures/T4P/<pkg>_class_avgs_std.png` — standardised class-avg panels (all 7 packages, XY central slice)
 - `packages/figures/T4P/fsc_comparison.png` — FSC curves: unsplit vs Dynamo classes vs PyTom junk verification
 - `outputs/benchmark/T4P_labels_matrix.csv` — 672 × 5 labels matrix (particle × package + consensus score)
-- `packages/figures/T4P/noise_perturb.png` — ARI vs noise level curve
+- `packages/figures/T4P/noise_perturb.png` — ARI vs noise level curve (Dynamo UMAP + PEET PCA caveat)
+- `results/T4P/clusterboot_summary.csv` — per-cluster Jaccard stats (Dynamo UMAP/tSNE; PEET skipped due to WMD gap)
+- `results/T4P/noise_perturb_summary.csv` — ARI vs σ per package and embedding type
 
 ---
 

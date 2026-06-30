@@ -6,6 +6,28 @@
 
 ## Now / Next / Parked
 
+- **INJECTISOME (T3SS) DATASET — FINALIZED AS 2-CLASS (2026-06-30):** Sorting-platform class
+  boundary (A–B, six-pod C6-star, 14 px) is unlearnable even via GT-aligned template matching
+  (ARI=0.034, holds at AMP=4.0). IM-ring boundary (B–C, 19 px, continuous ring) gives ceiling
+  ARI=0.558 — a solid hard-tier signal. **Final design: class_B (IM ring + outer ring, n=215) vs.
+  class_C (outer ring only, n=120) + 80 junk.**
+  **Why not push for 3 classes:** Literature review confirms the field treats "unknown/large K" as
+  an open challenge, not a solved problem; SPA classification quality (higher-SNR regime than cryoET)
+  is documented to degrade as K grows; real in-situ multi-state studies (flagellar assembly
+  intermediates) rely on manual curation across many tomograms, not blind single-pass k≥3 clustering;
+  even sophisticated 2025 in-cell work (TRiC, Beck/Frydman) resolved a 2-way split despite richer
+  underlying conformational space. Our own T4P real-data benchmark shows most packages fail even a
+  2-class problem at ~650 particles — a 3rd diffuse class would likely flatten all packages to a
+  uniform failure floor, killing discriminative power.
+  **Kept finding:** motor_easy (3-class, large discrete differences, ARI=0.289 baseline) vs.
+  injectisome sorting platform (diffuse multi-pod, unlearnable) together map the feasibility
+  boundary: large discrete structural removal is learnable at k=3; small diffuse multi-component
+  signal is not. Worth stating as a design finding in the manuscript, not just a limitation.
+  Full citation-backed writeup: `REPORT.md §"Design Decision: Two-Class Injectisome Benchmark"`.
+  **NEXT:** Resolve symmetry policy for injectisome (sorting platform ~C6 vs needle complex
+  treatment) before dataset generation; verify EMD-8544 pixel size/box dims from EMDB directly
+  (network was unreachable in prior session — first task in `injectisome_dataset_instructions.md`).
+
 - **T4P EVAL FRAMEWORK — STANDARDISED (2026-06-29):** All T4P result CSVs normalised to
   `results/T4P/<pkg>_k<k>_std.csv` (columns: `particle`, `class_int`, `class_name`) by
   `scripts/eval/standardize_t4p_results.py`. Labels Hungarian-aligned to PEET reference for
@@ -21,18 +43,22 @@
   external mask (package constraints). OPUS uses threshold mask (VAE constraint).
   All documented in `docs/datasets.md §Junk Class Protocol` and §Mask Exceptions.
   `gen_cross_pkg_correlation.py` + `build_labels_matrix.py` updated to use standardised CSVs.
-  **Key numbers:**
-  - Pairwise ARI (all 6 pairs): 0.40–0.65 (updated: Dynamo–PyTom 0.510)
-  - High-consensus core (all 4 agree with Dynamo): **309/672 = 46%** (corrected)
-  - Dynamo UMAP Jaccard stability (Hennig, 20 draws 80%): 0.63 ± 0.01 (moderate)
-  - Noise robustness: ARI decays 0.54→0.07 as σ 0→2.0 (gradual = real structure)
+  **Key numbers (ALL COMPUTED 2026-06-29):**
+  - Pairwise ARI (all 6 pairs, 4 converging pkgs): **0.40–0.65** (Dynamo–PyTom 0.510, PEET–PyTom 0.653)
+  - High-consensus core (all 4 agree with Dynamo): **309/672 = 46%**
+  - Dynamo UMAP bootstrap Jaccard (Hennig, 20×80%): **0.562** weighted (class1: 0.587, class2: 0.513) [MODERATE]
+  - Dynamo UMAP noise robustness: ARI decays **0.351→0.050** (σ=0→σ=2.0); PEET PCA k-means ARI≈0 (WMD gap — expected)
+  - Note: σ=0 ARI=0.351 (not 1.0) reflects HAC-vs-k-means method gap; gradual decay is real-structure signal
+  - STOPGAP PCA k-means (eigenval_1.csv, k=2): 385/287, ARI=0.07 vs Dynamo → confirms non-convergence
   **Junk class k=3 COMPLETE (2026-06-29):** All 9 packages with per-particle CSVs now have k=3 junk class:
   - **Dynamo k=3**: Ward HAC re-cut from existing CC matrix → 447/157/68junk; `dynamo_k3_std.csv`
   - **DISCA k=3**: existing `disca_cyl_v2_k3.csv` standardized → 315/267/90junk; `disca_k3_std.csv`
   - **OPUS k=3**: retrained 20 epochs (RTX 5080, ~2 min), analyzed at k=3 → 368/221/83junk; `opus_k3_std.csv`
   - Class-avg panels generated for all three; packages/README.md updated
+  **STOPGAP COMPILED LOCALLY (2026-06-29):** R2024a mcc on Josh's node. All 4 binaries verified (stopgap, stopgap_parser, stopgap_watcher, sg_toolbox). Smoke test passed. Script: `packages/STOPGAP/compile_local_r2024a.sh`. STOPGAP can now run on Josh's node without the BYU RC cluster.
   **NEXT:**
   - Run FM_hard on all 10 packages (k=3, `diff_mask_hard.mrc`, start PEET/DISCA/Dynamo)
+  - Run STOPGAP on FM_easy locally (first local STOPGAP run on Josh's node)
 
 - **ALIGNED RE-RUN — registration fix re-runs all packages (2026-06-19):** Built a blind reference-based
   alignment of the FM_easy particles (`scripts/data_prep/align_fm_easy.py` — iterative translational FFT
@@ -165,8 +191,7 @@
   the hardest particles are degraded reconstructions, not one conformation. Figures: `packages/figures/FM_easy/
   error_overlap_jaccard.png`, `missed_top{1..5}.png`; also added mask-overlay + 2-class perfect-confusion
   figures and rewrote the main `README.md` synthetic section for the 2-class design.
-  **STOPGAP: BLOCKED on this node** — its runtime/binaries need `/apps/matlab/r2023b` (BYU RC cluster
-  path, absent here) and it ships only SLURM wrappers; ran on the RC cluster via Eben. Needs cluster (Eben).
+  **STOPGAP: UNBLOCKED (2026-06-29)** — R2024a mcc compiled all 4 binaries locally (`compile_local_r2024a.sh`); smoke test passed. `run_type='local'` + `mpiexec` eliminates SLURM dependency. Can now run FM_easy/FM_hard locally.
   Old k=3 outputs → `outputs/FM_easy/_archive_3class_k3/`; old scores → `results/_archive_motor_easy_3class_scores.csv`.
   New per-package preds/confusions in `outputs/FM_easy/<pkg>/`; scores in `results/synthetic_scores.csv`
   (`*_AC_hc_x6_542`). Scripts: `scripts/data_prep/setup_relion_motor_easy_hc.py` +
@@ -354,6 +379,14 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started · ❌ skip · — n/a/u
   Alignment QC done (`alignment_review/`, `review_alignment.py`). **Expert ground truth (Stefano):
   two distinct pili-phase classes**, recovered by Dynamo — the reference split for the benchmark.
 - **Synthetic — motor_easy (3-class flagellar motor, ~30 Å differences):** **CLASS C RE-SIMULATED + merged_all_aln REBUILT (2026-06-05/06)** — C_noRodHook = C-ring only (CUT2_C=46.5 base px). 5 runs, 177 particles. `merged_all_aln/` rebuilt (A=246, B=271, C=177=694). GT-aligned avg: `production/subtomos/avg_classC_aligned.mrc`. GT avg CCs (new C): A-B=0.539, A-C=0.339, B-C=0.027. Results so far: RELION iter1 ARI=0.475, PEET k=2 ARI=0.116, Dynamo dpkpca k=3 ARI=0.200. Mask: r=32 px, center=(48,38), 96³ box. Scoring infra: `scripts/eval/`. ⚠️ **SUPERSEDED by the 2-class FM_easy redesign (see top bullet); the old 3-class `motor_easy/production/` set was scrapped and DELETED 2026-06-17.** Canonical FM_easy input is now `motor_easy/hc_test_x6/subtomos/merged_AC_full/`.
+- **Synthetic — injectisome (T3SS, 2-class hard tier):** EMD-8544. **Finalized 2-class design
+  (2026-06-30):** class_B (IM ring + outer ring, n=215) vs. class_C (outer ring only, n=120) +
+  80 junk. Template-matching ceiling ARI=0.558 (B–C, 19 px continuous ring). Sorting-platform
+  3rd class (A–B, 14 px six-pod C6-star) was unlearnable at ARI=0.034 even at AMP=4.0 —
+  dropped. **PENDING:** symmetry policy for sorting platform (~C6) and needle complex; verify
+  EMD-8544 pixel size / box dims from EMDB. Dataset generation not yet started.
+  Rationale: `REPORT.md §"Design Decision: Two-Class Injectisome Benchmark"`.
+
 - **Synthetic — motor_switch (2-class + junk, flagellar motor CCW↔CW, semi-difficult):** **RE-SIMULATED 2026-06-09 at 5 Å/px.** Borrelia burgdorferi (EMD-21884 CCW, EMD-21886 CW). **208 CCW + 208 CW + 35 junk = 451 particles total.** 160³ box, 5 Å/px. GT-avg CC (ccw vs cw) = **0.615** (clean map CC=0.650). Signal/bkg 2.1–2.5×. ⚠️ **DATA DELETED 2026-06-17 (cleanup error)** — `production_5apix/` (the canonical 5 Å/px set incl. `all_particles_aligned/`) and the superseded 13.33 `production/` are both gone; no backup. **Regenerate from** `maps/5apix/` + `motor_switch/*_5apix.sh` + `extract_subtomos_5apix.py`/`align_all_5apix.py` if re-running. Package results (RELION GT 0.379, PEET 0.007, Dynamo −0.001) committed in `results/synthetic_scores.csv` + `outputs/`/`packages/*/FM_switch/`. Maps: `maps/5apix/`.
 
 ## Open Decisions (owner)

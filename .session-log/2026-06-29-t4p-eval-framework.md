@@ -96,3 +96,59 @@ class-average figures in packages/README.md.
 ## Next step
 1. Re-run Dynamo/DISCA/OPUS at k=3 with junk class for T4P
 2. Begin FM_hard package runs (k=3, start PEET/DISCA/Dynamo, use `diff_mask_hard.mrc`)
+
+---
+
+## Session continuation (2026-06-29 — STOPGAP compile + T4P stability tests + k=3 junk)
+
+### k=3 junk class added for Dynamo, DISCA, OPUS (T4P)
+- **Dynamo k=3**: Ward HAC re-cut at k=3 from existing `ccmatrix.npy` → 447/157/68junk; `dynamo_k3_std.csv`
+- **DISCA k=3**: standardized from existing `disca_cyl_v2_k3.csv` → 315/267/90junk; `disca_k3_std.csv`
+- **OPUS k=3**: retrained 20 epochs (~2 min RTX 5080), k-means at k=3 → 368/221/83junk; `opus_k3_std.csv`
+- Class-avg panels generated for k=3 variants; packages/README.md updated
+
+### T4P stability tests updated (actual computed values)
+`clusterboot_t4p.py` and `noise_perturb_t4p.py` updated to include PEET PCA (from `pca672_peet_wedge.mat::coeffs`):
+- **Dynamo UMAP Jaccard (Hennig 20×80%)**: 0.562 weighted [MODERATE] (class1: 0.587±0.044; class2: 0.513±0.040)
+- **PEET PCA Jaccard**: ~0.247 [FRAGILE] — invalid due to WMD gap (PEET's original clustering used WMD-weighted k-means, not raw PCA)
+- **Dynamo UMAP noise ARI**: σ=0: 0.351 (not 1.0 — HAC-vs-k-means method gap), σ=0.5: 0.244, σ=2.0: 0.050
+- `docs/benchmarkIdeas.md §12` updated with actual values and PEET WMD caveat
+- `results/T4P/clusterboot_summary.csv` and `results/T4P/noise_perturb_summary.csv` generated
+
+### STOPGAP compiled locally
+- User installed MATLAB Compiler toolbox (R2024a); `mcc` now at `~/Applications/matlab/bin/mcc`
+- `packages/STOPGAP/compile_local_r2024a.sh` written and run successfully
+  - **Key fix:** MATLAB `-batch` rejects multi-line bash strings; solution = write commands to temp `.m` file and call `matlab -batch "run('$FILE')"`
+  - `compile_toolbox.m` paths patched via `sed -i` (was hardcoded to Eben's `/home/ejl62/...`)
+  - All 4 binaries compiled, verified, smoke-tested: stopgap, stopgap_parser, stopgap_watcher, sg_toolbox
+- STOPGAP can now run locally with `run_type='local'` + `mpiexec` (no SLURM needed)
+- STATUS.md updated: STOPGAP row changed from "blocked (cluster)" → "UNBLOCKED"
+
+### STOPGAP T4P PCA k-means CSV extracted
+- Particle order from alphabetical sort of `aligned_tom*_P*.mrc` (matches `build_inputs.m` MATLAB `dir()`)
+- k-means on `eigenval_1.csv` (672×10 PCA scores, StandardScaler + top-10 components)
+- k=2 result: 385/287; **ARI=0.07 vs Dynamo** → confirms STOPGAP non-convergence on T4P
+- Saved: `results/T4P/stopgap_k2_std.csv`
+
+### Cross-package correlation (re-verified)
+- Script already uses ProTomo (not OPUS) as the 4th converging package
+- Re-run: pairwise ARI 0.40–0.65 (Dynamo×PyTom 0.510, PEET×PyTom 0.653)
+- 309/672 (46%) high-consensus core confirmed
+
+## Files changed (continuation)
+**New:** `packages/STOPGAP/compile_local_r2024a.sh`, `results/T4P/clusterboot_summary.csv`,
+`results/T4P/noise_perturb_summary.csv`, `results/T4P/stopgap_k2_std.csv`
+
+**Modified:** `scripts/eval/clusterboot_t4p.py` (added PEET PCA), `scripts/eval/noise_perturb_t4p.py`
+(added PEET PCA + CSV output), `packages/STOPGAP/src/stopgap/compile_toolbox.m` (paths patched),
+`packages/STOPGAP/exec/lib/stopgap_config_local.sh` (R2024a matlabRoot),
+`packages/STOPGAP/exec/lib/stopgap_config_slurm.sh`, `packages/STOPGAP/exec/lib/stopgap_config.sh`,
+`packages/figures/T4P/noise_perturb.png`, `docs/benchmarkIdeas.md` (§12 values updated),
+`STATUS.md` (STOPGAP UNBLOCKED + actual stability numbers)
+
+## Where I stopped
+All T4P evaluation framework work complete. STOPGAP compiled locally. Changes staged, not committed.
+
+## Next step
+1. Run FM_hard on all 10 packages (k=3, `diff_mask_hard.mrc`, start PEET/DISCA/Dynamo)
+2. Run STOPGAP on FM_easy locally (first test of local STOPGAP pipeline)

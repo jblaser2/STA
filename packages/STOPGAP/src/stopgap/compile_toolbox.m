@@ -1,8 +1,8 @@
 function compile_toolbox(target_dir)
 
 % Add sg_toolbox
-sg_toolbox_dir = '/home/ejl62/summerResearch/STA/STOPGAP/sg_toolbox/';
-matlab_root = '/apps/matlab/r2023b/';
+sg_toolbox_dir = '/home/jblaser2/Research/STA/packages/STOPGAP/sg_toolbox/';
+matlab_root = '/home/jblaser2/Applications/matlab/';
 
 % Compile (drop the graph2d -a arg if that toolbox path no longer exists in r2023b)
 target_dir = sg_check_dir_slash(target_dir);
