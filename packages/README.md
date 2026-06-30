@@ -29,11 +29,17 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 
 <img src="figures/T4P/reference_class_avgs.png" width="420">
 
-**Cross-package consensus** — 4 packages converge (Dynamo/PEET/PyTom/ProTomo), 5 do not. Pairwise ARI 0.40–0.65; **309/672 (46%)** in full 4-way consensus (using k=3 for PyTom/ProTomo with junk excluded; was 357/53% with k=2 PyTom). See `docs/benchmarkIdeas.md §12` for the no-GT evidence chain. All result CSVs standardised to `results/T4P/<pkg>_k<k>_std.csv` (columns: `particle`, `class_int`, `class_name`) by `scripts/eval/standardize_t4p_results.py`.
+**Cross-package comparison — all 10 packages** (`scripts/eval/gen_t4p_full_pkg_grid.py`):
+
+<img src="figures/T4P/all_pkg_grid.png" width="900">
+
+Three failure modes are visible in the grid. (1) **Converging** (green, top-left block): Dynamo/PEET/PyTom/ProTomo agree with each other at ARI 0.40–0.65 — 4 independent algorithms finding the same structural split. (2) **Non-structural split** (orange, middle block): DISCA/OPUS/EMAN2 agree *with each other* at ARI 0.88–1.00 but show ARI≈0 against the converging group — they find the same contrast/intensity axis, which is reproducible but biologically different from the conformational split. STOPGAP finds no discrete gap (continuous PCA axis, ARI≈0 against all). (3) **Collapsed** (red): RELION soft-EM (16/656) and TomoFlow (638/34) produce degenerate partitions; RELION is shown in the grid. See `docs/benchmarkIdeas.md §12` for the full no-GT evidence chain.
+
+**Deep-dive: 4 converging packages** (`scripts/eval/gen_cross_pkg_correlation.py`):
 
 <img src="figures/T4P/cross_pkg_correlation.png" width="860">
 
-**Junk class status:** ✅ PEET (68), EMAN2 (85), ProTomo (126), **PyTom (100, FSC-confirmed)**; ✅ **Dynamo (68)**, ✅ **DISCA (90)**, ✅ **OPUS (83)**; ❌ STOPGAP (no per-particle CSV). All 9 packages with per-particle CSVs now have k=3 junk class. See `docs/datasets.md §Junk Class Protocol`.
+**Junk class status:** ✅ PEET (68), EMAN2 (85), ProTomo (126), **PyTom (100, FSC-confirmed)**; ✅ **Dynamo (68)**, ✅ **DISCA (90)**, ✅ **OPUS (83)**; STOPGAP: k=2 PCA k-means CSV now exists (`stopgap_k2_std.csv`, 385/287, ARI=0.07 vs Dynamo — non-structural, no junk class). All 10 packages now have per-particle T4P output. See `docs/datasets.md §Junk Class Protocol`.
 
 **FSC comparison (unsplit baseline vs Dynamo classes vs PyTom junk verification):**
 
