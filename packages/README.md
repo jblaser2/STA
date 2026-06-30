@@ -56,6 +56,60 @@ Class-average panels below use XY central slice only; particle counts labeled. A
 | [ProTomo](protomo/) | ✅ | 334/212 (+126 junk ✅) | none | **Yes** | <img src="figures/T4P/protomo_class_avgs_std.png" width="340"> | CC=0.943; junk extracted via `--include-junk` flag; std CSV: `protomo_k3_std.csv` |
 | [STOPGAP](STOPGAP/) | 🟡 | PCA 336/336 · MRA **70/602** (k=2) | cyl **r=8/h=26** (≠ v2) | **No** | <img src="STOPGAP/T4P/results/meta/class_pca_class_avg_k2.png" width="340"> | Eben's; **mask differs from canonical v2** (r=8 vs r=13); **no per-particle class CSV** — only PCA eigenfactors |
 
+#### T4P Class Average Gallery
+
+Full-size class averages for every package. Each panel = XY central slice of the mean subtomogram for that class; particle counts labeled. Packages grouped by whether they recover the two known pili-phase conformations.
+
+**Reference (Stefano expert split) — ring\_complete 509 / ring\_altered 95 / junk 68**
+
+<img src="figures/T4P/reference_class_avgs.png" width="700">
+
+---
+
+**Converging packages** — recover the ring\_complete / ring\_altered conformational split
+
+**Dynamo** ✅ — 447 ring\_complete / 157 ring\_altered / 68 junk (k=3, Ward HAC)
+
+<img src="figures/T4P/dynamo_k3_class_avgs_std.png" width="900">
+
+**PEET** ✅ — 374 ring\_complete / 230 ring\_altered / 68 junk (k=3, WMD-PCA, cyl v2)
+
+<img src="figures/T4P/peet_class_avgs_std.png" width="900">
+
+**PyTom** ✅ — 422 ring\_complete / 150 ring\_altered / 100 junk FSC-confirmed (k=3, cyl v2)
+
+<img src="figures/T4P/pytom_class_avgs_std.png" width="900">
+
+**ProTomo** ✅ — 334 ring\_complete / 212 ring\_altered / 126 junk (k=3, SVD+HAC, CC=0.943)
+
+<img src="figures/T4P/protomo_class_avgs_std.png" width="900">
+
+---
+
+**Non-converging packages** — split on a contrast axis or collapse entirely
+
+**OPUS-TOMO** — 368 / 221 / 83 junk (k=3, threshold mask; contrast-axis split, ARI≈0 vs converging)
+
+<img src="figures/T4P/opus_k3_class_avgs_std.png" width="900">
+
+**EMAN2** — 270 / 317 / 85 junk (k=3, auto-tight mask; PCA captures intensity not conformation)
+
+<img src="figures/T4P/eman2_class_avgs_std.png" width="900">
+
+**DISCA** — 315 / 267 / 90 junk (k=3, cyl v2; contrast-axis split, high ARI with OPUS-TOMO 0.678)
+
+<img src="figures/T4P/disca_k3_class_avgs_std.png" width="900">
+
+**TomoFlow** — unimodal landscape; k=2 run only, does not separate the two phases
+
+<img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="700">
+
+**STOPGAP** — PCA k=2 split 336/336 (equal halves of a continuous PC axis; Eben's run; mask differs from canonical v2)
+
+<img src="STOPGAP/T4P/results/meta/class_pca_class_avg_k2.png" width="350">
+
+**RELION** — algorithm-level failure; soft-EM collapses to 672/0 under all tested configurations; no class averages.
+
 ---
 
 ### Synthetic Dataset — FM_easy (REDESIGNED 2026-06-16: 542 particles, 2 classes, high-contrast)
