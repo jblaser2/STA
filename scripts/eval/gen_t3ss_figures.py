@@ -39,6 +39,15 @@ def load(path):
     with mrcfile.open(path, permissive=True) as f:
         return f.data.astype(np.float32)
 
+def crop_to_particle_box(vol):
+    """Crop 96³ source map/average to the 48³ particle box used in classification.
+    Two-step crop applied during dataset construction:
+      step 1 (crop_subtomos.py):   [:, 48:, 32:]  → (96, 48, 64)
+      step 2 (reshape_to_48.py):   [23:71, :, 1:49] → (48, 48, 48)
+    Combined: vol[23:71, 48:96, 33:81]
+    """
+    return vol[23:71, 48:96, 33:81]
+
 def cslice(vol):
     return vol[vol.shape[0] // 2]
 
@@ -92,10 +101,10 @@ def hungarian_accuracy(gt_list, pred_list):
 def gen_header():
     fig, axes = plt.subplots(1, 4, figsize=(14, 3.8))
     panels = [
-        (cslice(load(f"{MAPS}/class_B_t3ss.mrc")), "Class B — source map\n(IM ring + sorting platform)"),
-        (cslice(load(f"{MAPS}/class_C_t3ss.mrc")), "Class C — source map\n(IM ring absent)"),
-        (cslice(load(f"{AVGS}/avg_class_B.mrc")),   "Class B — subtomo avg\n(215 particles)"),
-        (cslice(load(f"{AVGS}/avg_class_C.mrc")),   "Class C — subtomo avg\n(120 particles)"),
+        (cslice(crop_to_particle_box(load(f"{MAPS}/class_B_t3ss.mrc"))), "Class B — source map\n(IM ring + sorting platform)"),
+        (cslice(crop_to_particle_box(load(f"{MAPS}/class_C_t3ss.mrc"))), "Class C — source map\n(IM ring absent)"),
+        (cslice(crop_to_particle_box(load(f"{AVGS}/avg_class_B.mrc"))),  "Class B — subtomo avg\n(215 particles)"),
+        (cslice(crop_to_particle_box(load(f"{AVGS}/avg_class_C.mrc"))),  "Class C — subtomo avg\n(120 particles)"),
     ]
     for ax, (img, title) in zip(axes, panels):
         show(ax, img, title, fontsize=10)
