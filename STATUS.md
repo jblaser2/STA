@@ -6,26 +6,28 @@
 
 ## Now / Next / Parked
 
-- **FM_hard PACKAGE RUNS — 9/10 COMPLETE (2026-06-30):** 813p assembly-intermediate dataset
-  (base/basal_body/mature, 96³, k=3, no junk, `diff_mask_hard.mrc`). **9 done, 1 still running:**
+- **FM_hard PACKAGE RUNS COMPLETE (2026-06-30):** All 10 packages on 813p assembly-intermediate
+  dataset (base/basal_body/mature, 96³, k=3, no junk, `diff_mask_hard.mrc`). Final ranking:
   | Package | k=3 ARI | Notes |
   |---|---|---|
-  | PEET | **0.078** | pc1_5; near blind baseline (0.07); best among completed |
-  | DISCA | **0.014** | 32³ CNN too coarse for ~15-20Å assembly differences |
-  | Dynamo | **-0.000** | dpkpca collapsed |
-  | EMAN2 | **0.008** | PCA split collapsed |
-  | OPUS-TOMO | **0.017** | VAE collapsed |
-  | RELION | **0.000** | soft-EM collapsed (all class 2) |
-  | ProTomo | **-0.001** | SVD+HAC collapsed (1/710/102) |
-  | PyTom | **0.017** | FRM iter14; 175/318/320; near baseline |
-  | STOPGAP | **0.013** | eigenfac PCA k-means; 240/260/313; collapsed |
-  | TomoFlow | 🟡 RUNNING | optical flow 150/813 vols, ~128 min remaining |
-  **Key finding:** Registration wall confirmed on ALL 8 completed packages — no package recovers
-  structure above chance. Even DISCA fails (subtle inter-stage differences ~15-20Å too fine for
-  32³ CNN). Supervised ceiling 0.472 >> best blind 0.078. Scripts: `packages/<pkg>/FM_hard/scripts/`.
-  Output CSVs: `outputs/FM_hard/<pkg>/`. 8 packages committed to git (commit 8ac4a60 onward).
-  **NEXT:** Wait for STOPGAP/TomoFlow to finish (both running in background); score and commit
-  their CSVs; update packages/README.md final table; write complete FM_hard handoff.
+  | **TomoFlow** | **0.223** | **BEST** — optical flow partially immune to registration wall |
+  | PEET | 0.078 | pc1_5; near blind baseline; WMD-PCA |
+  | OPUS-TOMO | 0.017 | VAE collapsed |
+  | PyTom | 0.017 | FRM iter14; collapsed |
+  | DISCA | 0.014 | 32³ CNN too coarse for ~15-20Å differences |
+  | STOPGAP | 0.013 | eigenfac PCA k-means; collapsed |
+  | EMAN2 | 0.008 | PCA split collapsed |
+  | RELION | 0.000 | soft-EM collapsed (all class 2) |
+  | Dynamo | -0.000 | dpkpca collapsed |
+  | ProTomo | -0.001 | SVD+HAC collapsed (1/710/102) |
+  **Key findings:** (1) **Registration wall confirmed** on 9/10 packages — all PCA/alignment-based
+  methods score ≈ blind baseline (0.07). (2) **DISCA fails** — ~15-20Å assembly intermediate
+  differences too subtle for 32³ CNN. (3) **TomoFlow breaks the wall** (ARI=0.223) — optical flow
+  measures pairwise deformation fields without pre-registration; partially recovers structure even
+  from GT-pose synthetic data. Supervised ceiling 0.472. Scripts: `packages/<pkg>/FM_hard/scripts/`.
+  Output CSVs: `outputs/FM_hard/<pkg>/`. Commits: 8ac4a60, d7f16c7, 88b8e53, fcee1ab, 069e1c4, 36441d1.
+  **NEXT:** Write complete FM_hard session handoff log; update packages/README.md final table;
+  commit; decide next analysis (T3SS class-avg figures? FM_hard TomoFlow deep-dive? New dataset?).
 
 - **T3SS PACKAGE RUNS COMPLETE (2026-06-30):** All 10 packages classified on T3SS injectisome
   (415p, 48³, class_B=IM ring present vs class_C=absent, +80 junk). ARI(B/C): DISCA **0.720/0.812**
