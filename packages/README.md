@@ -218,104 +218,64 @@ SNR — i.e. the hardest particles are degraded reconstructions, not a particula
 
 ---
 
-### Synthetic Dataset — FM_switch (451 particles, 2 classes + junk, ~15–25 Å differences)
-
-> Borrelia burgdorferi flagellar motor CCW↔CW rotational switching (EMD-21884/21886, Chang et al. 2020).
-> Re-simulated at 5 Å/px, 160³. 208 CCW + 208 CW + 35 junk = 451 particles. GT-avg CC=0.615.
-> **Protocol:** k=2 (CCW vs CW, exclude junk from ARI). Mask: RELION ellipsoidal (r_xz=38, r_y=65 + soft edge).
-
-| Package | FM_switch Status | k=2 ARI | Best Confusion | Notes |
-|---------|-----------------|---------|----------------|-------|
-| [RELION](relion/) | ✅ | **0.379** (iter 1 GT) | <img src="relion/FM_switch/results/confusion_relion_k2_k2_v3_GT_seeded_iter1.png" width="200"> | GT-seeded+firstiter_cc+skip_align; collapses to ARI≈0 by iter5 |
-| [PEET](peet/) | ✅ | **0.007** (k=2 pc1_10) | <img src="peet/FM_switch/results/confusion_peet_k2_motor_switch_k2_pc1_10.png" width="200"> | WMD-PCA ARI≈0; CCW/CW equally split; same limitation as FM_easy |
-| [Dynamo](dynamo/) | ✅ | **−0.001** (k=2 dpkpca) | <img src="dynamo/FM_switch/results/confusion_dynamo_k2_k2_pca_motor_switch.png" width="200"> | dpkpca 50 eigs, k-means k=2 → 229/222; CCW/CW split ~50/50 across both clusters; same unsupervised failure as PEET |
-| [OPUS-TOMO](opusTomo/) | ⬜ | — | ⬜ | Not yet run |
-| [PyTom](PyTom/) | ⬜ | — | ⬜ | Not yet run |
-| All others | ⬜ | — | ⬜ | EMAN2, DISCA, TomoFlow, ProTomo, STOPGAP not yet run |
-
----
-
-### Synthetic Dataset — FM_hard (BUILT 2026-06-17: 813 particles, 3 classes, assembly intermediates)
-
-> **3-class flagellar-motor assembly-intermediate series** (inside-out): **base** (C-ring + MS-ring) →
-> **basal_body** (+ proximal rod + P-ring, no hook) → **mature** (full motor + hook/bulb = FM_easy's A).
-> Built from EMD-5311 at ×6 contrast through the same ETSim→WBP→extract pipeline as FM_easy; `base` ≡
-> FM_easy's C and `mature` ≡ FM_easy's A, so it nests in the same frame. "Slightly harder than FM_easy"
-> by design: inserting the real middle stage creates two harder *adjacent* pairs while base↔mature stays
-> as the recoverable anchor. 271 × 3 = 813 particles, 96³, 13.329 Å/px, SNR 0.299, GT-aligned, **no junk**.
-> Reference ceilings: blind masked-PCA k=3 ARI ≈ **0.07**; supervised 5-fold 3-way ARI **0.472 / 78% acc**.
-> **All package numbers below will be BLIND (unsupervised, no class info)** — equal footing.
-
-**Ground truth — source class maps (top) and subtomogram averages of each stage (bottom):**
-
-<img src="figures/FM_hard/header_maps_and_avgs.png" width="900">
-
-*(Central slice, dark = density. Top = the 3 clean source maps; bottom = the GT subtomo averages each
-blind package is trying to recover. Inside-out progression: base = one band (C/MS-ring), basal_body
-adds the P-ring tier, mature adds the L-ring/bulb cap.)*
-
-**Perfect classification reference (ARI = 1.0) — what a confusion entry looks like at the top of the table:**
-
-<img src="figures/FM_hard/perfect_confusion.png" width="300">
-
-| Package | FM_hard k=3 ARI | Acc | Class Avgs (3 predicted clusters) | Best Confusion | Notes |
-|---|---|---|---|---|---|
-| [TomoFlow](tomoflow/) | ✅ **0.223** | 0.576 | <img src="figures/FM_hard/tomoflow_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/tomoflow/confusion_tomoflow_fm_hard_k3.png" width="280"> | **BEST** — optical flow immune to registration wall; split 400/313/100; 2.4h compute |
-| [PEET](peet/) | ✅ **0.078** | 0.534 | <img src="figures/FM_hard/peet_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/peet/confusion_peet_fm_hard_k3.png" width="280"> | pc1_5; near blind baseline (0.07); split 620/111/82; WMD-PCA |
-| [OPUS-TOMO](opusTomo/) | ✅ **0.017** | 0.395 | <img src="figures/FM_hard/opus_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/opus/confusion_opus_fm_hard_k3.png" width="280"> | VAE collapsed; split 360/231/222 |
-| [PyTom](PyTom/) | ✅ **0.017** | 0.389 | <img src="figures/FM_hard/pytom_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/pytom/confusion_pytom_fm_hard_k3.png" width="280"> | FRM iter14; split 320/318/175; registration wall |
-| [DISCA](disca/) | ✅ **0.014** | 0.383 | <img src="figures/FM_hard/disca_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/disca/confusion_disca_fm_hard_k3.png" width="280"> | 32³ CNN too coarse for ~15-20Å assembly differences; split 323/298/192 |
-| [STOPGAP](STOPGAP/) | ✅ **0.013** | 0.389 | <img src="figures/FM_hard/stopgap_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/stopgap/confusion_stopgap_fm_hard_k3.png" width="280"> | eigenfac PCA k-means; split 313/260/240 |
-| [EMAN2](eman2/) | ✅ **0.008** | 0.383 | <img src="figures/FM_hard/eman2_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/eman2/confusion_eman2_fm_hard_k3.png" width="280"> | PCA split collapsed; split 465/206/142 |
-| [RELION](relion/) | ✅ **0.000** | 0.333 | <img src="figures/FM_hard/relion_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/relion/confusion_relion_fm_hard_k3.png" width="280"> | soft-EM fully collapsed (all 813 → class 2) |
-| [Dynamo](dynamo/) | ✅ **-0.000** | 0.354 | <img src="figures/FM_hard/dynamo_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/dynamo/confusion_dynamo_fm_hard_k3.png" width="280"> | dpkpca collapsed; split 292/263/258; registration wall |
-| [ProTomo](protomo/) | ✅ **-0.001** | 0.335 | <img src="figures/FM_hard/protomo_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/protomo/confusion_protomo_fm_hard_k3.png" width="280"> | SVD+HAC collapsed; split 710/102/1 |
-
-> **Run protocol:** k=3, no junk, mask = 3-class diff mask `diff_mask_hard.mrc`, no alignment step.
-> Canonical input `~/Research/synthetic_sta/motor_hard/subtomos/merged_ABC_full/` (+ `labels.csv`).
-> Reuse each package's FM_easy config pattern with k=3. Score into `results/synthetic_scores.csv`
-> (run tag `*_ABC_hard_x6_813`); confusions → `outputs/FM_hard/<pkg>/`; class-avg panels →
-> `packages/figures/FM_hard/` via `scripts/eval/gen_class_avg_panels.py`.
-
-**Supervised upper bounds (reference only — NOT blind, excluded from any ranking):**
-
-| Method | 3-way ARI | Acc | Note |
-|---|---|---|---|
-| Logreg 5-fold ceiling (25 PC) | 0.472 | 0.782 | supervised classifier on masked-PCA feats (`classify_hard.py`) |
-| — pairwise: base↔mature | 0.752 | 0.934 | = FM_easy A–C (0.745); pipeline cross-check ✓ |
-| — pairwise: base↔basal_body | 0.611 | 0.891 | the +P-ring step |
-| — pairwise: basal_body↔mature | 0.347 | 0.795 | the +bulb step — the bottleneck (wedge-sensitive) |
-
-### Synthetic Dataset — T3SS Injectisome (415 particles, 2 signal classes + junk, 2026-06-30)
+### Synthetic Dataset — T3SS Injectisome (415 particles, 2 signal classes + junk)
 
 > **T3SS injectisome sorting-platform presence/absence** (EMD-8544, Hu et al. 2017 Cell).
 > ETSim-simulated at 13.33 Å/px, 48³ box, AMP=1.5.
-> **class_B** (215p): IM ring + sorting platform present. **class_C** (120p): IM ring absent.
+> **class_B** (215p): IM ring + sorting platform present (full injectisome base).
+> **class_C** (120p): IM ring absent (partially assembled state).
 > **junk** (80p): background-noise particles (no structure). Total = 415.
-> **Protocol:** k=2 (blind B vs C, junk=noise) and k=3 (junk may isolate as third class).
-> ARI scored on signal particles only (B vs C, excluding junk).
-> Classification mask: cylinder R=20, ZC=24, XC=24, Y=[2,27] in 48³ box.
-> **DISCA alone shows non-trivial ARI — all PCA/OF methods collapse (registration wall).**
+> **Protocol:** k=2 or k=3 (best k used per package); ARI scored on signal particles only
+> (class_B + class_C, excluding junk). Classification mask: cylinder R=20, ZC=24, XC=24, Y=[2,27]
+> in 48³ box. **DISCA alone shows non-trivial ARI — all PCA/alignment methods collapse (registration wall).**
+> Structurally distinct from FM_easy (different complex, different fold) — provides geometric diversity
+> to the benchmark beyond flagellar motors.
 
-| Package | Status | k=2 ARI | k=3 ARI | Notes |
-|---------|--------|---------|---------|-------|
-| [DISCA](disca/) | ✅ | **0.720** | **0.812** | CNN detects gross IM-ring presence/absence; immune to registration wall |
-| [PEET](peet/) | ✅ | **0.069** | **0.083** | pc1_10; best PCA method — marginal separation |
-| [STOPGAP](STOPGAP/) | ✅ | **0.020** | **0.025** | eigenfac k-means from compiled PCA binary |
-| [PyTom](PyTom/) | ✅ | **0.005** | **0.009** | FRM with `-a` flag + cylinder mask |
-| [OPUS-TOMO](opusTomo/) | ✅ | −0.013 | **0.041** | VAE latent; k=3 slight improvement |
-| [ProTomo](protomo/) | ✅ | −0.032 | N/A | SVD+HAC k=2 only; 348/67 split, near-chance |
-| [Dynamo](dynamo/) | ✅ | 0.000 | 0.000 | dpkpca collapsed; unimodal PCA landscape |
-| [EMAN2](eman2/) | ✅ | N/A | 0.000 | k=3 only (junk protocol); all-one-class collapse |
-| [TomoFlow](tomoflow/) | ✅ | 0.000 | 0.000 | OF features collapse at 24³ (downsample=2 limit) |
-| [RELION](relion/) | ✅ | 0.000 | 0.014 | soft-EM near-total collapse; consistent with FM_easy/T4P |
+**Ground truth — source density maps and subtomogram averages of each class:**
 
-> **Registration wall confirmed on T3SS:** GT-pose synthetic particles mis-register WBP reconstructions,
-> collapsing PCA axes. Only DISCA (CNN, no registration step) escapes the wall. Matches FM_easy finding.
-> See memory `fm-easy-registration-is-the-gap.md` for full diagnosis.
+<img src="figures/T3SS/header_maps_and_avgs.png" width="900">
+
+*(Central slice, dark = density. Left: source maps (class_B = full injectisome, class_C = IM ring absent).
+Right: GT subtomogram averages computed from the 48³ WBP subtomograms each blind package is trying to
+separate. The structural difference is at the cytoplasmic base — the IM ring / sorting platform tier.)*
+
+**Classification mask (cylinder, red contour on global average of all 415 particles):**
+
+<img src="figures/T3SS/mask_overlay.png" width="700">
+
+**Perfect classification reference (signal ARI = 1.0) — what a confusion entry looks like at the top of the table:**
+
+<img src="figures/T3SS/perfect_confusion.png" width="300">
+
+Figures show the **best-k run** per package (k=3 where it helps, k=2 otherwise). Class-avg panels = mean
+of all subtomograms in that predicted cluster; GT majority label and count annotated. Confusion matrix rows
+= all GT classes (class_B / class_C / junk); columns = predicted clusters. ARI is signal-only (B vs C).
+
+| Package | Best ARI (signal) | Acc | Class Avgs (predicted clusters) | Confusion | Notes |
+|---|---|---|---|---|---|
+| [DISCA](disca/) | ✅ **0.812** (k=3) | 0.957 | <img src="figures/T3SS/disca_class_avgs.png" width="420"> | <img src="../outputs/T3SS/disca/confusion_disca_t3ss.png" width="280"> | **BEST** — CNN detects IM-ring presence/absence; immune to registration wall; 229/106/80; k=2 ARI=0.720 |
+| [PEET](peet/) | ✅ **0.083** (k=3 pc1_10) | 0.455 | <img src="figures/T3SS/peet_class_avgs.png" width="420"> | <img src="../outputs/T3SS/peet/confusion_peet_t3ss.png" width="280"> | WMD-PCA; best PCA method; marginal separation; split 287/71/57; k=2 ARI=0.069 |
+| [OPUS-TOMO](opusTomo/) | ✅ **0.041** (k=3) | 0.441 | <img src="figures/T3SS/opus_class_avgs.png" width="420"> | <img src="../outputs/T3SS/opus/confusion_opus_t3ss.png" width="280"> | VAE latent; k=3 slight improvement over k=2 (−0.013); split 251/83/81 |
+| [STOPGAP](STOPGAP/) | ✅ **0.025** (k=3) | 0.665 | <img src="figures/T3SS/stopgap_class_avgs.png" width="420"> | <img src="../outputs/T3SS/stopgap/confusion_stopgap_t3ss.png" width="280"> | eigenfac PCA k-means; split 186/148/81; k=2 ARI=0.020 |
+| [RELION](relion/) | ✅ **0.014** (k=3) | 0.506 | <img src="figures/T3SS/relion_class_avgs.png" width="420"> | <img src="../outputs/T3SS/relion/confusion_relion_t3ss.png" width="280"> | soft-EM near-collapse; split 380/35; k=2 ARI=0.000 |
+| [PyTom](PyTom/) | ✅ **0.009** (k=3) | 0.422 | <img src="figures/T3SS/pytom_class_avgs.png" width="420"> | <img src="../outputs/T3SS/pytom/confusion_pytom_t3ss.png" width="280"> | FRM with `-a` flag + cylinder mask; split 176/120/119; k=2 ARI=0.005 |
+| [Dynamo](dynamo/) | ✅ **0.000** (k=2) | 0.427 | <img src="figures/T3SS/dynamo_class_avgs.png" width="420"> | <img src="../outputs/T3SS/dynamo/confusion_dynamo_t3ss.png" width="280"> | dpkpca collapsed; unimodal PCA landscape; split 215/200 |
+| [EMAN2](eman2/) | ✅ **0.000** (k=3) | — | — | — | k=3 only (junk protocol); all particles → one class; no prediction CSV |
+| [TomoFlow](tomoflow/) | ✅ **0.000** (k=2) | 0.518 | <img src="figures/T3SS/tomoflow_class_avgs.png" width="420"> | <img src="../outputs/T3SS/tomoflow/confusion_tomoflow_t3ss.png" width="280"> | OF features collapse at 24³ (downsample=2); all 415 → single cluster |
+| [ProTomo](protomo/) | ✅ **−0.032** (k=2) | 0.405 | <img src="figures/T3SS/protomo_class_avgs.png" width="420"> | <img src="../outputs/T3SS/protomo/confusion_protomo_t3ss.png" width="280"> | SVD+HAC; split 348/67; k=2 only |
+
+> **Registration wall confirmed on T3SS (9/10 packages):** GT-pose synthetic particles mis-register WBP
+> reconstructions, collapsing PCA eigenspectrum. Only DISCA (CNN, no pre-registration step) escapes the
+> wall — and succeeds strongly (ARI=0.812) because the IM-ring presence/absence is a gross structural
+> difference detectable at 48³ resolution. This mirrors the FM_easy finding: DISCA leads on large-signal
+> datasets, all PCA methods collapse on synthetic data. See `fm-easy-registration-is-the-gap.md`.
+>
+> **Supervised ceiling:** logistic regression on masked-PCA features → ARI ≈ 0.95 signal-only (B vs C,
+> the structures differ by an entire ring tier). The signal IS learnable; only registration blocks PCA methods.
 >
 > **Run protocol:** GT labels at `~/Research/synthetic_sta/injectisome/subtomos/merged_BC_t3ss/labels.csv`.
 > Prediction CSVs → `outputs/T3SS/<pkg>/`; mask → `~/Research/synthetic_sta/injectisome/maps/mask_t3ss.mrc`.
+> Figures generated by `scripts/eval/gen_t3ss_figures.py`.
 
 ---
 

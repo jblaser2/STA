@@ -57,53 +57,43 @@ file first. Do not infer protocol from individual package READMEs — those may 
   "easy tier." Old 3-class results archived in `outputs/FM_easy/_archive_3class_k3/` and
   `results/_archive_motor_easy_3class_scores.csv`.
 
-### FM_hard (Synthetic) — BUILT 2026-06-17 (3-class assembly intermediates)
+### T3SS Injectisome (Synthetic) — BUILT 2026-06-30 (2-class + junk, structurally distinct complex)
 
-<img src="../packages/figures/FM_hard/header_maps_and_avgs.png" width="780">
+<img src="../packages/figures/T3SS/header_maps_and_avgs.png" width="780">
 
-*Top = the 3 clean source class maps; bottom = the GT subtomo averages (central slice, dark = density).
-The inside-out assembly progression: base = one band (C/MS-ring) → basal_body adds the P-ring tier →
-mature adds the L-ring/bulb cap.*
+*Left = source maps (class_B = full injectisome base, class_C = IM ring absent); right = GT subtomo
+averages (central slice, dark = density). The structural difference is at the cytoplasmic base.*
 
-- **Particles:** 813 (271 base + 271 basal_body + 271 mature), 96³ box, 13.329 Å/px
-- **Source:** ETSimulations → IMOD WBP → extraction at GT orientation, **×6 model contrast**
-  (same imaging as FM_easy; built from EMD-5311 via axial-truncation cuts).
-- **Biology:** Flagellar-motor **inside-out assembly intermediates** (3 stages; grounded in in-situ
-  cryo-ET of motor assembly — PMC6627242, EMBO 2021 transient-ring paper):
-  - **base** — C-ring + MS-ring (cytoplasmic inner-membrane sub-complex). Earliest stage.
-  - **basal_body** — base + proximal rod + P-ring (+ partial L-ring) in periplasm, **no hook**.
-  - **mature** — full motor incl. rod + hook + periplasmic bulb (= FM_easy's mature/A class).
-  A monotonic *nested additive* series: each stage adds the next axial tier going inside-out.
-  `base` ≡ FM_easy's C and `mature` ≡ FM_easy's A (same maps/frame) → directly comparable.
-- **Why "slightly harder than FM_easy":** FM_easy is the two *extremes* of this axis (base vs mature,
-  gross/disjoint). Inserting the real middle stage creates two *adjacent subtle-addition* pairs
-  (base↔basal_body = +P-ring; basal_body↔mature = +bulb) that are harder, while base↔mature stays
-  as the recoverable diagonal anchor. Difficulty comes from the 3rd class, **not** degraded contrast.
-- **Contrast / SNR:** ×6 → measured SNR **0.299** (FM_easy ×6 was 0.34; production 0.21).
-- **Reference ceilings (on this set, balanced 271×3):** blind masked-PCA k=3 ARI ≈ **0.07**;
-  supervised 5-fold 3-way ceiling ARI **0.472 / 78% acc**. Pairwise supervised ceilings:
-  base↔mature **0.752** (= FM_easy A–C 0.745, pipeline cross-check ✓), base↔basal_body **0.611**,
-  basal_body↔mature **0.347** (the bottleneck — the wedge-sensitive +bulb step).
-- **Canonical input:** `~/Research/synthetic_sta/motor_hard/subtomos/merged_ABC_full/`
-  (813 GT-aligned MRCs + `labels.csv`; local, not in repo).
-- **Ground truth:** Known per-particle labels (`merged_ABC_full/labels.csv`). Use ARI / AMI / V-measure.
-- **Alignment:** Particles extracted at ground-truth orientation (identity pose). No alignment step.
-- **Missing wedge:** ±60°/3°/41 tilts (see §Missing Wedge). No correction needed.
-- **Junk class:** None (all 813 are valid class members; a junk variant may be added later).
-- **Mask:** data-driven 3-class difference mask `maps/diff_mask_hard.mrc` (between-class variance of
-  the GT averages, top ~1% voxels dilated+softened; ~6% of box). Local; regenerate via `classify_hard.py`.
-- **Pipeline (local, not repo):** `~/Research/synthetic_sta/motor_hard/` — `make_variants_hard.py`
-  (3 maps, UC2=60 balances the adjacent L2 steps), `run_full.sh` (3 classes × runs 01–08,
-  self-contained inputs under `motor_hard/inputs/`), `classify_hard.py` (GT-align → merged_ABC_full +
-  GT averages + mask + calibration). Sim config = clean `inputs/sim_clean.txt` (sim_13A + dose 5000).
-
-### FM_switch (Synthetic) — *Borrelia* CCW/CW rotational switch (= the dataset formerly slotted as "FM_hard")
-
-- **Biology:** *Borrelia burgdorferi* flagellar motor CCW ↔ CW switching (EMD-21884 / EMD-21886).
-- **Classes:** ccw / cw / junk (208 / 208 / 35 = 451), 160³ box, **5 Å/px** (FliG shift is sub-pixel
-  at 13.33 Å/px). See memory [[motor-switch-dataset-design]].
-- **Status:** Simulated + partially run (RELION GT-seeded 0.379 / PEET 0.007 / Dynamo −0.001 — very hard).
-  Tracked separately from the FM_hard assembly set above; see STATUS.md.
+- **Particles:** 415 total — 215 class_B + 120 class_C + 80 junk, **48³ box, 13.33 Å/px**
+- **Source:** ETSimulations → IMOD WBP → particle extraction at GT orientation, **AMP=1.5**
+  (higher than FM_easy because EMD-8544 needs AMP=1.5 to reach usable SNR; see memory
+  `etsim-t3ss-amp-calibration.md`). Based on EMD-8544 (Hu et al. 2017 Cell).
+- **Biology:** T3SS injectisome sorting-platform presence/absence:
+  - **class_B** (215p): IM ring + cytoplasmic sorting platform + ATPase present (full assembled base)
+  - **class_C** (120p): IM ring absent (partially assembled; sorting platform missing)
+  - **junk** (80p): background noise boxes (no structure)
+  The class difference is a full ring-tier presence/absence — larger structural signal than FM_easy's
+  axial truncation, but a completely different fold (six-fold cytoplasmic cage vs flagellar motor).
+- **Why this dataset:** provides structural/geometric diversity beyond flagellar motors. All three
+  prior synthetic datasets (FM_easy, FM_hard, FM_switch) used EMD-5311 variants; T3SS is an
+  independent complex with different symmetry and spatial arrangement.
+- **Contrast / SNR:** AMP=1.5 → estimated SNR ~0.25 (class_C harder — fewer structural features).
+- **Reference ceilings (signal only, class_B vs class_C):** supervised logistic regression
+  ARI ≈ **0.95**; blind DISCA (best package) k=3 ARI = **0.812** — large enough signal that the
+  CNN recovers it. All PCA methods collapse (registration wall, same as FM_easy).
+- **Canonical input:** `~/Research/synthetic_sta/injectisome/subtomos/merged_BC_t3ss/`
+  (415 GT-aligned MRCs + `labels.csv`; local, not in repo).
+- **Ground truth:** per-particle labels in `merged_BC_t3ss/labels.csv` (class_B / class_C / junk).
+  ARI is scored on signal particles only (class_B + class_C, **excluding junk**).
+- **Alignment:** Particles extracted at ground-truth orientation. No alignment step.
+- **Missing wedge:** ±60°/3°/41 tilts. No correction needed.
+- **Junk class:** Yes — 80 background-noise boxes. Protocol: k=3 where the package can isolate
+  a third class; ARI always scored on B vs C signal only.
+- **Mask:** Cylinder `mask_t3ss.mrc` — R=20, ZC=24, XC=24, Y=[2,27] in 48³ box (~18% of box).
+  Local: `~/Research/synthetic_sta/injectisome/maps/mask_t3ss.mrc`.
+- **Pipeline (local, not repo):** `~/Research/synthetic_sta/injectisome/` — `make_variants_t3ss.py`
+  (3 maps from EMD-8544 axial cuts), `run_full.sh` (3 classes × 8 runs), `classify_t3ss.py`
+  (GT-align → merged_BC_t3ss + GT averages + mask + calibration). Sim config in `inputs/sim_clean.txt`.
 
 ### T4SS (Real, Planned)
 
@@ -135,14 +125,14 @@ mature adds the L-ring/bulb cap.*
 
 ### Per-Dataset Parameters
 
-| Parameter | T4P | FM_easy | FM_hard | T4SS |
-|-----------|-----|---------|---------|------|
-| **k (reported)** | 2 | 2 | 3 | TBD |
-| **k (total in run)** | 3 (2 signal + 1 junk) | 2 (no junk) | 3 (3 signal, no junk) | TBD |
-| **Mask** | Cylindrical v2 (see below) | A-vs-C diff sphere `diff_sphere_r23_y55.mrc` | 3-class diff mask `diff_mask_hard.mrc` | TBD |
+| Parameter | T4P | FM_easy | T3SS | T4SS |
+|-----------|-----|---------|------|------|
+| **k (reported)** | 2 | 2 | 2 (signal B vs C) | TBD |
+| **k (total in run)** | 3 (2 signal + 1 junk) | 2 (no junk) | 3 (2 signal + 1 junk) | TBD |
+| **Mask** | Cylindrical v2 (see below) | A-vs-C diff sphere `diff_sphere_r23_y55.mrc` | Cylinder `mask_t3ss.mrc` (R=20, Y=[2,27], 48³) | TBD |
 | **Alignment** | None | None | None | None |
 | **Missing wedge correction** | No | No | No | No |
-| **Junk class** | Yes | No | No | TBD |
+| **Junk class** | Yes | No | Yes (80 junk) | TBD |
 
 **Cylindrical mask v2 (T4P canonical):**
 - Radius: 13 voxels (~173 Å) in XZ plane
@@ -198,8 +188,8 @@ The mapping is `idx → sorted(glob("aligned_tom*.mrc"))[idx]` — verified from
 
 For T4P: one class is designated junk and excluded from all downstream scoring
 (cross-package ARI, FSC, visual inspection). Junk particles are typically lower-quality,
-edge-affected, or structurally ambiguous particles. (FM_easy and FM_hard have **no** junk class —
-all particles are valid; a junk variant may be added to both later.)
+edge-affected, or structurally ambiguous particles. (FM_easy has **no** junk class — all 542
+particles are valid. T3SS has 80 junk background-noise boxes; ARI is always scored signal-only.)
 
 ### Per-package junk status (T4P)
 
