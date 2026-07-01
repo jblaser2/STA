@@ -58,7 +58,7 @@ Class-average panels below use XY central slice only; particle counts labeled. A
 | [RELION](relion/) | ✅ (exhausted) | 672/0 | cyl v2 | **No** | — | Algorithm-level SNR failure; all configs collapse |
 | [EMAN2](eman2/) | ✅ | 270/317 (+85 junk ✅) | auto-tight | **No** | <img src="figures/T4P/eman2_class_avgs_std.png" width="340"> | k=3 + `--clean`; junk = PCA outliers. Does not separate phases. std CSV: `eman2_k3_std.csv` (index→filename mapping applied) |
 | [DISCA](disca/) | ✅ | **315/267** (+90 junk ✅) | cyl v2 | **No** | <img src="figures/T4P/disca_k3_class_avgs_std.png" width="340"> | k=3 cyl v2; junk=90p; contrast-axis split (ARI≈0 vs converging pkgs); std CSV: `disca_k3_std.csv` |
-| [TomoFlow](tomoflow/) | 🟡 | — (old run) | none | **No** | <img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="340"> | Unimodal; k=3 canonical run needed |
+| [TomoFlow](tomoflow/) | ✅ | 403/269 masked (k=2) | cyl v2 (**mask confirms no help**) | **No** | <img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="340"> | Unimodal landscape both masked and unmasked; CC=0.970 masked (class avgs shown are masked run) |
 | [ProTomo](protomo/) | ✅ | 334/212 (+126 junk ✅) | none | **Yes** | <img src="figures/T4P/protomo_class_avgs_std.png" width="340"> | CC=0.943; junk extracted via `--include-junk` flag; std CSV: `protomo_k3_std.csv` |
 | [STOPGAP](STOPGAP/) | 🟡 | PCA 336/336 · MRA **70/602** (k=2) | cyl **r=8/h=26** (≠ v2) | **No** | <img src="STOPGAP/T4P/results/meta/class_pca_class_avg_k2.png" width="340"> | Eben's; **mask differs from canonical v2** (r=8 vs r=13); **no per-particle class CSV** — only PCA eigenfactors |
 
@@ -106,9 +106,15 @@ Full-size class averages for every package. Each panel = XY central slice of the
 
 <img src="figures/T4P/disca_k3_class_avgs_std.png" width="900">
 
-**TomoFlow** — unimodal landscape; k=2 run only, does not separate the two phases
+**TomoFlow** — unimodal landscape; masked re-run (ORC SLURM, 2026-07-01) confirms masking does not help.
+k=2 unmasked: 638/34 (CC=0.840) → k=2 masked: 403/269 (CC=0.970). Higher CC = class averages more similar with mask.
+Figures below show the **masked run** (cylindrical mask v2).
 
 <img src="tomoflow/T4P/results/tomoflow_k2_classes.png" width="700">
+
+k=3 masked (149/402/121, CC=0.934–0.960):
+
+<img src="tomoflow/T4P/results/tomoflow_k3_classes.png" width="700">
 
 **STOPGAP** — PCA k=2 split 336/336 (equal halves of a continuous PC axis; Eben's run; mask differs from canonical v2)
 
