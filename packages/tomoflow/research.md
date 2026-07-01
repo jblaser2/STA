@@ -108,10 +108,11 @@ and DISCA — **five general-purpose packages now miss the two-phase split that 
 ([[dynamo]] = reference). The OF descriptor here is dominated by a continuous noise/missing-wedge
 axis rather than the (apparently subtle) phase difference.
 
-**Caveats / next:** native 80³ should be enough spatial detail, so the miss is not a sampling-floor
-issue (unlike DISCA's 32³). Worth trying: OF with a phase-aware mask (focus on the helical lattice),
-or a non-OF reference; and the **ETSimulations** synthetic two-class set to confirm TomoFlow *can*
-separate a known phase difference when one exists.
+**Masked run (2026-07-01, ORC SLURM job 12460059):** Re-run with cylindrical mask v2 applied to
+all particles before OF computation. Result: k=2 → 403/269 (more balanced than 638/34 without
+mask), but inter-class CC **increases** 0.840 → 0.970 — the mask removes the solvent outlier
+signal, but the remaining structural landscape is even more unimodal. **The mask does not help.**
+Final verdict: TomoFlow is **collapsed** on T4P regardless of masking configuration.
 
 ## 6. Files
 

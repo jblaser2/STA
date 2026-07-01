@@ -59,7 +59,7 @@ PKGS = [
          note="16 / 656\nsoft-EM smooths signal away\n(ARI≈0 on FM_easy too)"),
     # TomoFlow: no per-particle CSV; class sizes only
     dict(name="TomoFlow", csv=None,                 cat="collapsed",
-         note="638 / 34  (k=2)\n95% one class; no per-particle output"),
+         note="638/34 unmasked → 403/269 masked (k=2)\nCC=0.970 masked; landscape unimodal\nno per-particle output"),
 ]
 
 CAT_COLOR = {
