@@ -39,9 +39,10 @@ completely orthogonal to the structural axis.
 
 ## Conclusion
 
-The masked PCA landscape is bimodal (two separated blobs in PC1) but the separation axis
-corresponds to a **noise/missing-wedge axis**, not the ring_complete/ring_altered structural
-axis. ARI ≈ 0 vs all structural references confirms the split is degenerate. The mask removes
-the outlier/solvent signal driving the 95%/5% unmasked split, but the remaining landscape
-captures only noise. TomoFlow **cannot recover the T4P phase split** in either configuration.
-Finalized as **collapsed** in the benchmark.
+The masked PCA landscape is bimodal (two separated blobs in PC1). ARI ≈ 0 vs structural
+references (Dynamo, PEET), but **ARI = 1.000 vs DISCA, 0.993 vs EMAN2, 0.887 vs OPUS** —
+TomoFlow's masked OF landscape finds the same contrast/intensity axis as the non-structural
+group. The mask removes the outlier/solvent signal driving the 95%/5% unmasked collapse;
+what remains is a real but biologically uninformative contrast split shared with DISCA/EMAN2.
+Finalized as **non-structural** in the benchmark (reclassified from "collapsed" on evidence
+of cross-package ARI with the non-structural group).

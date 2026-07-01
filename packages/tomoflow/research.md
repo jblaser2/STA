@@ -109,12 +109,12 @@ and DISCA — **five general-purpose packages now miss the two-phase split that 
 axis rather than the (apparently subtle) phase difference.
 
 **Masked run (2026-07-01, ORC SLURM job 12460059):** Re-run with cylindrical mask v2 applied.
-Result: k=2 → 403/269 (more balanced than 638/34 unmasked), inter-class CC **increases**
-0.840 → 0.970. The PCA landscape is bimodal (two separated clusters in PC1), but ARI vs Dynamo
-= **-0.001** (ARI vs PEET = +0.001) — both TomoFlow clusters have the same ~66/34 Dynamo ratio
-as the population base rate. The bimodal axis is a **noise/missing-wedge axis**, not the
-structural axis. The mask does not help. Final verdict: TomoFlow is **collapsed** on T4P
-regardless of masking configuration.
+Result: k=2 → 403/269. ARI vs Dynamo = **-0.001**, but cross-package comparison reveals:
+**ARI = 1.000 vs DISCA, 0.993 vs EMAN2, 0.887 vs OPUS**. The masked optical-flow landscape
+captures the same contrast/intensity axis as the non-structural group — not the conformational
+axis. Reclassified: TomoFlow is **non-structural** on T4P (not collapsed). The OF descriptor
+is sensitive to contrast/missing-wedge variation, consistent with the bimodal PC1 split that
+is real but biologically uninformative for conformational classification.
 
 ## 6. Files
 

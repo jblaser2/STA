@@ -33,7 +33,7 @@ tight cylindrical). See `docs/datasets.md` for junk class handling per package.
 
 <img src="figures/T4P/all_pkg_grid.png" width="900">
 
-Three failure modes are visible in the grid. (1) **Converging** (green, top-left block): Dynamo/PEET/PyTom/ProTomo agree with each other at ARI 0.40–0.65 — 4 independent algorithms finding the same structural split. (2) **Non-structural split** (orange, middle block): DISCA/OPUS/EMAN2 agree *with each other* at ARI 0.88–1.00 but show ARI≈0 against the converging group — they find the same contrast/intensity axis, which is reproducible but biologically different from the conformational split. STOPGAP finds no discrete gap (continuous PCA axis, ARI≈0 against all). (3) **Collapsed** (red): RELION soft-EM (16/656) and TomoFlow (collapsed; ARI≈0 vs Dynamo on both masked and unmasked runs) produce degenerate partitions; RELION is shown in the grid. See `docs/benchmarkIdeas.md §12` for the full no-GT evidence chain.
+Three failure modes are visible in the grid. (1) **Converging** (green, top-left block): Dynamo/PEET/PyTom/ProTomo agree with each other at ARI 0.40–0.65 — 4 independent algorithms finding the same structural split. (2) **Non-structural split** (orange, middle block): DISCA/OPUS/EMAN2 agree *with each other* at ARI 0.88–1.00 but show ARI≈0 against the converging group — they find the same contrast/intensity axis, which is reproducible but biologically different from the conformational split. STOPGAP finds no discrete gap (continuous PCA axis, ARI≈0 against all). (3) **Collapsed** (red): RELION soft-EM (16/656) produces a degenerate partition; RELION is shown in the grid. See `docs/benchmarkIdeas.md §12` for the full no-GT evidence chain.
 
 **Deep-dive: 4 converging packages** (`scripts/eval/gen_cross_pkg_correlation.py`):
 
@@ -58,7 +58,7 @@ Class-average panels below use XY central slice only; particle counts labeled. A
 | [RELION](relion/) | ✅ (exhausted) | 672/0 | cyl v2 | **No** | — | Algorithm-level SNR failure; all configs collapse |
 | [EMAN2](eman2/) | ✅ | 270/317 (+85 junk ✅) | auto-tight | **No** | <img src="figures/T4P/eman2_class_avgs_std.png" width="340"> | k=3 + `--clean`; junk = PCA outliers. Does not separate phases. std CSV: `eman2_k3_std.csv` (index→filename mapping applied) |
 | [DISCA](disca/) | ✅ | **315/267** (+90 junk ✅) | cyl v2 | **No** | <img src="figures/T4P/disca_k3_class_avgs_std.png" width="340"> | k=3 cyl v2; junk=90p; contrast-axis split (ARI≈0 vs converging pkgs); std CSV: `disca_k3_std.csv` |
-| [TomoFlow](tomoflow/) | ✅ | 403/269 masked (k=2) | cyl v2 (**mask confirms no help**) | **No** | <img src="figures/T4P/tomoflow_class_avgs_std.png" width="340"> | Bimodal PC1 but ARI=-0.001 vs Dynamo — split on noise/wedge axis. CC=0.970 masked. |
+| [TomoFlow](tomoflow/) | ✅ | 403/269 masked (k=2) | cyl v2 | **No** | <img src="figures/T4P/tomoflow_class_avgs_std.png" width="340"> | **Non-structural**: ARI=1.00 vs DISCA, 0.99 vs EMAN2 — OF finds contrast/intensity axis, not conformation |
 | [ProTomo](protomo/) | ✅ | 334/212 (+126 junk ✅) | none | **Yes** | <img src="figures/T4P/protomo_class_avgs_std.png" width="340"> | CC=0.943; junk extracted via `--include-junk` flag; std CSV: `protomo_k3_std.csv` |
 | [STOPGAP](STOPGAP/) | 🟡 | PCA 336/336 · MRA **70/602** (k=2) | cyl **r=8/h=26** (≠ v2) | **No** | <img src="STOPGAP/T4P/results/meta/class_pca_class_avg_k2.png" width="340"> | Eben's; **mask differs from canonical v2** (r=8 vs r=13); **no per-particle class CSV** — only PCA eigenfactors |
 
@@ -106,8 +106,8 @@ Full-size class averages for every package. Each panel = XY central slice of the
 
 <img src="figures/T4P/disca_k3_class_avgs_std.png" width="900">
 
-**TomoFlow** — bimodal PC1 landscape (masked run), but **ARI=-0.001 vs Dynamo** — the split axis is noise/missing-wedge, not structural.
-k=2 unmasked: 638/34 (CC=0.840) → k=2 masked: 403/269 (CC=0.970, ARI≈0). Collapsed in both configurations.
+**TomoFlow** — masked run (ORC, 2026-07-01): k=2 → 403/269. ARI=-0.001 vs Dynamo but **ARI=1.000 vs DISCA / 0.993 vs EMAN2 / 0.887 vs OPUS** —
+optical flow captures the same contrast/intensity axis as the non-structural group, not the conformational axis.
 
 <img src="figures/T4P/tomoflow_class_avgs_std.png" width="900">
 

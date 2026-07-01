@@ -2,7 +2,7 @@
 
 **Algorithm:** ContinuousFlex optical-flow-based conformational classification  
 **Environment:** `tomoflow` conda env  
-**Status:** ✅ T4P k=2 complete (unimodal landscape) · ✅ FM_easy 2-class hc k=2 (ARI=0.036, collapses)
+**Status:** ✅ T4P k=2 complete (non-structural; ARI=1.00 vs DISCA, 0.99 vs EMAN2) · ✅ FM_easy 2-class hc k=2 (ARI=0.036)
 
 ---
 
@@ -11,15 +11,15 @@
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
 | **T4P** (unmasked) | ✅ | k=2,3,4 | none | — (no GT) | — | Unimodal; k=2 → 638/34 (95%:5%), CC=0.840 |
-| **T4P** (masked, 2026-07-01) | ✅ | k=2,3,4 | cyl v2 | **ARI≈0 vs Dynamo** | — | **Mask does not help**: k=2 → 403/269, CC=0.970. PCA landscape is bimodal but ARI=-0.001 vs Dynamo — split is on noise/wedge axis, not structural. |
+| **T4P** (masked, 2026-07-01) | ✅ | k=2,3,4 | cyl v2 | **ARI=1.00 vs DISCA** | — | k=2 → 403/269. ARI=-0.001 vs Dynamo but **1.000 vs DISCA, 0.993 vs EMAN2, 0.887 vs OPUS** — OF finds the same contrast/intensity axis as the non-structural group. |
 | **FM_easy** (2-class hc, 542p) | ✅ | k=2 / k=2 | diff sphere (input) | **0.036** | 462/80 | OF landscape collapses (unimodal), as on T4P. Run at downsample 3 (32³) — native 96³ ≈7 hrs and result is collapse regardless. Confusion: `outputs/FM_easy/tomoflow/` |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 
-> T4P masked run on ORC (SLURM, P100): job 12460059, `~/Research/tomoflow_orc/`. Mask removes
-> outlier/solvent signal driving the 95%/5% split; landscape is bimodal in PC1 but ARI vs Dynamo
-> = -0.001 — the bimodal axis is noise/missing-wedge, not structural. CC goes UP (0.840→0.970).
-> Conclusion: TomoFlow cannot find the T4P phase split with or without masking.
+> T4P masked run on ORC (SLURM, P100): job 12460059, `~/Research/tomoflow_orc/`. k=2 → 403/269.
+> ARI vs Dynamo = -0.001, but **ARI=1.000 vs DISCA, 0.993 vs EMAN2, 0.887 vs OPUS** — the masked
+> OF landscape finds the same contrast/intensity axis as the non-structural group. Reclassified
+> from "collapsed" to **non-structural** in the benchmark.
 
 ---
 
@@ -36,7 +36,7 @@
 
 ## Next Steps
 
-- T4P: masking confirmed to not help — result finalized as "collapsed" (unimodal landscape).
+- T4P: finalized as **non-structural** — OF finds contrast/intensity axis (ARI=1.00 vs DISCA, 0.99 vs EMAN2), not the structural axis.
 - FM_easy: run k=3 when bandwidth allows (lower priority).
 
 ---

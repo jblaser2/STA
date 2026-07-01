@@ -52,14 +52,13 @@ PKGS = [
          note="368 / 221 / 83 junk\ncontrast axis (confirmed FM_easy)"),
     dict(name="EMAN2",    csv="eman2_k3_std.csv",   cat="non_structural",
          note="317 / 270 / 85 junk\ncontrast axis (confirmed FM_easy)"),
+    dict(name="TomoFlow", csv="tomoflow_k2_std.csv", cat="non_structural",
+         note="403/269 masked (k=2)\nARI=1.00 vs DISCA, 0.99 vs EMAN2\ncontrast/OF axis"),
     dict(name="STOPGAP",  csv="stopgap_k2_std.csv", cat="non_structural",
          note="385 / 287\nno discrete gap in PCA space"),
     # --- Collapsed: degenerate partition (1 dominant class) ---
     dict(name="RELION",   csv="relion_k2_std.csv",  cat="collapsed",
          note="16 / 656\nsoft-EM smooths signal away\n(ARI≈0 on FM_easy too)"),
-    # TomoFlow: no per-particle CSV; class sizes only
-    dict(name="TomoFlow", csv=None,                 cat="collapsed",
-         note="638/34 unmasked → 403/269 masked (k=2)\nCC=0.970; ARI vs Dynamo=-0.001\nbimodal PC1 but on noise axis\nno per-particle output"),
 ]
 
 CAT_COLOR = {
@@ -203,9 +202,9 @@ def main():
     cbar.ax.tick_params(labelsize=7)
 
     ax_grid.set_title(
-        "T4P — Pairwise ARI: all packages with per-particle output\n"
+        "T4P — Pairwise ARI: all 10 packages\n"
         "(junk class excluded; ARI on non-junk intersection per pair)\n"
-        "Key finding: DISCA/OPUS/EMAN2 agree with each other (ARI 0.88–1.00) but not "
+        "Key finding: DISCA/OPUS/EMAN2/TomoFlow agree (ARI 0.88–1.00) but not "
         "with converging packages (ARI ≈ 0) — different axes, not the same split.",
         fontsize=9, pad=8
     )
@@ -238,7 +237,7 @@ def main():
         "■  Non-structural split (orange): partition produced, but on contrast / intensity / no-gap PCA axis — "
         "confirmed by FM_easy confusion matrices (no diagonal at known GT).\n"
         "■  Collapsed (red): output is a degenerate 1- or near-1-class partition. "
-        "RELION soft-EM and TomoFlow both collapse even when GT-seeded on FM_easy.\n"
+        "RELION soft-EM (16/656) — soft-EM smooths all signal away.\n"
         "ARI = 0 means no agreement beyond chance; ARI = 1 means identical assignments. "
         "Near-zero ARI between converging and non-structural packages is expected — "
         "they are finding different structure, not the same one."
