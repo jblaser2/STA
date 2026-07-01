@@ -183,6 +183,19 @@ PACKAGES = [
              "from_particles": STD_DIR / "opus_k2_std.csv"},
         ],
     },
+    {
+        "name": "TomoFlow",
+        "key": "tomoflow",
+        "k": 2,
+        "converged": False,
+        "note": "masked; ARI≈0 vs Dynamo — noise axis",
+        "classes": [
+            {"class_int": 0, "label": "class_0", "n": 403,
+             "mrc": REPO / "outputs/T4P/tomoflow/tomoflow_k2_class0_avg.mrc"},
+            {"class_int": 1, "label": "class_1", "n": 269,
+             "mrc": REPO / "outputs/T4P/tomoflow/tomoflow_k2_class1_avg.mrc"},
+        ],
+    },
 ]
 
 
