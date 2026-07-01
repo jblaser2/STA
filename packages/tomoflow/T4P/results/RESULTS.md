@@ -18,10 +18,30 @@
 | 3 | 149 (22%), 402 (60%), 121 (18%) | 0.934–0.960 |
 | 4 | 225 (33%), 130 (19%), 178 (26%), 139 (21%) | 0.933–0.947 |
 
+## Cross-package ARI (masked run, k=2)
+
+ARI computed against Dynamo k=2 assignments (447 ring_complete / 225 ring_altered):
+
+| Reference package | n shared | ARI |
+|---|---|---|
+| Dynamo k=2 | 672 | **-0.001** |
+| PEET k=3 (non-junk) | 604 | **+0.001** |
+
+Cross-tabulation vs Dynamo (TomoFlow rows × Dynamo cols):
+
+|  | Dynamo class 1 | Dynamo class 2 |
+|---|---|---|
+| TomoFlow class 0 (n=269) | 179 (67%) | 90 (33%) |
+| TomoFlow class 1 (n=403) | 268 (66%) | 135 (34%) |
+
+Both TomoFlow clusters have the same ~66/34 ratio as the Dynamo marginal — the split is
+completely orthogonal to the structural axis.
+
 ## Conclusion
 
-The mask removes the solvent/outlier signal that was driving the 95%/5% collapse, producing a
-more balanced k=2 split (403/269). However, the inter-class CC actually **increases** from
-0.840 → 0.970, meaning the two class averages are nearly identical. The structural landscape
-is unimodal regardless of masking. TomoFlow cannot recover the T4P phase split in either
-configuration. Finalized as **collapsed** in the benchmark.
+The masked PCA landscape is bimodal (two separated blobs in PC1) but the separation axis
+corresponds to a **noise/missing-wedge axis**, not the ring_complete/ring_altered structural
+axis. ARI ≈ 0 vs all structural references confirms the split is degenerate. The mask removes
+the outlier/solvent signal driving the 95%/5% unmasked split, but the remaining landscape
+captures only noise. TomoFlow **cannot recover the T4P phase split** in either configuration.
+Finalized as **collapsed** in the benchmark.

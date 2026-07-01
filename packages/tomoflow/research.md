@@ -108,11 +108,13 @@ and DISCA — **five general-purpose packages now miss the two-phase split that 
 ([[dynamo]] = reference). The OF descriptor here is dominated by a continuous noise/missing-wedge
 axis rather than the (apparently subtle) phase difference.
 
-**Masked run (2026-07-01, ORC SLURM job 12460059):** Re-run with cylindrical mask v2 applied to
-all particles before OF computation. Result: k=2 → 403/269 (more balanced than 638/34 without
-mask), but inter-class CC **increases** 0.840 → 0.970 — the mask removes the solvent outlier
-signal, but the remaining structural landscape is even more unimodal. **The mask does not help.**
-Final verdict: TomoFlow is **collapsed** on T4P regardless of masking configuration.
+**Masked run (2026-07-01, ORC SLURM job 12460059):** Re-run with cylindrical mask v2 applied.
+Result: k=2 → 403/269 (more balanced than 638/34 unmasked), inter-class CC **increases**
+0.840 → 0.970. The PCA landscape is bimodal (two separated clusters in PC1), but ARI vs Dynamo
+= **-0.001** (ARI vs PEET = +0.001) — both TomoFlow clusters have the same ~66/34 Dynamo ratio
+as the population base rate. The bimodal axis is a **noise/missing-wedge axis**, not the
+structural axis. The mask does not help. Final verdict: TomoFlow is **collapsed** on T4P
+regardless of masking configuration.
 
 ## 6. Files
 

@@ -11,15 +11,15 @@
 | Dataset | Status | k (run / reported) | Mask | ARI | Split | Notes |
 |---------|--------|--------------------|------|-----|-------|-------|
 | **T4P** (unmasked) | ✅ | k=2,3,4 | none | — (no GT) | — | Unimodal; k=2 → 638/34 (95%:5%), CC=0.840 |
-| **T4P** (masked, 2026-07-01) | ✅ | k=2,3,4 | cyl v2 | — (no GT) | — | **Mask does not help**: k=2 → 403/269, CC=0.970 (more balanced split, but classes more similar). Landscape remains unimodal. |
+| **T4P** (masked, 2026-07-01) | ✅ | k=2,3,4 | cyl v2 | **ARI≈0 vs Dynamo** | — | **Mask does not help**: k=2 → 403/269, CC=0.970. PCA landscape is bimodal but ARI=-0.001 vs Dynamo — split is on noise/wedge axis, not structural. |
 | **FM_easy** (2-class hc, 542p) | ✅ | k=2 / k=2 | diff sphere (input) | **0.036** | 462/80 | OF landscape collapses (unimodal), as on T4P. Run at downsample 3 (32³) — native 96³ ≈7 hrs and result is collapse regardless. Confusion: `outputs/FM_easy/tomoflow/` |
 | **FM_hard** | ⬜ | — | — | — | — | Not yet run |
 | **T4SS** | ⬜ | — | — | — | — | Not yet run |
 
 > T4P masked run on ORC (SLURM, P100): job 12460059, `~/Research/tomoflow_orc/`. Mask removes
-> outlier/solvent signal driving the 95%/5% split, but the structural landscape is still unimodal —
-> CC goes UP (0.840→0.970) meaning class averages become more similar. Conclusion: TomoFlow
-> cannot find the T4P phase split with or without masking.
+> outlier/solvent signal driving the 95%/5% split; landscape is bimodal in PC1 but ARI vs Dynamo
+> = -0.001 — the bimodal axis is noise/missing-wedge, not structural. CC goes UP (0.840→0.970).
+> Conclusion: TomoFlow cannot find the T4P phase split with or without masking.
 
 ---
 
