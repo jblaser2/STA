@@ -248,18 +248,22 @@ SNR — i.e. the hardest particles are degraded reconstructions, not a particula
 blind package is trying to recover. Inside-out progression: base = one band (C/MS-ring), basal_body
 adds the P-ring tier, mature adds the L-ring/bulb cap.)*
 
-| Package | FM_hard k=3 ARI | Acc | Class Avgs | Best Confusion | Notes |
+**Perfect classification reference (ARI = 1.0) — what a confusion entry looks like at the top of the table:**
+
+<img src="figures/FM_hard/perfect_confusion.png" width="300">
+
+| Package | FM_hard k=3 ARI | Acc | Class Avgs (3 predicted clusters) | Best Confusion | Notes |
 |---|---|---|---|---|---|
-| [PEET](peet/) | ✅ **0.078** | — | _(pending)_ | _(pending)_ | pc1_5; near blind baseline (0.07); WMD-PCA |
-| [DISCA](disca/) | ✅ **0.014** | — | _(pending)_ | _(pending)_ | 32³ CNN too coarse for ~15-20Å assembly differences |
-| [Dynamo](dynamo/) | ✅ **-0.000** | — | _(pending)_ | _(pending)_ | dpkpca collapsed; registration wall |
-| [EMAN2](eman2/) | ✅ **0.008** | — | _(pending)_ | _(pending)_ | PCA split collapsed |
-| [ProTomo](protomo/) | ✅ **-0.001** | — | _(pending)_ | _(pending)_ | SVD+HAC collapsed 1/710/102 |
-| [TomoFlow](tomoflow/) | ✅ **0.223** | — | _(pending)_ | _(pending)_ | **Best on FM_hard!** Optical flow partially immune to registration wall; 313/400/100; 2.4h compute |
-| [PyTom](PyTom/) | ✅ **0.017** | — | _(pending)_ | _(pending)_ | FRM iter14; split 175/318/320; registration wall |
-| [RELION](relion/) | ✅ **0.000** | — | _(pending)_ | _(pending)_ | soft-EM collapsed (all class 2) |
-| [OPUS-TOMO](opusTomo/) | ✅ **0.017** | — | _(pending)_ | _(pending)_ | VAE collapsed |
-| [STOPGAP](STOPGAP/) | ✅ **0.013** | — | — | — | eigenfac PCA k-means; 240/260/313; collapsed |
+| [TomoFlow](tomoflow/) | ✅ **0.223** | 0.576 | <img src="figures/FM_hard/tomoflow_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/tomoflow/confusion_tomoflow_fm_hard_k3.png" width="280"> | **BEST** — optical flow immune to registration wall; split 400/313/100; 2.4h compute |
+| [PEET](peet/) | ✅ **0.078** | 0.534 | <img src="figures/FM_hard/peet_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/peet/confusion_peet_fm_hard_k3.png" width="280"> | pc1_5; near blind baseline (0.07); split 620/111/82; WMD-PCA |
+| [OPUS-TOMO](opusTomo/) | ✅ **0.017** | 0.395 | <img src="figures/FM_hard/opus_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/opus/confusion_opus_fm_hard_k3.png" width="280"> | VAE collapsed; split 360/231/222 |
+| [PyTom](PyTom/) | ✅ **0.017** | 0.389 | <img src="figures/FM_hard/pytom_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/pytom/confusion_pytom_fm_hard_k3.png" width="280"> | FRM iter14; split 320/318/175; registration wall |
+| [DISCA](disca/) | ✅ **0.014** | 0.383 | <img src="figures/FM_hard/disca_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/disca/confusion_disca_fm_hard_k3.png" width="280"> | 32³ CNN too coarse for ~15-20Å assembly differences; split 323/298/192 |
+| [STOPGAP](STOPGAP/) | ✅ **0.013** | 0.389 | <img src="figures/FM_hard/stopgap_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/stopgap/confusion_stopgap_fm_hard_k3.png" width="280"> | eigenfac PCA k-means; split 313/260/240 |
+| [EMAN2](eman2/) | ✅ **0.008** | 0.383 | <img src="figures/FM_hard/eman2_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/eman2/confusion_eman2_fm_hard_k3.png" width="280"> | PCA split collapsed; split 465/206/142 |
+| [RELION](relion/) | ✅ **0.000** | 0.333 | <img src="figures/FM_hard/relion_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/relion/confusion_relion_fm_hard_k3.png" width="280"> | soft-EM fully collapsed (all 813 → class 2) |
+| [Dynamo](dynamo/) | ✅ **-0.000** | 0.354 | <img src="figures/FM_hard/dynamo_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/dynamo/confusion_dynamo_fm_hard_k3.png" width="280"> | dpkpca collapsed; split 292/263/258; registration wall |
+| [ProTomo](protomo/) | ✅ **-0.001** | 0.335 | <img src="figures/FM_hard/protomo_class_avgs.png" width="420"> | <img src="../outputs/FM_hard/protomo/confusion_protomo_fm_hard_k3.png" width="280"> | SVD+HAC collapsed; split 710/102/1 |
 
 > **Run protocol:** k=3, no junk, mask = 3-class diff mask `diff_mask_hard.mrc`, no alignment step.
 > Canonical input `~/Research/synthetic_sta/motor_hard/subtomos/merged_ABC_full/` (+ `labels.csv`).
